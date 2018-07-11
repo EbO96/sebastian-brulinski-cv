@@ -74,4 +74,8 @@ class MainActivity : AppCompatActivity(),
     override fun electronicVersionClick() {
 
     }
+
+    override fun printCvClick() {
+
+    }
 }

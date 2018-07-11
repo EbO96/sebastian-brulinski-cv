@@ -15,6 +15,7 @@ class StartFragment : Fragment() {
     interface StartFragmentCallback {
         fun pdfVersionClick()
         fun electronicVersionClick()
+        fun printCvClick()
     }
 
     //Callback to parent activity
@@ -29,11 +30,15 @@ class StartFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         pdfVersionView.setOnClickListener {
-
+            startFragmentCallback.pdfVersionClick()
         }
 
         electronicVersionView.setOnClickListener {
+            startFragmentCallback.electronicVersionClick()
+        }
 
+        printCvButton.setOnClickListener {
+            startFragmentCallback.printCvClick()
         }
     }
 
