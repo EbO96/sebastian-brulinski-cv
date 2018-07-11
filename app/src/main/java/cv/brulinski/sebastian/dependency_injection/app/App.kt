@@ -3,7 +3,7 @@ package cv.brulinski.sebastian.dependency_injection.app
 import android.app.Application
 import cv.brulinski.sebastian.dependency_injection.component.AppComponent
 import cv.brulinski.sebastian.dependency_injection.module.AppModule
-import cv.brulinski.sebastian.dependency_injection.DaggerAppComponent
+import cv.brulinski.sebastian.dependency_injection.component.DaggerAppComponent
 
 class App : Application() {
 

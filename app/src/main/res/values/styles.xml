@@ -16,4 +16,12 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <!-- my_toolbar toolbar style. -->
+    <style name="MyToolbarStyle" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:textAppearance">@style/MyToolbarTextAppearance</item>
+    </style>
+
+    <style name="MyToolbarTextAppearance" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">@android:color/white</item>
+    </style>
 </resources>
