@@ -24,4 +24,23 @@
     <style name="MyToolbarTextAppearance" parent="TextAppearance.AppCompat">
         <item name="android:textColor">@android:color/white</item>
     </style>
+
+    <style name="MyCardViewStyle" parent="Base.CardView">
+        <item name="cardCornerRadius">@dimen/card_corners_radius</item>
+        <item name="cardElevation">@dimen/card_elevation</item>
+    </style>
+
+    <style name="MyFragmentRootLayoutStyle">
+        <item name="android:background">@color/colorPrimaryDark</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+
+    <style name="MyStartFragmentCardTitle" parent="TextAppearance.AppCompat">
+        <item name="android:textAlignment">gravity</item>
+        <item name="android:gravity">center_vertical|center_horizontal</item>
+        <item name="android:textSize">36sp</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:textColor">@color/colorAccent</item>
+    </style>
 </resources>

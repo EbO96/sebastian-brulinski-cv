@@ -12,7 +12,8 @@ import cv.brulinski.sebastian.utils.get
 import kotlinx.android.synthetic.main.activity_main.*
 import setBaseToolbar
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(),
+        StartFragment.StartFragmentCallback {
 
     //ViewPager adapter
     private lateinit var mainActivityViewPagerAdapter: MainActivityViewPagerAdapter
@@ -56,5 +57,21 @@ class MainActivity : AppCompatActivity() {
 
     private fun String.asToolbarTitle() {
         supportActionBar?.title = this
+    }
+
+    /*
+    VIEWPAGER FRAGMENTS CALLBACKS BELOW
+     */
+
+    /*
+    Start Fragment callbacks
+     */
+
+    override fun pdfVersionClick() {
+
+    }
+
+    override fun electronicVersionClick() {
+
     }
 }
