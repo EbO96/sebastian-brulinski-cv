@@ -1,4 +1,4 @@
-package cv.brulinski.sebastian.dependency_injection
+package cv.brulinski.sebastian.dependency_injection.scope
 
 import javax.inject.Qualifier
 
