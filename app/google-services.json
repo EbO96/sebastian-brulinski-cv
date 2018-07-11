@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "104601719679",
+    "firebase_url": "https://sebastian-brulinski-cv-app.firebaseio.com",
+    "project_id": "sebastian-brulinski-cv-app",
+    "storage_bucket": "sebastian-brulinski-cv-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:104601719679:android:313e558274039a71",
+        "android_client_info": {
+          "package_name": "cv.brulinski.sebastian"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "104601719679-1f4j0a7ci0ar1cj9r1mo1pvqpneqn0o9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "cv.brulinski.sebastian",
+            "certificate_hash": "393599e9874c6123a1bb003de3bd883b625f2d3c"
+          }
+        },
+        {
+          "client_id": "104601719679-m6pne0fghlrhfcgq1r83a8mj6074bqhc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBGe2LA4LgGkChU_1VWVVyr1xW3Nx8ytyE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "104601719679-m6pne0fghlrhfcgq1r83a8mj6074bqhc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
