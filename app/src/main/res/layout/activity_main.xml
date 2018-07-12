@@ -14,8 +14,9 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.viewpager.widget.ViewPager
+    <cv.brulinski.sebastian.view.MyViewPager
         android:id="@+id/viewPager"
+        app:enablePaging="false"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />

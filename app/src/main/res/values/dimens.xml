@@ -2,4 +2,5 @@
 <resources>
     <dimen name="card_corners_radius">2dp</dimen>
     <dimen name="card_elevation">2dp</dimen>
+    <dimen name="material_button_corners">4dp</dimen>
 </resources>

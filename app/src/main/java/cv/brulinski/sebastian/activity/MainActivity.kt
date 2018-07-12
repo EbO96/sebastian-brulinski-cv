@@ -1,14 +1,19 @@
 package cv.brulinski.sebastian.activity
 
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.viewpager.widget.ViewPager
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.adapter.MainActivityViewPagerAdapter
+import cv.brulinski.sebastian.adapter.MainActivityViewPagerAdapter.Companion.Page.START_SCREEN
+import cv.brulinski.sebastian.adapter.MainActivityViewPagerAdapter.Companion.Page.WELCOME_SCREEN
+import cv.brulinski.sebastian.adapter.MainActivityViewPagerAdapter.Companion.pageMap
 import cv.brulinski.sebastian.fragment.StartFragment
 import cv.brulinski.sebastian.fragment.WelcomeFragment
-import cv.brulinski.sebastian.utils.get
+import cv.brulinski.sebastian.utils.goTo
+import cv.brulinski.sebastian.utils.string
 import kotlinx.android.synthetic.main.activity_main.*
 import setBaseToolbar
 
@@ -22,7 +27,8 @@ class MainActivity : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        setBaseToolbar(title = R.string.start.get())
+        setBaseToolbar(title = R.string.start.string(), enableHomeButton = true)
+        homeButton(false)
 
         setupViewPager()
     }
@@ -33,12 +39,12 @@ class MainActivity : AppCompatActivity(),
             add(WelcomeFragment())
         }
         val pagesTitles = ArrayList<String>().apply {
-            add(R.string.start.get().apply { asToolbarTitle() })
-            add(R.string.welcome.get())
+            add(R.string.start.string().apply { asToolbarTitle() })
+            add(R.string.welcome.string())
         }
         viewPager.apply {
             mainActivityViewPagerAdapter = MainActivityViewPagerAdapter(fragments, pagesTitles, supportFragmentManager).apply { adapter = this }
-
+            offscreenPageLimit = fragments.size
             addOnPageChangeListener(viewPagerPageListener())
         }
     }
@@ -52,6 +58,7 @@ class MainActivity : AppCompatActivity(),
 
         override fun onPageSelected(position: Int) {
             mainActivityViewPagerAdapter.getPageTitle(position).asToolbarTitle()
+            viewPager.paging = false
         }
     }
 
@@ -72,10 +79,29 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun electronicVersionClick() {
-
+        homeButton(true)
+        viewPager goTo WELCOME_SCREEN
     }
 
     override fun printCvClick() {
 
+    }
+
+    private fun homeButton(enabled: Boolean = true) = supportActionBar?.apply {
+        setHomeButtonEnabled(enabled)
+        setDisplayHomeAsUpEnabled(enabled)
+        setDisplayShowHomeEnabled(enabled)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        return when (item?.itemId) {
+            android.R.id.home -> {
+                if (viewPager.toPrevious() == (pageMap[START_SCREEN] ?: 0)) {
+                    homeButton(false)
+                }
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 }

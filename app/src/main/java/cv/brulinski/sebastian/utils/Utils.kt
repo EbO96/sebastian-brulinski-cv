@@ -4,4 +4,4 @@ import cv.brulinski.sebastian.dependency_injection.app.App
 
 val ctx by lazy { App.component.getContext() }
 
-fun Int.get() = ctx.getString(this)
+fun Int.string() = ctx.getString(this)
