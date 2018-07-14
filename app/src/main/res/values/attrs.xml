@@ -8,4 +8,5 @@
         <attr name="buttonColor" format="color" />
         <attr name="flat" format="boolean" />
     </declare-styleable>
+
 </resources>

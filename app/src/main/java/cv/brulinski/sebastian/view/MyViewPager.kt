@@ -16,8 +16,9 @@ class MyViewPager(context: Context, attrs: AttributeSet?) : ViewPager(context, a
     /**
      * returns current screen
      */
-    fun toPrevious() = previousPage.apply {
-        toPage(this)
+    fun toPrevious() {
+        val page = currentItem - 1
+        toPage(if (page < 0) 0 else page)
     }
 
     override fun onTouchEvent(ev: MotionEvent): Boolean {

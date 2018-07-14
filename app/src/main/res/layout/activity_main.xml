@@ -14,11 +14,17 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <cv.brulinski.sebastian.view.MyViewPager
-        android:id="@+id/viewPager"
-        app:enablePaging="false"
+    <ScrollView
+        android:fillViewport="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <cv.brulinski.sebastian.view.MyViewPager
+            android:id="@+id/viewPager"
+            app:enablePaging="false"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </ScrollView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

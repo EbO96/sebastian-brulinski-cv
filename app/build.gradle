@@ -55,6 +55,7 @@ dependencies {
     kapt 'com.google.dagger:dagger-compiler:2.15'
     implementation 'androidx.legacy:legacy-support-core-ui:1.0.0-beta01'
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+    implementation 'com.google.android.gms:play-services-maps:15.0.1'
 }
 
 apply plugin: 'com.google.gms.google-services'

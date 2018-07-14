@@ -11,10 +11,14 @@ class MainActivityViewPagerAdapter(private val fragments: ArrayList<Fragment>,
     companion object {
         enum class Page {
             START_SCREEN,
-            WELCOME_SCREEN
+            WELCOME_SCREEN,
+            PERSONAL_INFO_SCREEN
         }
 
-        val pageMap = mapOf(Page.START_SCREEN to 0, Page.WELCOME_SCREEN to 1)
+        val pageMap = mapOf(
+                Page.START_SCREEN to 0,
+                Page.WELCOME_SCREEN to 1,
+                Page.PERSONAL_INFO_SCREEN to 2)
     }
 
     override fun getItem(position: Int) = fragments[position]

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/birthDateTextView"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="8dp"
+    android:drawablePadding="8dp"
+    android:gravity="start|center_vertical"
+    android:padding="8dp"
+    android:textAlignment="gravity"
+    android:textColor="@color/whiteBackgroundTextColor"
+    android:textSize="16dp"
+    android:theme="@style/PersonalInfoTitleTextStyle" />

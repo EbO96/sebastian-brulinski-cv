@@ -16,8 +16,8 @@ class StartFragment : Fragment() {
         fun pdfVersionClick()
         fun electronicVersionClick()
         fun printCvClick()
+        fun onStartFragmentResume()
     }
-
     //Callback to parent activity
     private lateinit var startFragmentCallback: StartFragmentCallback
 
@@ -28,7 +28,6 @@ class StartFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         pdfVersionView.setOnClickListener {
             startFragmentCallback.pdfVersionClick()
         }
@@ -49,5 +48,9 @@ class StartFragment : Fragment() {
         } catch (e: ClassCastException) {
             throw ClassCastException("$context must implement StartFragmentCallback")
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
     }
 }
