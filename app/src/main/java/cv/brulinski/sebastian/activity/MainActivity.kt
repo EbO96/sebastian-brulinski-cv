@@ -59,6 +59,7 @@ class MainActivity : AppCompatActivity(),
         override fun onPageSelected(position: Int) {
             mainActivityViewPagerAdapter.getPageTitle(position).asToolbarTitle()
             viewPager.paging = false
+            homeButton(!(position == pageMap[START_SCREEN] ?: 0))
         }
     }
 
@@ -96,12 +97,18 @@ class MainActivity : AppCompatActivity(),
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         return when (item?.itemId) {
             android.R.id.home -> {
-                if (viewPager.toPrevious() == (pageMap[START_SCREEN] ?: 0)) {
-                    homeButton(false)
-                }
+                viewPager.toPrevious()
                 true
             }
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    override fun onBackPressed() {
+        viewPager.apply {
+            if (currentItem == pageMap[START_SCREEN] ?: 0)
+            super.onBackPressed()
+            else toPrevious()
         }
     }
 }
