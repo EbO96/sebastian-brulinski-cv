@@ -5,6 +5,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager.widget.ViewPager
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.adapter.MainActivityViewPagerAdapter
@@ -15,6 +16,7 @@ import cv.brulinski.sebastian.fragment.StartFragment
 import cv.brulinski.sebastian.fragment.WelcomeFragment
 import cv.brulinski.sebastian.utils.goTo
 import cv.brulinski.sebastian.utils.string
+import cv.brulinski.sebastian.view_model.MainViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 import setBaseToolbar
 
@@ -26,6 +28,8 @@ class MainActivity : AppCompatActivity(),
     private lateinit var mainActivityViewPagerAdapter: MainActivityViewPagerAdapter
     //Menu item forward button
     private var forwardButton: MenuItem? = null
+    //ViewModel
+    private var mainViewModel: MainViewModel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +37,8 @@ class MainActivity : AppCompatActivity(),
         setBaseToolbar(title = R.string.start.string(), enableHomeButton = true)
         setupViewPager()
         homeForwardButton(pageMap[START_SCREEN] ?: 0)
+        //ViewModel
+        mainViewModel = ViewModelProvider.AndroidViewModelFactory.getInstance(application).create(MainViewModel::class.java)
     }
 
     private fun setupViewPager() {
@@ -103,6 +109,8 @@ class MainActivity : AppCompatActivity(),
     override fun onWelcomeFragmentResume() {
         homeForwardButton(viewPager.currentItem)
     }
+
+    override fun getWelcome() = mainViewModel?.welcome
 
     private fun homeForwardButton(pagePosition: Int) = supportActionBar?.apply {
         val enabled = pagePosition != pageMap[START_SCREEN]
