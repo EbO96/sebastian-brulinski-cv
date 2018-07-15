@@ -36,7 +36,10 @@ class WelcomeFragment : Fragment(), LifecycleOwner {
             welcomeFragmentCallback.nextButtonClicked()
         }
         welcomeFragmentCallback.getWelcome()?.observe(this, Observer {
-            it
+            it?.apply {
+                welcomeTitleTextView.text = title
+                welcomeDescriptionTextView.text = description
+            }
         })
     }
 
