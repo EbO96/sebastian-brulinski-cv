@@ -1,8 +1,12 @@
 package cv.brulinski.sebastian.model
 
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
 /**
@@ -22,13 +26,13 @@ class PersonalInfo {
     var surname = ""
     @ColumnInfo(name = "birthDay")
     @SerializedName("birthDay")
-    var birthDay = 0
+    var birthDay = ""
     @ColumnInfo(name = "birthMonth")
     @SerializedName("birthMonth")
-    var birthMonth = 0
+    var birthMonth = ""
     @ColumnInfo(name = "birthYear")
     @SerializedName("birthYear")
-    var birthYear = 0
+    var birthYear = ""
     @ColumnInfo(name = "profileUrl")
     @SerializedName("profileUrl")
     var profilePhotoUrl = ""
@@ -50,5 +54,10 @@ class PersonalInfo {
     @ColumnInfo(name = "longitude")
     @SerializedName("longitude")
     var longitude = 0.0
-
+    @Expose
+    @Ignore
+    var profilePicture: Bitmap? = null
+    @Expose
+    @Ignore
+    var profileBcg: Bitmap? = null
 }

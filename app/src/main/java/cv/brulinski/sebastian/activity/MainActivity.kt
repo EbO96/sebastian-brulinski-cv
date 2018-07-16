@@ -3,9 +3,9 @@ package cv.brulinski.sebastian.activity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager.widget.ViewPager
 import cv.brulinski.sebastian.R
@@ -15,7 +15,6 @@ import cv.brulinski.sebastian.adapter.MainActivityViewPagerAdapter.Companion.pag
 import cv.brulinski.sebastian.fragment.PersonalInfoFragment
 import cv.brulinski.sebastian.fragment.StartFragment
 import cv.brulinski.sebastian.fragment.WelcomeFragment
-import cv.brulinski.sebastian.model.PersonalInfo
 import cv.brulinski.sebastian.utils.goTo
 import cv.brulinski.sebastian.utils.string
 import cv.brulinski.sebastian.view_model.MainViewModel

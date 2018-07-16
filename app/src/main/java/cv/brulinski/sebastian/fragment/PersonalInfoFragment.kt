@@ -32,8 +32,10 @@ class PersonalInfoFragment : Fragment(), LifecycleOwner {
         super.onViewCreated(view, savedInstanceState)
         personalInfoCallback.getPersonalInfo()?.observe(this, Observer {
             it?.apply {
+                profileImageView.setImageBitmap(profilePicture)
+                bcgImageView.setImageBitmap(profileBcg)
                 nameAndSurnameTextView.text = "$name\n$surname"
-                birthDateTextView.text = "$birthDay/$birthMonth/$birthYear"
+                birthDateTextView.text = "$birthDay.$birthMonth.$birthYear"
                 phoneTextView.text = phoneNumber
                 emailTextView.text = email
                 locationTextView.text = "$cityName\n$provinceName"
