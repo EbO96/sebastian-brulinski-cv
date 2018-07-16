@@ -3,7 +3,6 @@ package cv.brulinski.sebastian.activity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -12,6 +11,7 @@ import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.adapter.MainActivityViewPagerAdapter
 import cv.brulinski.sebastian.adapter.MainActivityViewPagerAdapter.Companion.Page.*
 import cv.brulinski.sebastian.adapter.MainActivityViewPagerAdapter.Companion.pageMap
+import cv.brulinski.sebastian.fragment.CareerFragment
 import cv.brulinski.sebastian.fragment.PersonalInfoFragment
 import cv.brulinski.sebastian.fragment.StartFragment
 import cv.brulinski.sebastian.fragment.WelcomeFragment
@@ -48,11 +48,13 @@ class MainActivity : AppCompatActivity(),
             add(StartFragment())
             add(WelcomeFragment())
             add(PersonalInfoFragment())
+            add(CareerFragment())
         }
         val pagesTitles = ArrayList<String>().apply {
             add(R.string.start.string().apply { asToolbarTitle() })
             add(R.string.welcome.string())
             add(R.string.personal_details.string())
+            add(R.string.career.string())
         }
         viewPager.apply {
             mainActivityViewPagerAdapter = MainActivityViewPagerAdapter(fragments, pagesTitles, supportFragmentManager).apply { adapter = this }
@@ -104,7 +106,7 @@ class MainActivity : AppCompatActivity(),
     /*
     WelcomeFragment callbacks
      */
-    override fun nextButtonClicked() {
+    override fun goToPersonalInfoScreen() {
         viewPager goTo PERSONAL_INFO_SCREEN
     }
 
@@ -118,6 +120,10 @@ class MainActivity : AppCompatActivity(),
     PersonalInfo callbacks
      */
     override fun getPersonalInfo() = mainViewModel?.personalInfo
+
+    override fun goToCareerScreen() {
+        viewPager goTo CAREER
+    }
 
     private fun homeForwardButton(pagePosition: Int) = supportActionBar?.apply {
         val enabled = pagePosition != pageMap[START_SCREEN]
@@ -142,9 +148,12 @@ class MainActivity : AppCompatActivity(),
             R.id.pageForward -> {
                 when (viewPager.currentItem) {
                     pageMap[WELCOME_SCREEN] -> {
-                        nextButtonClicked()
+                        goToPersonalInfoScreen()
                     }
                     pageMap[PERSONAL_INFO_SCREEN] -> {
+                        goToCareerScreen()
+                    }
+                    pageMap[CAREER] -> {
 
                     }
                 }

@@ -18,6 +18,7 @@ class PersonalInfoFragment : Fragment(), LifecycleOwner {
 
     interface PersonalInfoCallback {
         fun getPersonalInfo(): LiveData<PersonalInfo>?
+        fun goToCareerScreen()
     }
 
     //Callback to parent activity

@@ -17,7 +17,7 @@ import java.lang.ClassCastException
 class WelcomeFragment : Fragment(), LifecycleOwner {
 
     interface WelcomeFragmentCallback {
-        fun nextButtonClicked()
+        fun goToPersonalInfoScreen()
         fun onWelcomeFragmentResume()
         fun getWelcome(): LiveData<Welcome>?
     }
@@ -32,7 +32,7 @@ class WelcomeFragment : Fragment(), LifecycleOwner {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         nextButton.setOnClickListener {
-            welcomeFragmentCallback.nextButtonClicked()
+            welcomeFragmentCallback.goToPersonalInfoScreen()
         }
         welcomeFragmentCallback.getWelcome()?.observe(this, Observer {
             it?.apply {
