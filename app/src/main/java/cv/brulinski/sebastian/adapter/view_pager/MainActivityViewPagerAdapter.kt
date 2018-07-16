@@ -1,4 +1,4 @@
-package cv.brulinski.sebastian.adapter
+package cv.brulinski.sebastian.adapter.view_pager
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager

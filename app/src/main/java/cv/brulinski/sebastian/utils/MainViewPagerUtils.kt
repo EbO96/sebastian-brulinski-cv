@@ -1,7 +1,7 @@
 package cv.brulinski.sebastian.utils
 
-import cv.brulinski.sebastian.adapter.MainActivityViewPagerAdapter.Companion.Page
-import cv.brulinski.sebastian.adapter.MainActivityViewPagerAdapter.Companion.pageMap
+import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Companion.Page
+import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Companion.pageMap
 import cv.brulinski.sebastian.view.MyViewPager
 
 infix fun MyViewPager.goTo(page: Page) {

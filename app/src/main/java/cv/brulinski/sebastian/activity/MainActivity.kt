@@ -8,9 +8,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager.widget.ViewPager
 import cv.brulinski.sebastian.R
-import cv.brulinski.sebastian.adapter.MainActivityViewPagerAdapter
-import cv.brulinski.sebastian.adapter.MainActivityViewPagerAdapter.Companion.Page.*
-import cv.brulinski.sebastian.adapter.MainActivityViewPagerAdapter.Companion.pageMap
+import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter
+import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Companion.Page.*
+import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Companion.pageMap
 import cv.brulinski.sebastian.fragment.CareerFragment
 import cv.brulinski.sebastian.fragment.PersonalInfoFragment
 import cv.brulinski.sebastian.fragment.StartFragment
