@@ -121,7 +121,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/phoneTextView" />
 
             <TextView
-                android:id="@+id/textView6"
+                android:id="@+id/locationTextView"
                 style="@style/PersonalInfoTitleTextStyle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -138,9 +138,9 @@
                 android:layout_marginBottom="8dp"
                 android:background="@color/colorAccent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@+id/textView6"
-                app:layout_constraintStart_toStartOf="@+id/textView6"
-                app:layout_constraintTop_toBottomOf="@+id/textView6"
+                app:layout_constraintEnd_toEndOf="@+id/locationTextView"
+                app:layout_constraintStart_toStartOf="@+id/locationTextView"
+                app:layout_constraintTop_toBottomOf="@+id/locationTextView"
                 app:layout_constraintVertical_bias="0.0" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

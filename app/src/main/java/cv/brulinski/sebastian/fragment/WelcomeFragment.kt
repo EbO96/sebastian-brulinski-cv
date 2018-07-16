@@ -21,7 +21,6 @@ class WelcomeFragment : Fragment(), LifecycleOwner {
         fun onWelcomeFragmentResume()
         fun getWelcome(): LiveData<Welcome>?
     }
-
     //Callback to parent activity
     private lateinit var welcomeFragmentCallback: WelcomeFragmentCallback
 
@@ -48,7 +47,7 @@ class WelcomeFragment : Fragment(), LifecycleOwner {
         try {
             welcomeFragmentCallback = context as WelcomeFragmentCallback
         } catch (e: ClassCastException) {
-            throw ClassCastException("$context must implement StartFragmentCallback")
+            throw ClassCastException("$context must implement WelcomeFragmentCallback")
         }
     }
 }
