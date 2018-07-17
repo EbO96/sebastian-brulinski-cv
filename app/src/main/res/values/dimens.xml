@@ -6,4 +6,5 @@
     <dimen name="profile_size">128dp</dimen>
     <dimen name="profile_size_card">64dp</dimen>
     <dimen name="divider">1dp</dimen>
+    <dimen name="start_screen_drawable_size">128dp</dimen>
 </resources>
