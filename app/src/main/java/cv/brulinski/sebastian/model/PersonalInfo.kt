@@ -18,6 +18,9 @@ class PersonalInfo {
     @PrimaryKey
     @ColumnInfo(name = "id")
     var id = 1
+    @Expose
+    @ColumnInfo(name = "timestamp")
+    var timestamp = 0L
     @ColumnInfo(name = "name")
     @SerializedName("name")
     var name = ""

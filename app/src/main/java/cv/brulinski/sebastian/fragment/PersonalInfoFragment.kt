@@ -9,15 +9,18 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.model.PersonalInfo
 import kotlinx.android.synthetic.main.fragment_personal_info.*
 import java.lang.ClassCastException
 
-class PersonalInfoFragment : Fragment(), LifecycleOwner {
+class PersonalInfoFragment : Fragment(), LifecycleOwner,
+        SwipeRefreshLayout.OnRefreshListener {
 
     interface PersonalInfoCallback {
         fun getPersonalInfo(): LiveData<PersonalInfo>?
+        fun refreshPersonalInfo()
         fun goToCareerScreen()
     }
 
@@ -41,7 +44,13 @@ class PersonalInfoFragment : Fragment(), LifecycleOwner {
                 emailTextView.text = email
                 locationTextView.text = "$cityName\n$provinceName"
             }
+            refreshLayout.isRefreshing = false
         })
+        refreshLayout.setOnRefreshListener(this)
+    }
+
+    override fun onRefresh() {
+        personalInfoCallback.refreshPersonalInfo()
     }
 
     override fun onAttach(context: Context?) {

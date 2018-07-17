@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import com.google.firebase.storage.FirebaseStorage
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
@@ -22,6 +23,7 @@ import cv.brulinski.sebastian.utils.retrofit
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import java.io.FileNotFoundException
+import java.util.*
 
 @SuppressLint("CheckResult")
 class MainRepository {
@@ -36,42 +38,45 @@ class MainRepository {
     private val storage = FirebaseStorage.getInstance()
     private val profilePictureReference = storage.getReference("profile_picture/profile.jpg")
     private val profilePictureBcgReference = storage.getReference("profile_bcg/bcg.jpg")
+    private val welcomeObserver = Observer<Welcome> {
+        it?.let {
+            welcome.value = it
+        } ?: run {
+            fetchWelcome()
+        }
+    }
+    private val personalInfoObserver = Observer<PersonalInfo> {
+        it?.let {
+            personalInfo.value = it
+            fetchProfileGraphics()
+        } ?: run {
+            fetchPersonalInfo()
+        }
+    }
 
     fun getWelcome(): LiveData<Welcome> {
-        database
-                .getWelcome()
-                .observeForever {
-                    it?.let {
-                        welcome.value = it
-                    } ?: run {
-                        fetchWelcome {
-                            insertWelcome(it)
-                        }
-                    }
-                }
+        database.getWelcome().observeForever(welcomeObserver)
         return welcome
     }
 
+    fun refreshWelcome() {
+        fetchWelcome(true)
+    }
+
     fun getPersonalInfo(): LiveData<PersonalInfo> {
-        database
-                .getPersonalInfo()
-                .observeForever {
-                    it?.let {
-                        personalInfo.value = it
-                        fetchProfileGraphics()
-                    } ?: run {
-                        fetchPersonalInfo {
-                            insertPersonalInfo(it)
-                        }
-                    }
-                }
+        database.getPersonalInfo().observeForever(personalInfoObserver)
         return personalInfo
     }
 
-    private fun fetchProfileGraphics() {
+    fun refreshPersonalInfo() {
+        fetchPersonalInfo(true)
+        fetchProfileGraphics(true)
+    }
+
+    private fun fetchProfileGraphics(refresh: Boolean = false) {
         ProfilePictureManager().apply {
             Type.values().forEach { type ->
-                if (!loadFromDevice(type))
+                if (!loadFromDevice(type) || refresh)
                     type.getRef().downloadUrl.addOnSuccessListener {
                         Picasso
                                 .with(App.component.getContext())
@@ -97,28 +102,48 @@ class MainRepository {
         }
     }
 
-    private fun fetchWelcome(result: (Welcome) -> Unit) {
+    private fun fetchWelcome(refresh: Boolean = false) {
         retrofit
                 .getWelcome()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    result(it)
+                    insertWelcome(it.apply {
+                        timestamp = Calendar.getInstance().timeInMillis
+                    })
+                    if (refresh)
+                        welcome.value = it
                 }, {
+                    fetchError()
                     it.printStackTrace()
                 })
     }
 
-    private fun fetchPersonalInfo(result: (PersonalInfo) -> Unit) {
+    private fun fetchPersonalInfo(refresh: Boolean = false) {
         retrofit
                 .getPersonalInfo()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    result(it)
+                    insertPersonalInfo(it.apply {
+                        timestamp = Calendar.getInstance().timeInMillis
+                        personalInfo.value?.let {
+                            profilePicture = it.profilePicture
+                            profileBcg = it.profileBcg
+                        }
+                    })
+                    if (refresh)
+                        personalInfo.value = it
                 }, {
+                    fetchError()
                     it.printStackTrace()
                 })
+    }
+
+    private fun fetchError() {
+        personalInfo.value = personalInfo.value?.apply {
+            timestamp = Calendar.getInstance().timeInMillis
+        }
     }
 
     private fun Type.getRef() = when (this) {

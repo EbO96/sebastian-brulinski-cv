@@ -116,6 +116,10 @@ class MainActivity : AppCompatActivity(),
 
     override fun getWelcome() = mainViewModel?.welcome
 
+    override fun refreshWelcome() {
+        mainViewModel?.refreshWelcome()
+    }
+
     /*
     PersonalInfo callbacks
      */
@@ -123,6 +127,10 @@ class MainActivity : AppCompatActivity(),
 
     override fun goToCareerScreen() {
         viewPager goTo CAREER
+    }
+
+    override fun refreshPersonalInfo() {
+        mainViewModel?.refreshPersonalInfo()
     }
 
     private fun homeForwardButton(pagePosition: Int) = supportActionBar?.apply {

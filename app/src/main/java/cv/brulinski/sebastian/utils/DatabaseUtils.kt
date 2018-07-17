@@ -13,9 +13,21 @@ fun insertWelcome(welcome: Welcome) {
     }
 }
 
+fun deleteWelcome() {
+    doAsync {
+        database.deleteWelcome()
+    }
+}
+
 fun insertPersonalInfo(personalInfo: PersonalInfo) {
     doAsync {
         database.insertPersonalInfo(personalInfo)
+    }
+}
+
+fun deletePersonalInfo() {
+    doAsync {
+        database.deletePersonalInfo()
     }
 }
 

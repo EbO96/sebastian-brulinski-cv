@@ -9,18 +9,22 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.model.Welcome
 import kotlinx.android.synthetic.main.fragment_welcome.*
 import java.lang.ClassCastException
 
-class WelcomeFragment : Fragment(), LifecycleOwner {
+class WelcomeFragment : Fragment(), LifecycleOwner,
+        SwipeRefreshLayout.OnRefreshListener {
 
     interface WelcomeFragmentCallback {
         fun goToPersonalInfoScreen()
         fun onWelcomeFragmentResume()
         fun getWelcome(): LiveData<Welcome>?
+        fun refreshWelcome()
     }
+
     //Callback to parent activity
     private lateinit var welcomeFragmentCallback: WelcomeFragmentCallback
 
@@ -39,7 +43,13 @@ class WelcomeFragment : Fragment(), LifecycleOwner {
                 welcomeTitleTextView.text = title
                 welcomeDescriptionTextView.text = description
             }
+            refreshLayout.isRefreshing = false
         })
+        refreshLayout.setOnRefreshListener(this)
+    }
+
+    override fun onRefresh() {
+        welcomeFragmentCallback.refreshWelcome()
     }
 
     override fun onAttach(context: Context?) {
