@@ -6,6 +6,7 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.viewpager.widget.ViewPager
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter
@@ -16,6 +17,7 @@ import cv.brulinski.sebastian.fragment.PersonalInfoFragment
 import cv.brulinski.sebastian.fragment.StartFragment
 import cv.brulinski.sebastian.fragment.WelcomeFragment
 import cv.brulinski.sebastian.utils.goTo
+import cv.brulinski.sebastian.utils.pages
 import cv.brulinski.sebastian.utils.string
 import cv.brulinski.sebastian.view_model.MainViewModel
 import kotlinx.android.synthetic.main.activity_main.*
@@ -24,7 +26,8 @@ import setBaseToolbar
 class MainActivity : AppCompatActivity(),
         StartFragment.StartFragmentCallback,
         WelcomeFragment.WelcomeFragmentCallback,
-        PersonalInfoFragment.PersonalInfoCallback {
+        PersonalInfoFragment.PersonalInfoCallback,
+        SwipeRefreshLayout.OnRefreshListener {
 
     //ViewPager adapter
     private lateinit var mainActivityViewPagerAdapter: MainActivityViewPagerAdapter
@@ -41,6 +44,8 @@ class MainActivity : AppCompatActivity(),
         homeForwardButton(pageMap[START_SCREEN] ?: 0)
         //ViewModel
         mainViewModel = ViewModelProvider.AndroidViewModelFactory.getInstance(application).create(MainViewModel::class.java)
+        refreshLayout.setOnRefreshListener(this)
+        lockUnlockRefreshLayout()
     }
 
     private fun setupViewPager() {
@@ -74,7 +79,22 @@ class MainActivity : AppCompatActivity(),
             mainActivityViewPagerAdapter.getPageTitle(position).asToolbarTitle()
             viewPager.paging = false
             homeForwardButton(position)
+            lockUnlockRefreshLayout()
         }
+    }
+
+    private fun lockUnlockRefreshLayout() {
+        refreshLayout.isEnabled = viewPager.pages({
+            false
+        }, {
+            true
+        }, {
+            true
+        }, {
+            false
+        }, {
+            false
+        })
     }
 
     private fun String.asToolbarTitle() {
@@ -129,8 +149,8 @@ class MainActivity : AppCompatActivity(),
         viewPager goTo CAREER
     }
 
-    override fun refreshPersonalInfo() {
-        mainViewModel?.refreshPersonalInfo()
+    override fun onRefreshed() {
+        refreshLayout.isRefreshing = false
     }
 
     private fun homeForwardButton(pagePosition: Int) = supportActionBar?.apply {
@@ -169,6 +189,30 @@ class MainActivity : AppCompatActivity(),
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun onRefresh() {
+        viewPager.pages({
+            //START
+            refreshLayout.isRefreshing = false
+        }, {
+            //WELCOME
+            mainViewModel?.refreshWelcome()
+        }, {
+            //PERSONAL INFO
+            mainViewModel?.refreshPersonalInfo()
+        }, {
+            //CAREER
+            refreshLayout.isRefreshing = false
+        }, {
+            //ELSE
+            refreshLayout.isRefreshing = false
+        })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        homeForwardButton(viewPager.currentItem)
     }
 
     override fun onBackPressed() {

@@ -1,6 +1,7 @@
 package cv.brulinski.sebastian.fragment
 
 import android.content.Context
+import android.graphics.Paint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,18 +10,19 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import cv.brulinski.sebastian.R
+import cv.brulinski.sebastian.interfaces.OnContentRefreshed
 import cv.brulinski.sebastian.model.PersonalInfo
+import cv.brulinski.sebastian.utils.age
+import cv.brulinski.sebastian.utils.ageSufix
+import cv.brulinski.sebastian.utils.date
 import kotlinx.android.synthetic.main.fragment_personal_info.*
 import java.lang.ClassCastException
 
-class PersonalInfoFragment : Fragment(), LifecycleOwner,
-        SwipeRefreshLayout.OnRefreshListener {
+class PersonalInfoFragment : Fragment(), LifecycleOwner {
 
-    interface PersonalInfoCallback {
+    interface PersonalInfoCallback : OnContentRefreshed {
         fun getPersonalInfo(): LiveData<PersonalInfo>?
-        fun refreshPersonalInfo()
         fun goToCareerScreen()
     }
 
@@ -34,23 +36,32 @@ class PersonalInfoFragment : Fragment(), LifecycleOwner,
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        personalInfoCallback.getPersonalInfo()?.observe(this, Observer {
-            it?.apply {
-                profileImageView.setImageBitmap(profilePicture)
-                bcgImageView.setImageBitmap(profileBcg)
-                nameAndSurnameTextView.text = "$name\n$surname"
-                birthDateTextView.text = "$birthDay.$birthMonth.$birthYear"
-                phoneTextView.text = phoneNumber
-                emailTextView.text = email
-                locationTextView.text = "$cityName\n$provinceName"
-            }
-            refreshLayout.isRefreshing = false
-        })
-        refreshLayout.setOnRefreshListener(this)
-    }
-
-    override fun onRefresh() {
-        personalInfoCallback.refreshPersonalInfo()
+        phoneTextView.apply {
+            paintFlags = paintFlags or Paint.UNDERLINE_TEXT_FLAG
+        }
+        personalInfoCallback.apply {
+            getPersonalInfo()?.observe(this@PersonalInfoFragment, Observer {
+                it?.apply {
+                    profileImageView.setImageBitmap(profilePicture)
+                    bcgImageView.setImageBitmap(profileBcg)
+                    nameAndSurnameTextView.text = "$name\n$surname"
+                    val bornDate = "$birthDay.$birthMonth.$birthYear".trim()
+                    birthDateTextView.text = bornDate
+                    ageTextView.apply {
+                        val age = bornDate.date()?.age() ?: -1
+                        if (age != -1)
+                            "$age ${age.ageSufix()}".apply {
+                                text = this
+                            }
+                    }
+                    phoneTextView.text = phoneNumber
+                    emailTextView.text = email
+                    cityNameTextView.text = cityName
+                    provinceNameTextView.text = provinceName
+                }
+                onRefreshed()
+            })
+        }
     }
 
     override fun onAttach(context: Context?) {

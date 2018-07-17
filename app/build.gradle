@@ -76,6 +76,8 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxjava:2.1.8'
     //Picasso
     implementation 'com.squareup.picasso:picasso:2.5.1'
+    //Joda time
+    implementation 'joda-time:joda-time:2.10'
 }
 
 apply plugin: 'com.google.gms.google-services'

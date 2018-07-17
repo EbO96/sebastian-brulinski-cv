@@ -10,4 +10,6 @@
     <string name="next">Dalej</string>
     <string name="personal_details">Personalia</string>
     <string name="career">Kariera</string>
+    <string name="year">lat</string>
+    <string name="years">lata</string>
 </resources>

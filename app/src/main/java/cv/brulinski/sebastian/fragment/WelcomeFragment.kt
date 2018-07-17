@@ -9,16 +9,15 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import cv.brulinski.sebastian.R
+import cv.brulinski.sebastian.interfaces.OnContentRefreshed
 import cv.brulinski.sebastian.model.Welcome
 import kotlinx.android.synthetic.main.fragment_welcome.*
 import java.lang.ClassCastException
 
-class WelcomeFragment : Fragment(), LifecycleOwner,
-        SwipeRefreshLayout.OnRefreshListener {
+class WelcomeFragment : Fragment(), LifecycleOwner {
 
-    interface WelcomeFragmentCallback {
+    interface WelcomeFragmentCallback : OnContentRefreshed {
         fun goToPersonalInfoScreen()
         fun onWelcomeFragmentResume()
         fun getWelcome(): LiveData<Welcome>?
@@ -38,18 +37,15 @@ class WelcomeFragment : Fragment(), LifecycleOwner,
         nextButton.setOnClickListener {
             welcomeFragmentCallback.goToPersonalInfoScreen()
         }
-        welcomeFragmentCallback.getWelcome()?.observe(this, Observer {
-            it?.apply {
-                welcomeTitleTextView.text = title
-                welcomeDescriptionTextView.text = description
-            }
-            refreshLayout.isRefreshing = false
-        })
-        refreshLayout.setOnRefreshListener(this)
-    }
-
-    override fun onRefresh() {
-        welcomeFragmentCallback.refreshWelcome()
+        welcomeFragmentCallback.apply {
+            getWelcome()?.observe(this@WelcomeFragment, Observer {
+                it?.apply {
+                    welcomeTitleTextView.text = title
+                    welcomeDescriptionTextView.text = description
+                }
+                onRefreshed()
+            })
+        }
     }
 
     override fun onAttach(context: Context?) {

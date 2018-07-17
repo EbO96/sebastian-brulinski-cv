@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -78,6 +79,7 @@ class MainRepository {
             Type.values().forEach { type ->
                 if (!loadFromDevice(type) || refresh)
                     type.getRef().downloadUrl.addOnSuccessListener {
+                        Log.d("url", "$it")
                         Picasso
                                 .with(App.component.getContext())
                                 .load(it)

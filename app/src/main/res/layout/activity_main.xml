@@ -10,10 +10,19 @@
 
     <include layout="@layout/my_toolbar" />
 
-    <cv.brulinski.sebastian.view.MyViewPager
-        android:id="@+id/viewPager"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/refreshLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:enablePaging="false" />
+        android:layout_height="match_parent">
+
+        <cv.brulinski.sebastian.view.MyViewPager
+            android:id="@+id/viewPager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:enablePaging="false" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+
 </LinearLayout>
 

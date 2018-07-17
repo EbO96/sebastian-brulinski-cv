@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import androidx.viewpager.widget.ViewPager
 import cv.brulinski.sebastian.R
+import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter
 import cv.brulinski.sebastian.utils.toPage
 
 class MyViewPager(context: Context, attrs: AttributeSet?) : ViewPager(context, attrs) {

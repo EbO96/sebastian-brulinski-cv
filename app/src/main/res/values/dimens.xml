@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="card_corners_radius">2dp</dimen>
-    <dimen name="card_elevation">2dp</dimen>
+    <dimen name="card_corners_radius">4dp</dimen>
+    <dimen name="card_elevation">4dp</dimen>
     <dimen name="material_button_corners">4dp</dimen>
     <dimen name="profile_size">128dp</dimen>
     <dimen name="profile_size_card">64dp</dimen>
