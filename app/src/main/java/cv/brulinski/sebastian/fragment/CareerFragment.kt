@@ -13,13 +13,16 @@ import cv.brulinski.sebastian.adapter.recycler.CareerRecyclerAdapter
 import cv.brulinski.sebastian.interfaces.OnContentRefreshed
 import cv.brulinski.sebastian.interfaces.OnItemClickListener
 import cv.brulinski.sebastian.model.Education
+import cv.brulinski.sebastian.model.SchoolHeader
+import cv.brulinski.sebastian.model.SchoolItem
+import cv.brulinski.sebastian.model.recycler.CareerRecyclerItem
 import kotlinx.android.synthetic.main.fragment_career.*
 import setup
 import java.lang.ClassCastException
 
 class CareerFragment : Fragment() {
 
-    interface CareerFragmentCallback: OnContentRefreshed {
+    interface CareerFragmentCallback : OnContentRefreshed {
         fun getEducation(): LiveData<Education>?
         fun refreshEducation()
     }
@@ -39,6 +42,23 @@ class CareerFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupCareerRecycler()
         careerFragmentCallback.getEducation()?.observe(this, Observer {
+            it?.school?.apply {
+                val items = arrayListOf<CareerRecyclerItem>()
+                forEach {
+                    val header = SchoolHeader()
+                    header.place = it.place
+                    val startItem = SchoolItem()
+                    startItem.startTime = it.startTime
+                    startItem.startTimeDescription = it.startTimeDescription
+                    val endItem = SchoolItem()
+                    endItem.endTime = it.endTime
+                    endItem.endTimeDescription = it.endTimeDescription
+                    items.add(header)
+                    items.add(startItem)
+                    items.add(endItem)
+                }
+                careerRecyclerAdapter.items = items
+            }
             careerFragmentCallback.onRefreshed()
         })
     }

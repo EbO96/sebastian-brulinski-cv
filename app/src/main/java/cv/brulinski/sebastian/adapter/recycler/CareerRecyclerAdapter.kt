@@ -11,6 +11,7 @@ import cv.brulinski.sebastian.adapter.recycler.jon_experience_view_holder.JobExp
 import cv.brulinski.sebastian.interfaces.OnBindViewInViewHolder
 import cv.brulinski.sebastian.interfaces.OnItemClickListener
 import cv.brulinski.sebastian.model.recycler.CareerRecyclerItem
+import cv.brulinski.sebastian.utils.*
 import inflateViewHolderView
 
 class CareerRecyclerAdapter(private val onItemClickListener: OnItemClickListener? = null) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -22,13 +23,14 @@ class CareerRecyclerAdapter(private val onItemClickListener: OnItemClickListener
         }
 
     override fun getItemViewType(position: Int) = items[position].type()
+            ?: -1
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            CareerRecyclerItem.EDUCATION_ITEM_HEADER -> EducationHeaderViewHolder(parent inflateViewHolderView R.layout.education_header_item)
-            CareerRecyclerItem.EDUCATION_ITEM -> EducationViewHolder(parent inflateViewHolderView R.layout.education_item)
-            CareerRecyclerItem.JOB_EXPERIENCE_HEADER -> JobExperienceHeaderViewHolder(parent inflateViewHolderView R.layout.jon_experience_header_item)
-            CareerRecyclerItem.JOB_EXPERIENCE -> JobExperienceViewHolder(parent inflateViewHolderView R.layout.jon_experience_item)
+            EDUCATION_ITEM_HEADER -> EducationHeaderViewHolder(parent inflateViewHolderView R.layout.education_header_item)
+            EDUCATION_ITEM -> EducationViewHolder(parent inflateViewHolderView R.layout.education_item)
+            JOB_EXPERIENCE_HEADER -> JobExperienceHeaderViewHolder(parent inflateViewHolderView R.layout.jon_experience_header_item)
+            JOB_EXPERIENCE -> JobExperienceViewHolder(parent inflateViewHolderView R.layout.jon_experience_item)
             else -> EmptyRecyclerViewHolder(parent inflateViewHolderView R.layout.empty_list_item)
         }
     }
@@ -36,6 +38,6 @@ class CareerRecyclerAdapter(private val onItemClickListener: OnItemClickListener
     override fun getItemCount() = items.size
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        (holder as? OnBindViewInViewHolder)?.onBind(position, onItemClickListener)
+        (holder as? OnBindViewInViewHolder)?.onBind(items[position], position, onItemClickListener)
     }
 }

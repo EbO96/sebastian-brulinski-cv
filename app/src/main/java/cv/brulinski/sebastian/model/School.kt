@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
 @Entity
-class School {
+open class School {
 
     @PrimaryKey
     @SerializedName("place")
