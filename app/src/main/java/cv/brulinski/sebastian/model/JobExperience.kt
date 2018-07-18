@@ -1,9 +1,10 @@
 package cv.brulinski.sebastian.model
 
-/**
- * List of all user job experiences
- */
-class JobExperience(var id: Long) {
+import cv.brulinski.sebastian.model.recycler.CareerRecyclerItem
+
+class JobExperience(var id: Long) : CareerRecyclerItem() {
 
     var job: List<Job>? = null
+
+    override fun type() = CareerRecyclerItem.JOB_EXPERIENCE
 }

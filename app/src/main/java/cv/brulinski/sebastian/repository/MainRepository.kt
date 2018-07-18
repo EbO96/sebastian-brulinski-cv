@@ -5,7 +5,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -13,14 +12,13 @@ import com.google.firebase.storage.FirebaseStorage
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import cv.brulinski.sebastian.dependency_injection.app.App
+import cv.brulinski.sebastian.model.Education
 import cv.brulinski.sebastian.model.PersonalInfo
+import cv.brulinski.sebastian.model.School
 import cv.brulinski.sebastian.model.Welcome
 import cv.brulinski.sebastian.repository.MainRepository.Type.BCG
 import cv.brulinski.sebastian.repository.MainRepository.Type.PROFILE
-import cv.brulinski.sebastian.utils.database
-import cv.brulinski.sebastian.utils.insertPersonalInfo
-import cv.brulinski.sebastian.utils.insertWelcome
-import cv.brulinski.sebastian.utils.retrofit
+import cv.brulinski.sebastian.utils.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import java.io.FileNotFoundException
@@ -36,6 +34,7 @@ class MainRepository {
 
     private val welcome = MutableLiveData<Welcome>()
     private val personalInfo = MutableLiveData<PersonalInfo>()
+    private val education = MutableLiveData<Education>()
     private val storage = FirebaseStorage.getInstance()
     private val profilePictureReference = storage.getReference("profile_picture/profile.jpg")
     private val profilePictureBcgReference = storage.getReference("profile_bcg/bcg.jpg")
@@ -52,6 +51,17 @@ class MainRepository {
             fetchProfileGraphics()
         } ?: run {
             fetchPersonalInfo()
+        }
+    }
+    private val schoolsObserver = Observer<List<School>> {
+        it?.let {
+            if (it.isNotEmpty())
+                education.value = Education().apply {
+                    school = it
+                }
+            else fetchSchools()
+        } ?: run {
+            fetchSchools()
         }
     }
 
@@ -74,12 +84,20 @@ class MainRepository {
         fetchProfileGraphics(true)
     }
 
+    fun getEducation(): LiveData<Education> {
+        database.getSchools().observeForever(schoolsObserver)
+        return education
+    }
+
+    fun refreshEducation() {
+        fetchSchools()
+    }
+
     private fun fetchProfileGraphics(refresh: Boolean = false) {
         ProfilePictureManager().apply {
             Type.values().forEach { type ->
                 if (!loadFromDevice(type) || refresh)
                     type.getRef().downloadUrl.addOnSuccessListener {
-                        Log.d("url", "$it")
                         Picasso
                                 .with(App.component.getContext())
                                 .load(it)
@@ -105,8 +123,7 @@ class MainRepository {
     }
 
     private fun fetchWelcome(refresh: Boolean = false) {
-        retrofit
-                .getWelcome()
+        retrofit.getWelcome()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
@@ -116,14 +133,13 @@ class MainRepository {
                     if (refresh)
                         welcome.value = it
                 }, {
-                    fetchError()
+                    fetchingError()
                     it.printStackTrace()
                 })
     }
 
     private fun fetchPersonalInfo(refresh: Boolean = false) {
-        retrofit
-                .getPersonalInfo()
+        retrofit.getPersonalInfo()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
@@ -137,12 +153,25 @@ class MainRepository {
                     if (refresh)
                         personalInfo.value = it
                 }, {
-                    fetchError()
+                    fetchingError()
                     it.printStackTrace()
                 })
     }
 
-    private fun fetchError() {
+    private fun fetchSchools() {
+        retrofit.getCareer()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    it?.apply {
+                        insertSchools(this)
+                    }
+                }, {
+                    it.printStackTrace()
+                })
+    }
+
+    private fun fetchingError() {
         personalInfo.value = personalInfo.value?.apply {
             timestamp = Calendar.getInstance().timeInMillis
         }

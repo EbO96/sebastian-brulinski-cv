@@ -27,7 +27,8 @@ class MainActivity : AppCompatActivity(),
         StartFragment.StartFragmentCallback,
         WelcomeFragment.WelcomeFragmentCallback,
         PersonalInfoFragment.PersonalInfoCallback,
-        SwipeRefreshLayout.OnRefreshListener {
+        SwipeRefreshLayout.OnRefreshListener,
+        CareerFragment.CareerFragmentCallback {
 
     //ViewPager adapter
     private lateinit var mainActivityViewPagerAdapter: MainActivityViewPagerAdapter
@@ -91,7 +92,7 @@ class MainActivity : AppCompatActivity(),
         }, {
             true
         }, {
-            false
+            true
         }, {
             false
         })
@@ -153,6 +154,15 @@ class MainActivity : AppCompatActivity(),
         refreshLayout.isRefreshing = false
     }
 
+    /*
+    CareerFragment callbacks
+     */
+    override fun getEducation() = mainViewModel?.education
+
+    override fun refreshEducation() {
+        mainViewModel?.refreshEducation()
+    }
+
     private fun homeForwardButton(pagePosition: Int) = supportActionBar?.apply {
         val enabled = pagePosition != pageMap[START_SCREEN]
         setHomeButtonEnabled(enabled)
@@ -203,7 +213,7 @@ class MainActivity : AppCompatActivity(),
             mainViewModel?.refreshPersonalInfo()
         }, {
             //CAREER
-            refreshLayout.isRefreshing = false
+            mainViewModel?.refreshEducation()
         }, {
             //ELSE
             refreshLayout.isRefreshing = false
