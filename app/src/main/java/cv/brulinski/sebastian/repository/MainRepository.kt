@@ -5,7 +5,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.storage.FirebaseStorage
@@ -62,7 +61,7 @@ class MainRepository {
             if (it != personalInfo.value) {
                 personalInfo.value = it
                 fetchProfileGraphics(true)
-            }
+            } else fetchProfileGraphics()
         }, {
             fetchPersonalInfo()
         })
@@ -81,7 +80,6 @@ class MainRepository {
                 }
         }, {
             fetchSchools()
-
         })
         return education
     }
@@ -104,7 +102,7 @@ class MainRepository {
 
     private fun getDatabaseSchools(schools: (List<School>) -> Unit, empty: () -> Unit) {
         database.getSchools().observeForever {
-            it?.let { schools(it) } ?: run { empty() }
+            it?.let { if (it.isEmpty()) empty() else schools(it) } ?: run { empty() }
         }
     }
 
@@ -177,10 +175,11 @@ class MainRepository {
     }
 
     private fun fetchSchools() {
-        retrofit.getCareer()
+        retrofit.getSchools()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
+                    it
                     it?.let {
                         education.value = Education().apply { school = it }
                         insertSchools(it)

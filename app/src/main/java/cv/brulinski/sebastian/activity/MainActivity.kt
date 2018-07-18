@@ -16,6 +16,7 @@ import cv.brulinski.sebastian.fragment.CareerFragment
 import cv.brulinski.sebastian.fragment.PersonalInfoFragment
 import cv.brulinski.sebastian.fragment.StartFragment
 import cv.brulinski.sebastian.fragment.WelcomeFragment
+import cv.brulinski.sebastian.utils.delay
 import cv.brulinski.sebastian.utils.goTo
 import cv.brulinski.sebastian.utils.pages
 import cv.brulinski.sebastian.utils.string
@@ -151,7 +152,9 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onRefreshed() {
-        refreshLayout.isRefreshing = false
+        200L.delay {
+            refreshLayout.isRefreshing = false
+        }
     }
 
     /*

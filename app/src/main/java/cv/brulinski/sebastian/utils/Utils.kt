@@ -1,6 +1,7 @@
 package cv.brulinski.sebastian.utils
 
 import android.os.AsyncTask
+import android.os.Handler
 import cv.brulinski.sebastian.dependency_injection.app.App
 
 val ctx by lazy { App.component.getContext() }
@@ -21,4 +22,10 @@ private class MyAsync(val handler: () -> Unit) : AsyncTask<Unit?, Unit?, Unit?>(
         handler()
         return null
     }
+}
+
+fun <T> Long.delay(trigger: () -> T) {
+    Handler().postDelayed({
+        trigger()
+    }, this)
 }

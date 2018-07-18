@@ -16,5 +16,5 @@ interface RetrofitApiCallbacks {
     fun getPersonalInfo(): Observable<PersonalInfo>
 
     @GET("getSchool")
-    fun getCareer(): Observable<List<School>>
+    fun getSchools(): Observable<List<School>>
 }

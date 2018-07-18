@@ -18,9 +18,10 @@ fun AppCompatActivity.setBaseToolbar(enableHomeButton: Boolean = false, title: S
 infix fun ViewGroup.inflateViewHolderView(resLayout: Int) =
         LayoutInflater.from(this.context).inflate(resLayout, this, false)
 
-fun RecyclerView.setup(divider: Boolean = false) {
+fun RecyclerView.setup(adapter: RecyclerView.Adapter<RecyclerView.ViewHolder>, divider: Boolean = false) {
     val lm = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
     layoutManager = lm
     itemAnimator = DefaultItemAnimator()
+    this.adapter = adapter
     if (divider) addItemDecoration(DividerItemDecoration(context, lm.orientation))
 }
