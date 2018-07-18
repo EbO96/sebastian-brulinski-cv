@@ -6,10 +6,10 @@ import cv.brulinski.sebastian.repository.MainRepository
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository = MainRepository()
-    val welcome = repository.getWelcome()
-    val education = repository.getEducation()
-    val personalInfo = repository.getPersonalInfo()
+    private val repository by lazy { MainRepository() }
+    val welcome by lazy { repository.getWelcome() }
+    val education by lazy { repository.getEducation() }
+    val personalInfo by lazy { repository.getPersonalInfo() }
 
     fun refreshWelcome() {
         repository.refreshWelcome()

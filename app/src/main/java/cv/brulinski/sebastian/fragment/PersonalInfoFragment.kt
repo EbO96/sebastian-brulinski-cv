@@ -3,6 +3,7 @@ package cv.brulinski.sebastian.fragment
 import android.content.Context
 import android.graphics.Paint
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +14,7 @@ import androidx.lifecycle.Observer
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.interfaces.OnContentRefreshed
 import cv.brulinski.sebastian.model.PersonalInfo
+import cv.brulinski.sebastian.repository.MainRepository
 import cv.brulinski.sebastian.utils.age
 import cv.brulinski.sebastian.utils.ageSufix
 import cv.brulinski.sebastian.utils.date

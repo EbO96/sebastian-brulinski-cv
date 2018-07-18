@@ -5,9 +5,9 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import com.google.firebase.storage.FirebaseStorage
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
@@ -32,65 +32,80 @@ class MainRepository {
         BCG
     }
 
+    companion object {
+        val TAG = "MainRepository"
+    }
+
     private val welcome = MutableLiveData<Welcome>()
     private val personalInfo = MutableLiveData<PersonalInfo>()
     private val education = MutableLiveData<Education>()
     private val storage = FirebaseStorage.getInstance()
     private val profilePictureReference = storage.getReference("profile_picture/profile.jpg")
     private val profilePictureBcgReference = storage.getReference("profile_bcg/bcg.jpg")
-    private val welcomeObserver = Observer<Welcome> {
-        it?.let {
-            welcome.value = it
-        } ?: run {
-            fetchWelcome()
-        }
-    }
-    private val personalInfoObserver = Observer<PersonalInfo> {
-        it?.let {
-            personalInfo.value = it
-            fetchProfileGraphics()
-        } ?: run {
-            fetchPersonalInfo()
-        }
-    }
-    private val schoolsObserver = Observer<List<School>> {
-        it?.let {
-            if (it.isNotEmpty())
-                education.value = Education().apply {
-                    school = it
-                }
-            else fetchSchools()
-        } ?: run {
-            fetchSchools()
-        }
-    }
 
     fun getWelcome(): LiveData<Welcome> {
-        database.getWelcome().observeForever(welcomeObserver)
+        getDatabaseWelcome({
+            if (it != welcome.value)
+                welcome.value = it
+        }, {
+            fetchWelcome()
+        })
         return welcome
     }
 
     fun refreshWelcome() {
-        fetchWelcome(true)
+        fetchWelcome()
     }
 
     fun getPersonalInfo(): LiveData<PersonalInfo> {
-        database.getPersonalInfo().observeForever(personalInfoObserver)
+        getDatabasePersonalInfo({
+            if (it != personalInfo.value) {
+                personalInfo.value = it
+                fetchProfileGraphics(true)
+            }
+        }, {
+            fetchPersonalInfo()
+        })
         return personalInfo
     }
 
     fun refreshPersonalInfo() {
-        fetchPersonalInfo(true)
-        fetchProfileGraphics(true)
+        fetchPersonalInfo()
     }
 
     fun getEducation(): LiveData<Education> {
-        database.getSchools().observeForever(schoolsObserver)
+        getDatabaseSchools({
+            if (it != education.value?.school)
+                education.value = Education().apply {
+                    school = it
+                }
+        }, {
+            fetchSchools()
+
+        })
         return education
     }
 
     fun refreshEducation() {
         fetchSchools()
+    }
+
+    private fun getDatabaseWelcome(welcome: (Welcome) -> Unit, empty: () -> Unit) {
+        database.getWelcome().observeForever {
+            it?.let { welcome(it) } ?: run { empty() }
+        }
+    }
+
+    private fun getDatabasePersonalInfo(personalInfo: (PersonalInfo) -> Unit, empty: () -> Unit) {
+        database.getPersonalInfo().observeForever {
+            it?.let { personalInfo(it) } ?: run { empty() }
+        }
+    }
+
+    private fun getDatabaseSchools(schools: (List<School>) -> Unit, empty: () -> Unit) {
+        database.getSchools().observeForever {
+            it?.let { schools(it) } ?: run { empty() }
+        }
     }
 
     private fun fetchProfileGraphics(refresh: Boolean = false) {
@@ -110,8 +125,8 @@ class MainRepository {
 
                                     override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
                                         bitmap?.apply {
-                                            saveToDevice(type, this)
                                             notifyProfileGraphics(type, this)
+                                            saveToDevice(type, this)
                                         }
                                     }
                                 })
@@ -122,38 +137,41 @@ class MainRepository {
         }
     }
 
-    private fun fetchWelcome(refresh: Boolean = false) {
+    private fun fetchWelcome() {
         retrofit.getWelcome()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    insertWelcome(it.apply {
-                        timestamp = Calendar.getInstance().timeInMillis
-                    })
-                    if (refresh)
+                    it?.let {
+                        it.timestamp = Calendar.getInstance().timeInMillis
                         welcome.value = it
+                        insertWelcome(it)
+                    } ?: run {
+                        welcomeFetchingError()
+                    }
                 }, {
-                    fetchingError()
+                    welcomeFetchingError()
                     it.printStackTrace()
                 })
     }
 
-    private fun fetchPersonalInfo(refresh: Boolean = false) {
+    private fun fetchPersonalInfo() {
         retrofit.getPersonalInfo()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    insertPersonalInfo(it.apply {
-                        timestamp = Calendar.getInstance().timeInMillis
-                        personalInfo.value?.let {
-                            profilePicture = it.profilePicture
-                            profileBcg = it.profileBcg
+                    it?.apply {
+                        personalInfo.value = it.apply {
+                            profilePicture = personalInfo.value?.profilePicture
+                            profileBcg = personalInfo.value?.profileBcg
                         }
-                    })
-                    if (refresh)
-                        personalInfo.value = it
+                        fetchProfileGraphics(true)
+                        insertPersonalInfo(this)
+                    } ?: run {
+                        personalInfoFetchingError()
+                    }
                 }, {
-                    fetchingError()
+                    personalInfoFetchingError()
                     it.printStackTrace()
                 })
     }
@@ -163,16 +181,32 @@ class MainRepository {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    it?.apply {
-                        insertSchools(this)
+                    it?.let {
+                        education.value = Education().apply { school = it }
+                        insertSchools(it)
+                    } ?: run {
+                        schoolsFetchingError()
                     }
                 }, {
+                    schoolsFetchingError()
                     it.printStackTrace()
                 })
     }
 
-    private fun fetchingError() {
+    private fun personalInfoFetchingError() {
         personalInfo.value = personalInfo.value?.apply {
+            timestamp = Calendar.getInstance().timeInMillis
+        }
+    }
+
+    private fun welcomeFetchingError() {
+        welcome.value = welcome.value?.apply {
+            timestamp = Calendar.getInstance().timeInMillis
+        }
+    }
+
+    private fun schoolsFetchingError() {
+        education.value = education.value?.apply {
             timestamp = Calendar.getInstance().timeInMillis
         }
     }

@@ -15,48 +15,48 @@ var db = admin.firestore();
 // exports.helloWorld = functions.https.onRequest((request, response) => {
 //  response.send("Hello from Firebase!");
 // });
-// exports.getWelcome = functions.https.onRequest((request, response) => {
-//     return db
-//         .collection('welcome')
-//         .get()
-//         .then((snapshot) => {
-//             var d;
-//             snapshot.forEach((doc) => {
-//                 d = doc.data()
-//             });
-//             response.status(200).json(d)
-//         })
-//         .catch((err) => {
-//             response.status(401).json(err)
-//         })
-// });
+exports.getWelcome = functions.https.onRequest((request, response) => {
+    return db
+        .collection('welcome')
+        .get()
+        .then((snapshot) => {
+            var d;
+            snapshot.forEach((doc) => {
+                d = doc.data()
+            });
+            response.status(200).json(d)
+        })
+        .catch((err) => {
+            response.status(401).json(err)
+        })
+});
 
-// exports.getPersonalInfo = functions.https.onRequest((request, response) => {
-//     return db
-//         .collection('personal_data')
-//         .get()
-//         .then((snapshot) => {
-//             snapshot.forEach((doc) => {
-//                 response.status(200).json(doc.data())
-//             })
-//         }).catch((err) => {
-//             response.status(401).json(err)
-//         })
-// })
+exports.getPersonalInfo = functions.https.onRequest((request, response) => {
+    return db
+        .collection('personal_data')
+        .get()
+        .then((snapshot) => {
+            snapshot.forEach((doc) => {
+                response.status(200).json(doc.data())
+            })
+        }).catch((err) => {
+            response.status(401).json(err)
+        })
+})
 
-// exports.getSchool = functions.https.onRequest((request, response) => {
-//     var resultJson = []
-//     return db
-//         .collection('career')
-//         .doc('school')
-//         .collection('schools')
-//         .get()
-//         .then((snapshot) => {
-//             snapshot.forEach((doc) => {
-//                 resultJson.push(doc.data())
-//             })
-//             response.status(200).json(resultJson)
-//         }).catch((err) => {
-//             response.status(200).json(resultJson)
-//         })
-// })
+exports.getSchool = functions.https.onRequest((request, response) => {
+    var resultJson = []
+    return db
+        .collection('career')
+        .doc('school')
+        .collection('schools')
+        .get()
+        .then((snapshot) => {
+            snapshot.forEach((doc) => {
+                resultJson.push(doc.data())
+            })
+            response.status(200).json(resultJson)
+        }).catch((err) => {
+            response.status(200).json(resultJson)
+        })
+})

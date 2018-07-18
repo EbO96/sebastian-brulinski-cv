@@ -1,10 +1,12 @@
 package cv.brulinski.sebastian.utils
 
+import android.util.Log
 import cv.brulinski.sebastian.database.AppDatabase
 import cv.brulinski.sebastian.dependency_injection.app.App
 import cv.brulinski.sebastian.model.PersonalInfo
 import cv.brulinski.sebastian.model.School
 import cv.brulinski.sebastian.model.Welcome
+import cv.brulinski.sebastian.repository.MainRepository.Companion.TAG
 
 val database by lazy { AppDatabase().database(App.component.getContext()).daoAccess() }
 

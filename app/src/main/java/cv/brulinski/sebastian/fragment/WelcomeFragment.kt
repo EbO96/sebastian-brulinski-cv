@@ -2,6 +2,7 @@ package cv.brulinski.sebastian.fragment
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,7 @@ import androidx.lifecycle.Observer
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.interfaces.OnContentRefreshed
 import cv.brulinski.sebastian.model.Welcome
+import cv.brulinski.sebastian.repository.MainRepository
 import kotlinx.android.synthetic.main.fragment_welcome.*
 import java.lang.ClassCastException
 
