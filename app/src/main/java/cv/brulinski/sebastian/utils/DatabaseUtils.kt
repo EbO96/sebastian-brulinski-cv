@@ -1,18 +1,17 @@
 package cv.brulinski.sebastian.utils
 
-import android.util.Log
 import cv.brulinski.sebastian.database.AppDatabase
 import cv.brulinski.sebastian.dependency_injection.app.App
+import cv.brulinski.sebastian.model.Job
 import cv.brulinski.sebastian.model.PersonalInfo
 import cv.brulinski.sebastian.model.School
 import cv.brulinski.sebastian.model.Welcome
-import cv.brulinski.sebastian.repository.MainRepository.Companion.TAG
 
 val database by lazy { AppDatabase().database(App.component.getContext()).daoAccess() }
 
-fun insertWelcome(welcome: Welcome) {
+fun Welcome.insert() {
     doAsync {
-        database.insertWelcome(welcome)
+        database.insertWelcome(this)
     }
 }
 
@@ -22,9 +21,9 @@ fun deleteWelcome() {
     }
 }
 
-fun insertPersonalInfo(personalInfo: PersonalInfo) {
+fun PersonalInfo.insert() {
     doAsync {
-        database.insertPersonalInfo(personalInfo)
+        database.insertPersonalInfo(this)
     }
 }
 
@@ -34,9 +33,15 @@ fun deletePersonalInfo() {
     }
 }
 
-fun insertSchools(school: List<School>) {
+fun List<School>.insertSchools() {
     doAsync {
-        database.insertSchools(school)
+        database.insertSchools(this)
+    }
+}
+
+fun List<Job>.insertJobs() {
+    doAsync {
+        database.insertJobs(this)
     }
 }
 

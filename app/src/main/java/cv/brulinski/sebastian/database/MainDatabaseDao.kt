@@ -5,6 +5,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import cv.brulinski.sebastian.model.Job
 import cv.brulinski.sebastian.model.PersonalInfo
 import cv.brulinski.sebastian.model.School
 import cv.brulinski.sebastian.model.Welcome
@@ -21,6 +22,9 @@ interface MainDatabaseDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertSchools(schools: List<School>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertJobs(jobs: List<Job>)
+
     @Query("DELETE FROM Welcome")
     fun deleteWelcome()
 
@@ -30,6 +34,9 @@ interface MainDatabaseDao {
     @Query("DELETE FROM School")
     fun deleteSchools()
 
+    @Query("DELETE FROM Job")
+    fun deleteJobs()
+
     @Query("SELECT * FROM Welcome")
     fun getWelcome(): LiveData<Welcome>
 
@@ -38,4 +45,7 @@ interface MainDatabaseDao {
 
     @Query("SELECT * FROM School")
     fun getSchools(): LiveData<List<School>>
+
+    @Query("SELECT * FROM Job")
+    fun getJobs(): LiveData<List<Job>>
 }

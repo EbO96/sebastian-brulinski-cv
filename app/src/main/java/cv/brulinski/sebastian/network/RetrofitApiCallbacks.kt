@@ -1,6 +1,6 @@
 package cv.brulinski.sebastian.network
 
-import cv.brulinski.sebastian.model.Education
+import cv.brulinski.sebastian.model.Job
 import cv.brulinski.sebastian.model.PersonalInfo
 import cv.brulinski.sebastian.model.School
 import cv.brulinski.sebastian.model.Welcome
@@ -15,6 +15,9 @@ interface RetrofitApiCallbacks {
     @GET("getPersonalInfo")
     fun getPersonalInfo(): Observable<PersonalInfo>
 
-    @GET("getSchool")
+    @GET("getSchools")
     fun getSchools(): Observable<List<School>>
+
+    @GET("getJobs")
+    fun getJobs(): Observable<List<Job>>
 }

@@ -44,7 +44,7 @@ exports.getPersonalInfo = functions.https.onRequest((request, response) => {
         })
 })
 
-exports.getSchool = functions.https.onRequest((request, response) => {
+exports.getSchools = functions.https.onRequest((request, response) => {
     var resultJson = []
     return db
         .collection('career')
@@ -53,10 +53,32 @@ exports.getSchool = functions.https.onRequest((request, response) => {
         .get()
         .then((snapshot) => {
             snapshot.forEach((doc) => {
-                resultJson.push(doc.data())
+                var d = doc.data()
+                d["id"] = doc.id
+                resultJson.push(d)
             })
             response.status(200).json(resultJson)
         }).catch((err) => {
             response.status(200).json(resultJson)
         })
+})
+
+exports.getJobs = functions.https.onRequest((request, response) => {
+    var resultJson = []
+    return db
+        .collection('career')
+        .doc('job')
+        .collection('jobs')
+        .get()
+        .then((snapshot) => {
+            snapshot.forEach((doc) => {
+                var d = doc.data()
+                d["id"] = doc.id
+                resultJson.push(d)
+            })
+            response.status(200).json(resultJson)
+        }).catch((err) => {
+            response.status(401).json(resultJson)
+        })
+
 })

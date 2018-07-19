@@ -11,10 +11,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import cv.brulinski.sebastian.dependency_injection.app.App
-import cv.brulinski.sebastian.model.Education
-import cv.brulinski.sebastian.model.PersonalInfo
-import cv.brulinski.sebastian.model.School
-import cv.brulinski.sebastian.model.Welcome
+import cv.brulinski.sebastian.model.*
 import cv.brulinski.sebastian.repository.MainRepository.Type.BCG
 import cv.brulinski.sebastian.repository.MainRepository.Type.PROFILE
 import cv.brulinski.sebastian.utils.*
@@ -38,6 +35,7 @@ class MainRepository {
     private val welcome = MutableLiveData<Welcome>()
     private val personalInfo = MutableLiveData<PersonalInfo>()
     private val education = MutableLiveData<Education>()
+    private val jobExperience = MutableLiveData<JobExperience>()
     private val storage = FirebaseStorage.getInstance()
     private val profilePictureReference = storage.getReference("profile_picture/profile.jpg")
     private val profilePictureBcgReference = storage.getReference("profile_bcg/bcg.jpg")
@@ -88,6 +86,25 @@ class MainRepository {
         fetchSchools()
     }
 
+    fun getJobExperience(): LiveData<JobExperience> {
+        getDatabaseJobs({
+            if (it != jobExperience.value?.jobs)
+                jobExperience.apply {
+                    value = value?.apply {
+                        timestamp = Calendar.getInstance().timeInMillis
+                        jobs = it
+                    }
+                }
+        }, {
+            fetchJobs()
+        })
+        return jobExperience
+    }
+
+    fun refreshJonExperience(){
+        fetchJobs()
+    }
+
     private fun getDatabaseWelcome(welcome: (Welcome) -> Unit, empty: () -> Unit) {
         database.getWelcome().observeForever {
             it?.let { welcome(it) } ?: run { empty() }
@@ -103,6 +120,12 @@ class MainRepository {
     private fun getDatabaseSchools(schools: (List<School>) -> Unit, empty: () -> Unit) {
         database.getSchools().observeForever {
             it?.let { if (it.isEmpty()) empty() else schools(it) } ?: run { empty() }
+        }
+    }
+
+    private fun getDatabaseJobs(jobs: (List<Job>) -> Unit, empty: () -> Unit) {
+        database.getJobs().observeForever {
+            it?.let { if (it.isEmpty()) empty() else jobs(it) } ?: run { empty() }
         }
     }
 
@@ -143,7 +166,7 @@ class MainRepository {
                     it?.let {
                         it.timestamp = Calendar.getInstance().timeInMillis
                         welcome.value = it
-                        insertWelcome(it)
+                        it.insert()
                     } ?: run {
                         welcomeFetchingError()
                     }
@@ -164,7 +187,7 @@ class MainRepository {
                             profileBcg = personalInfo.value?.profileBcg
                         }
                         fetchProfileGraphics(true)
-                        insertPersonalInfo(this)
+                        insert()
                     } ?: run {
                         personalInfoFetchingError()
                     }
@@ -179,15 +202,36 @@ class MainRepository {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    it
                     it?.let {
                         education.value = Education().apply { school = it }
-                        insertSchools(it)
+                        it.insertSchools()
                     } ?: run {
                         schoolsFetchingError()
                     }
                 }, {
                     schoolsFetchingError()
+                    it.printStackTrace()
+                })
+    }
+
+    private fun fetchJobs() {
+        retrofit.getJobs()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    it?.let {
+                        jobExperience.apply {
+                            value = value?.apply {
+                                timestamp = Calendar.getInstance().timeInMillis
+                                jobs = it
+                            }
+                        }
+                        it.insertJobs()
+                    } ?: run {
+                        jobsFetchingError()
+                    }
+                }, {
+                    jobsFetchingError()
                     it.printStackTrace()
                 })
     }
@@ -206,6 +250,12 @@ class MainRepository {
 
     private fun schoolsFetchingError() {
         education.value = education.value?.apply {
+            timestamp = Calendar.getInstance().timeInMillis
+        }
+    }
+
+    private fun jobsFetchingError() {
+        jobExperience.value = jobExperience.value?.apply {
             timestamp = Calendar.getInstance().timeInMillis
         }
     }

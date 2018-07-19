@@ -9,6 +9,9 @@ import com.google.gson.annotations.SerializedName
 open class School {
 
     @PrimaryKey
+    @ColumnInfo(name = "id")
+    var id = ""
+
     @SerializedName("place")
     @ColumnInfo(name = "place")
     var place = ""

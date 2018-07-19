@@ -12,10 +12,7 @@ import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.adapter.recycler.CareerRecyclerAdapter
 import cv.brulinski.sebastian.interfaces.OnContentRefreshed
 import cv.brulinski.sebastian.interfaces.OnItemClickListener
-import cv.brulinski.sebastian.model.Education
-import cv.brulinski.sebastian.model.NoCareer
-import cv.brulinski.sebastian.model.SchoolHeader
-import cv.brulinski.sebastian.model.SchoolItem
+import cv.brulinski.sebastian.model.*
 import cv.brulinski.sebastian.model.recycler.CareerRecyclerItem
 import cv.brulinski.sebastian.utils.date
 import kotlinx.android.synthetic.main.fragment_career.*
@@ -26,6 +23,7 @@ class CareerFragment : Fragment() {
 
     interface CareerFragmentCallback : OnContentRefreshed {
         fun getEducation(): LiveData<Education>?
+        fun getJobExperience(): LiveData<JobExperience>?
         fun refreshEducation()
     }
 
@@ -43,29 +41,34 @@ class CareerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupCareerRecycler()
-        careerFragmentCallback.getEducation()?.observe(this, Observer {
-            val items = arrayListOf<CareerRecyclerItem>()
-            it?.school?.apply {
-                forEach {
-                    val header = SchoolHeader(it.startTime.date())
-                    header.place = it.place
-                    val startItem = SchoolItem()
-                    startItem.startTime = it.startTime
-                    startItem.startTimeDescription = it.startTimeDescription
-                    val endItem = SchoolItem()
-                    endItem.endTime = it.endTime
-                    endItem.endTimeDescription = it.endTimeDescription
-                    items.add(header)
-                    items.add(startItem)
-                    items.add(endItem)
+        careerFragmentCallback.apply {
+            getEducation()?.observe(this@CareerFragment, Observer {
+                val items = arrayListOf<CareerRecyclerItem>()
+                it?.school?.apply {
+                    forEach {
+                        val header = SchoolHeader(it.startTime.date())
+                        header.place = it.place
+                        val startItem = SchoolItem()
+                        startItem.startTime = it.startTime
+                        startItem.startTimeDescription = it.startTimeDescription
+                        val endItem = SchoolItem()
+                        endItem.endTime = it.endTime
+                        endItem.endTimeDescription = it.endTimeDescription
+                        items.add(header)
+                        items.add(startItem)
+                        items.add(endItem)
+                    }
                 }
-            }
-            if (items.isNotEmpty()) {
-                careerRecyclerAdapter.items = items
-            }
-            else careerRecyclerAdapter.items.add(NoCareer())
-            careerFragmentCallback.onRefreshed()
-        })
+                if (items.isNotEmpty()) {
+                    careerRecyclerAdapter.items = items
+                } else careerRecyclerAdapter.items.add(NoCareer())
+                careerFragmentCallback.onRefreshed()
+            })
+            getJobExperience()?.observe(this@CareerFragment, Observer {
+                it
+            })
+        }
+
     }
 
     private fun setupCareerRecycler() {

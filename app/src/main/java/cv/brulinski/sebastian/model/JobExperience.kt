@@ -5,7 +5,9 @@ import cv.brulinski.sebastian.utils.JOB_EXPERIENCE
 
 class JobExperience(var id: Long) : CareerRecyclerItem {
 
-    var job: List<Job>? = null
+    var jobs: List<Job>? = listOf()
+
+    var timestamp = 0L
 
     override fun type() = JOB_EXPERIENCE
 }
