@@ -5,10 +5,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import cv.brulinski.sebastian.model.Job
-import cv.brulinski.sebastian.model.PersonalInfo
-import cv.brulinski.sebastian.model.School
-import cv.brulinski.sebastian.model.Welcome
+import cv.brulinski.sebastian.model.*
 
 @Dao
 interface MainDatabaseDao {
@@ -48,4 +45,5 @@ interface MainDatabaseDao {
 
     @Query("SELECT * FROM Job")
     fun getJobs(): LiveData<List<Job>>
+
 }

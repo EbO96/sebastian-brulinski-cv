@@ -1,11 +1,14 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const requestify = require('requestify');
 var serviceAccount = require("./sebastian-brulinski-cv-app-firebase-adminsdk-b1ddn-608e079791");
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
     databaseURL: "https://sebastian-brulinski-cv-app.firebaseio.com"
 });
+
+const baseUrl = 'https://us-central1-sebastian-brulinski-cv-app.cloudfunctions.net/'
 
 var db = admin.firestore();
 
@@ -44,13 +47,25 @@ exports.getPersonalInfo = functions.https.onRequest((request, response) => {
         })
 })
 
-exports.getSchools = functions.https.onRequest((request, response) => {
-    var resultJson = []
+function getSchoolsPromise() {
     return db
         .collection('career')
         .doc('school')
         .collection('schools')
         .get()
+}
+
+function getJobsPromise() {
+    return db
+        .collection('career')
+        .doc('job')
+        .collection('jobs')
+        .get()
+}
+
+exports.getSchools = functions.https.onRequest((request, response) => {
+    var resultJson = []
+    return getSchoolsPromise()
         .then((snapshot) => {
             snapshot.forEach((doc) => {
                 var d = doc.data()
@@ -65,11 +80,7 @@ exports.getSchools = functions.https.onRequest((request, response) => {
 
 exports.getJobs = functions.https.onRequest((request, response) => {
     var resultJson = []
-    return db
-        .collection('career')
-        .doc('job')
-        .collection('jobs')
-        .get()
+    return getJobsPromise()
         .then((snapshot) => {
             snapshot.forEach((doc) => {
                 var d = doc.data()
@@ -80,5 +91,33 @@ exports.getJobs = functions.https.onRequest((request, response) => {
         }).catch((err) => {
             response.status(401).json(resultJson)
         })
+})
 
+exports.getCareer = functions.https.onRequest((request, response) => {
+    var requests = []
+    requests.push(getSchoolsPromise())
+    requests.push(getJobsPromise())
+
+    return Promise.all(requests)
+        .then((results) => {
+            var result = { status: 1, schools: [], jobs: [] }
+            schoolsSnapshot = results[0]
+            jobsSnapshot = results[1]
+
+            schoolsSnapshot.forEach((doc) => {
+                var d = doc.data()
+                d["id"] = doc.id
+                result.schools.push(d)
+            })
+
+            jobsSnapshot.forEach((doc) => {
+                var d = doc.data()
+                d["id"] = doc.id
+                result.jobs.push(d)
+            })
+
+            response.status(200).json(result)
+        }).catch(err => {
+            response.status(401).json({ status: -1 })
+        })
 })

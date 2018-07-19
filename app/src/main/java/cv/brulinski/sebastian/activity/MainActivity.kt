@@ -5,7 +5,6 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.viewpager.widget.ViewPager
@@ -17,7 +16,6 @@ import cv.brulinski.sebastian.fragment.CareerFragment
 import cv.brulinski.sebastian.fragment.PersonalInfoFragment
 import cv.brulinski.sebastian.fragment.StartFragment
 import cv.brulinski.sebastian.fragment.WelcomeFragment
-import cv.brulinski.sebastian.model.JobExperience
 import cv.brulinski.sebastian.utils.delay
 import cv.brulinski.sebastian.utils.goTo
 import cv.brulinski.sebastian.utils.pages
@@ -159,15 +157,10 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
-    /*
-    CareerFragment callbacks
-     */
-    override fun getEducation() = mainViewModel?.education
+    override fun getCareer() = mainViewModel?.career
 
-    override fun getJobExperience() = mainViewModel?.jobExperience
-
-    override fun refreshEducation() {
-        mainViewModel?.refreshEducation()
+    override fun refreshCareer() {
+        mainViewModel?.refreshCareer()
     }
 
     private fun homeForwardButton(pagePosition: Int) = supportActionBar?.apply {
@@ -220,7 +213,7 @@ class MainActivity : AppCompatActivity(),
             mainViewModel?.refreshPersonalInfo()
         }, {
             //CAREER
-            mainViewModel?.refreshEducation()
+            mainViewModel?.refreshCareer()
         }, {
             //ELSE
             refreshLayout.isRefreshing = false

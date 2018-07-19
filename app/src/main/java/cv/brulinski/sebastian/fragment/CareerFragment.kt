@@ -12,7 +12,10 @@ import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.adapter.recycler.CareerRecyclerAdapter
 import cv.brulinski.sebastian.interfaces.OnContentRefreshed
 import cv.brulinski.sebastian.interfaces.OnItemClickListener
-import cv.brulinski.sebastian.model.*
+import cv.brulinski.sebastian.model.Career
+import cv.brulinski.sebastian.model.NoCareer
+import cv.brulinski.sebastian.model.SchoolHeader
+import cv.brulinski.sebastian.model.SchoolItem
 import cv.brulinski.sebastian.model.recycler.CareerRecyclerItem
 import cv.brulinski.sebastian.utils.date
 import kotlinx.android.synthetic.main.fragment_career.*
@@ -22,9 +25,8 @@ import java.lang.ClassCastException
 class CareerFragment : Fragment() {
 
     interface CareerFragmentCallback : OnContentRefreshed {
-        fun getEducation(): LiveData<Education>?
-        fun getJobExperience(): LiveData<JobExperience>?
-        fun refreshEducation()
+        fun getCareer(): LiveData<Career>?
+        fun refreshCareer()
     }
 
     //Callback to parent activity
@@ -42,10 +44,10 @@ class CareerFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupCareerRecycler()
         careerFragmentCallback.apply {
-            getEducation()?.observe(this@CareerFragment, Observer {
+            getCareer()?.observe(this@CareerFragment, Observer { career ->
                 val items = arrayListOf<CareerRecyclerItem>()
-                it?.school?.apply {
-                    forEach {
+                career?.schools?.let { schools ->
+                    schools.forEach {
                         val header = SchoolHeader(it.startTime.date())
                         header.place = it.place
                         val startItem = SchoolItem()
@@ -64,11 +66,7 @@ class CareerFragment : Fragment() {
                 } else careerRecyclerAdapter.items.add(NoCareer())
                 careerFragmentCallback.onRefreshed()
             })
-            getJobExperience()?.observe(this@CareerFragment, Observer {
-                it
-            })
         }
-
     }
 
     private fun setupCareerRecycler() {

@@ -32,17 +32,18 @@ class MainRepository {
         val TAG = "MainRepository"
     }
 
+    private var schoolsFetchedFromDb = false
+    private var jobsFetchedFromDb = false
     private val welcome = MutableLiveData<Welcome>()
     private val personalInfo = MutableLiveData<PersonalInfo>()
-    private val education = MutableLiveData<Education>()
-    private val jobExperience = MutableLiveData<JobExperience>()
+    private val career = MutableLiveData<Career>()
     private val storage = FirebaseStorage.getInstance()
     private val profilePictureReference = storage.getReference("profile_picture/profile.jpg")
     private val profilePictureBcgReference = storage.getReference("profile_bcg/bcg.jpg")
 
     fun getWelcome(): LiveData<Welcome> {
         getDatabaseWelcome({
-            if (it != welcome.value)
+            if (it.timestamp != welcome.value?.timestamp || it.timestamp == -1L)
                 welcome.value = it
         }, {
             fetchWelcome()
@@ -56,7 +57,7 @@ class MainRepository {
 
     fun getPersonalInfo(): LiveData<PersonalInfo> {
         getDatabasePersonalInfo({
-            if (it != personalInfo.value) {
+            if (it.timestamp != personalInfo.value?.timestamp || it.timestamp == -1L) {
                 personalInfo.value = it
                 fetchProfileGraphics(true)
             } else fetchProfileGraphics()
@@ -70,39 +71,18 @@ class MainRepository {
         fetchPersonalInfo()
     }
 
-    fun getEducation(): LiveData<Education> {
-        getDatabaseSchools({
-            if (it != education.value?.school)
-                education.value = Education().apply {
-                    school = it
-                }
-        }, {
-            fetchSchools()
-        })
-        return education
+    fun getCareer(): LiveData<Career> {
+        getDatabaseCareer {
+            if (it.timestamp != career.value?.timestamp || it.timestamp == -1L)
+                career.value = it
+            if (it.status == -1 && it.schools.isEmpty() && it.jobs.isEmpty())
+                fetchCareer()
+        }
+        return career
     }
 
-    fun refreshEducation() {
-        fetchSchools()
-    }
-
-    fun getJobExperience(): LiveData<JobExperience> {
-        getDatabaseJobs({
-            if (it != jobExperience.value?.jobs)
-                jobExperience.apply {
-                    value = value?.apply {
-                        timestamp = Calendar.getInstance().timeInMillis
-                        jobs = it
-                    }
-                }
-        }, {
-            fetchJobs()
-        })
-        return jobExperience
-    }
-
-    fun refreshJonExperience(){
-        fetchJobs()
+    fun refreshCareer() {
+        fetchCareer()
     }
 
     private fun getDatabaseWelcome(welcome: (Welcome) -> Unit, empty: () -> Unit) {
@@ -128,6 +108,20 @@ class MainRepository {
             it?.let { if (it.isEmpty()) empty() else jobs(it) } ?: run { empty() }
         }
     }
+
+    private fun getDatabaseCareer(career: (Career) -> Unit) {
+        val c = Career()
+        database.getSchools().observeForever {
+            c.schools = it
+            career(c)
+        }
+        database.getJobs().observeForever {
+            c.jobs = it
+            career(c)
+        }
+    }
+
+    private fun Career.isNoFetched() = jobsFetchedFromDb && schoolsFetchedFromDb && jobs.isEmpty() && schools.isEmpty()
 
     private fun fetchProfileGraphics(refresh: Boolean = false) {
         ProfilePictureManager().apply {
@@ -197,41 +191,20 @@ class MainRepository {
                 })
     }
 
-    private fun fetchSchools() {
-        retrofit.getSchools()
+    private fun fetchCareer() {
+        retrofit.getCareer()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    it?.let {
-                        education.value = Education().apply { school = it }
-                        it.insertSchools()
+                    career.value = it
+                    it?.apply {
+                        schools.insertSchools()
+                        jobs.insertJobs()
                     } ?: run {
-                        schoolsFetchingError()
+                        careerFetchingError()
                     }
                 }, {
-                    schoolsFetchingError()
-                    it.printStackTrace()
-                })
-    }
-
-    private fun fetchJobs() {
-        retrofit.getJobs()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    it?.let {
-                        jobExperience.apply {
-                            value = value?.apply {
-                                timestamp = Calendar.getInstance().timeInMillis
-                                jobs = it
-                            }
-                        }
-                        it.insertJobs()
-                    } ?: run {
-                        jobsFetchingError()
-                    }
-                }, {
-                    jobsFetchingError()
+                    careerFetchingError()
                     it.printStackTrace()
                 })
     }
@@ -248,14 +221,8 @@ class MainRepository {
         }
     }
 
-    private fun schoolsFetchingError() {
-        education.value = education.value?.apply {
-            timestamp = Calendar.getInstance().timeInMillis
-        }
-    }
-
-    private fun jobsFetchingError() {
-        jobExperience.value = jobExperience.value?.apply {
+    private fun careerFetchingError() {
+        career.value = career.value?.apply {
             timestamp = Calendar.getInstance().timeInMillis
         }
     }

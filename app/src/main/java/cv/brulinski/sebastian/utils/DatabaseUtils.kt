@@ -2,10 +2,7 @@ package cv.brulinski.sebastian.utils
 
 import cv.brulinski.sebastian.database.AppDatabase
 import cv.brulinski.sebastian.dependency_injection.app.App
-import cv.brulinski.sebastian.model.Job
-import cv.brulinski.sebastian.model.PersonalInfo
-import cv.brulinski.sebastian.model.School
-import cv.brulinski.sebastian.model.Welcome
+import cv.brulinski.sebastian.model.*
 
 val database by lazy { AppDatabase().database(App.component.getContext()).daoAccess() }
 
@@ -44,4 +41,6 @@ fun List<Job>.insertJobs() {
         database.insertJobs(this)
     }
 }
+
+
 

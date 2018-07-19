@@ -8,8 +8,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository by lazy { MainRepository() }
     val welcome by lazy { repository.getWelcome() }
-    val education by lazy { repository.getEducation() }
-    val jobExperience by lazy { repository.getJobExperience() }
+    val career by lazy { repository.getCareer() }
     val personalInfo by lazy { repository.getPersonalInfo() }
 
     fun refreshWelcome() {
@@ -20,8 +19,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         repository.refreshPersonalInfo()
     }
 
-    fun refreshEducation() {
-        repository.refreshEducation()
-        repository.refreshJonExperience()
+    fun refreshCareer() {
+        repository.refreshCareer()
     }
 }
