@@ -14,9 +14,8 @@
         android:theme="@style/AppThemeNoActionBar">
         <activity
             android:name=".activity.MainActivity"
-            android:resizeableActivity="false"
             android:screenOrientation="portrait"
-            android:theme="@style/AppThemeNoActionBar">
+            android:theme="@style/AppTheme.Launcher">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

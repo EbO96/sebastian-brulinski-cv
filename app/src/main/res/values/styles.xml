@@ -16,6 +16,10 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="AppTheme.Launcher" parent="AppThemeNoActionBar">
+        <item name="android:windowBackground">@drawable/launch_screen</item>
+    </style>
+
     <!-- my_toolbar toolbar style. -->
     <style name="MyToolbarStyle" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="android:textAppearance">@style/MyToolbarTextAppearance</item>
