@@ -7,7 +7,7 @@ class JobExperience() : CareerRecyclerItem {
 
     var jobs: List<Job>? = listOf()
 
-    var timestamp = 0L
+    var timestamp = -1L
 
     override fun type() = JOB_EXPERIENCE
 }

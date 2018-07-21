@@ -17,7 +17,7 @@ class Welcome {
     var id = 1
     @Expose
     @ColumnInfo(name = "timestamp")
-    var timestamp = 0L
+    var timestamp = -1L
     @SerializedName("title")
     @ColumnInfo(name = "title")
     var title = ""

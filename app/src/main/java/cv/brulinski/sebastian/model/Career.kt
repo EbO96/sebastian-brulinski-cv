@@ -15,5 +15,5 @@ class Career {
     var jobs: List<Job> = arrayListOf()
 
     @Expose
-    var timestamp = 0L
+    var timestamp = -1L
 }

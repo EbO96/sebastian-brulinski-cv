@@ -63,6 +63,18 @@ function getJobsPromise() {
         .get()
 }
 
+function getWelcomePromise() {
+    return db
+        .collection('welcome')
+        .get()
+}
+
+function getPersonalInfoPromise() {
+    return db
+        .collection('personal_data')
+        .get()
+}
+
 exports.getSchools = functions.https.onRequest((request, response) => {
     var resultJson = []
     return getSchoolsPromise()
@@ -120,4 +132,8 @@ exports.getCareer = functions.https.onRequest((request, response) => {
         }).catch(err => {
             response.status(401).json({ status: -1 })
         })
+})
+
+exports.getAll = functions.https.onRequest((request, response) => {
+    
 })

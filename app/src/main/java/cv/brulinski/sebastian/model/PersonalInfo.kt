@@ -20,7 +20,7 @@ class PersonalInfo {
     var id = 1
     @Expose
     @ColumnInfo(name = "timestamp")
-    var timestamp = 0L
+    var timestamp = -1L
     @ColumnInfo(name = "name")
     @SerializedName("name")
     var name = ""
