@@ -6,8 +6,8 @@ import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.adapter.recycler.education_view_holder.EducationHeaderViewHolder
 import cv.brulinski.sebastian.adapter.recycler.education_view_holder.EducationViewHolder
 import cv.brulinski.sebastian.adapter.recycler.empty.EmptyRecyclerViewHolder
-import cv.brulinski.sebastian.adapter.recycler.jon_experience_view_holder.JobExperienceHeaderViewHolder
-import cv.brulinski.sebastian.adapter.recycler.jon_experience_view_holder.JobExperienceViewHolder
+import cv.brulinski.sebastian.adapter.recycler.job_experience_view_holder.JobExperienceHeaderViewHolder
+import cv.brulinski.sebastian.adapter.recycler.job_experience_view_holder.JobExperienceViewHolder
 import cv.brulinski.sebastian.interfaces.OnBindViewInViewHolder
 import cv.brulinski.sebastian.interfaces.OnItemClickListener
 import cv.brulinski.sebastian.model.recycler.CareerRecyclerItem
@@ -29,8 +29,8 @@ class CareerRecyclerAdapter(private val onItemClickListener: OnItemClickListener
         return when (viewType) {
             EDUCATION_ITEM_HEADER -> EducationHeaderViewHolder(parent inflateViewHolderView R.layout.education_header_item)
             EDUCATION_ITEM -> EducationViewHolder(parent inflateViewHolderView R.layout.education_item)
-            JOB_EXPERIENCE_HEADER -> JobExperienceHeaderViewHolder(parent inflateViewHolderView R.layout.jon_experience_header_item)
-            JOB_EXPERIENCE -> JobExperienceViewHolder(parent inflateViewHolderView R.layout.jon_experience_item)
+            JOB_EXPERIENCE_HEADER -> JobExperienceHeaderViewHolder(parent inflateViewHolderView R.layout.job_header_item)
+            JOB_EXPERIENCE -> JobExperienceViewHolder(parent inflateViewHolderView R.layout.education_item)
             else -> EmptyRecyclerViewHolder(parent inflateViewHolderView R.layout.empty_list_item)
         }
     }

@@ -12,10 +12,7 @@ import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.adapter.recycler.CareerRecyclerAdapter
 import cv.brulinski.sebastian.interfaces.OnContentRefreshed
 import cv.brulinski.sebastian.interfaces.OnItemClickListener
-import cv.brulinski.sebastian.model.Career
-import cv.brulinski.sebastian.model.NoCareer
-import cv.brulinski.sebastian.model.SchoolHeader
-import cv.brulinski.sebastian.model.SchoolItem
+import cv.brulinski.sebastian.model.*
 import cv.brulinski.sebastian.model.recycler.CareerRecyclerItem
 import cv.brulinski.sebastian.utils.date
 import kotlinx.android.synthetic.main.fragment_career.*
@@ -47,13 +44,30 @@ class CareerFragment : Fragment() {
             getCareer()?.observe(this@CareerFragment, Observer { career ->
                 val items = arrayListOf<CareerRecyclerItem>()
                 career?.schools?.let { schools ->
-                    schools.forEach {
+                    schools.sortedBy { it.startTime }.forEach {
                         val header = SchoolHeader(it.startTime.date())
                         header.place = it.place
                         val startItem = SchoolItem()
                         startItem.startTime = it.startTime
                         startItem.startTimeDescription = it.startTimeDescription
                         val endItem = SchoolItem()
+                        endItem.endTime = it.endTime
+                        endItem.endTimeDescription = it.endTimeDescription
+                        items.add(header)
+                        items.add(startItem)
+                        items.add(endItem)
+                    }
+                }
+                career?.jobs?.let { jobs ->
+                    jobs.sortedBy { it.startTime }.forEach {
+                        val header = JobHeader(it.startTime.date())
+                        header.companyName = it.companyName
+                        header.jobPosition = it.jobPosition
+                        header.jobDescription = it.jobDescription
+                        val startItem = JobItem()
+                        startItem.startTime = it.startTime
+                        startItem.startTimeDescription = it.startTimeDescription
+                        val endItem = JobItem()
                         endItem.endTime = it.endTime
                         endItem.endTimeDescription = it.endTimeDescription
                         items.add(header)
