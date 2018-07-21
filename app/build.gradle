@@ -2,9 +2,13 @@ apply plugin: 'com.android.application'
 
 apply plugin: 'kotlin-android'
 
+apply plugin: 'org.jetbrains.dokka-android'
+
 apply plugin: 'kotlin-android-extensions'
 
 apply plugin: 'kotlin-kapt'
+
+
 
 android {
     compileSdkVersion 28
@@ -31,6 +35,10 @@ android {
     }
     lintOptions {
         disable 'PrivateResource'
+    }
+    dokka {
+        outputFormat = 'html'
+        outputDirectory = "$buildDir/javadoc"
     }
 }
 
@@ -81,3 +89,4 @@ dependencies {
 }
 
 apply plugin: 'com.google.gms.google-services'
+
