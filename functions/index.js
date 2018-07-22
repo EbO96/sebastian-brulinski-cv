@@ -12,57 +12,11 @@ const baseUrl = 'https://us-central1-sebastian-brulinski-cv-app.cloudfunctions.n
 
 var db = admin.firestore();
 
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-//
-// exports.helloWorld = functions.https.onRequest((request, response) => {
-//  response.send("Hello from Firebase!");
-// });
-exports.getWelcome = functions.https.onRequest((request, response) => {
-    return db
-        .collection('welcome')
-        .get()
-        .then((snapshot) => {
-            var d;
-            snapshot.forEach((doc) => {
-                d = doc.data()
-            });
-            response.status(200).json(d)
-        })
-        .catch((err) => {
-            response.status(401).json(err)
-        })
-});
-
-exports.getPersonalInfo = functions.https.onRequest((request, response) => {
-    return db
-        .collection('personal_data')
-        .get()
-        .then((snapshot) => {
-            snapshot.forEach((doc) => {
-                response.status(200).json(doc.data())
-            })
-        }).catch((err) => {
-            response.status(401).json(err)
-        })
-})
-
-function getSchoolsPromise() {
+function getCareerProomise() {
     return db
         .collection('career')
-        .doc('school')
-        .collection('schools')
         .get()
 }
-
-function getJobsPromise() {
-    return db
-        .collection('career')
-        .doc('job')
-        .collection('jobs')
-        .get()
-}
-
 function getWelcomePromise() {
     return db
         .collection('welcome')
@@ -81,107 +35,44 @@ function getLanguagesPromise() {
         .get()
 }
 
-exports.getSchools = functions.https.onRequest((request, response) => {
-    var resultJson = []
-    return getSchoolsPromise()
-        .then((snapshot) => {
-            snapshot.forEach((doc) => {
-                var d = doc.data()
-                d["id"] = doc.id
-                resultJson.push(d)
-            })
-            response.status(200).json(resultJson)
-        }).catch((err) => {
-            response.status(200).json(resultJson)
-        })
-})
-
-exports.getJobs = functions.https.onRequest((request, response) => {
-    var resultJson = []
-    return getJobsPromise()
-        .then((snapshot) => {
-            snapshot.forEach((doc) => {
-                var d = doc.data()
-                d["id"] = doc.id
-                resultJson.push(d)
-            })
-            response.status(200).json(resultJson)
-        }).catch((err) => {
-            response.status(401).json(resultJson)
-        })
-})
-
-exports.getCareer = functions.https.onRequest((request, response) => {
-    var requests = []
-    requests.push(getSchoolsPromise())
-    requests.push(getJobsPromise())
-
-    return Promise.all(requests)
-        .then((results) => {
-            var result = { status: 1, schools: [], jobs: [] }
-            schoolsSnapshot = results[0]
-            jobsSnapshot = results[1]
-
-            schoolsSnapshot.forEach((doc) => {
-                var d = doc.data()
-                d["id"] = doc.id
-                result.schools.push(d)
-            })
-
-            jobsSnapshot.forEach((doc) => {
-                var d = doc.data()
-                d["id"] = doc.id
-                result.jobs.push(d)
-            })
-
-            response.status(200).json(result)
-        }).catch(err => {
-            response.status(401).json({ status: -1 })
-        })
-})
-
 exports.getAll = functions.https.onRequest((request, response) => {
     var requests = []
-    var jsonResult = { status: -1, welcome: {}, personal_info: {}, career: {}, languages: [] }
+    var jsonResult = { status: -1, welcome: { timestamp: -1 }, personal_info: { timestamp: -1 }, career: [], languages: [] }
     requests.push(getWelcomePromise())
     requests.push(getPersonalInfoPromise())
-    requests.push(getSchoolsPromise())
-    requests.push(getJobsPromise())
+    requests.push(getCareerProomise())
     requests.push(getLanguagesPromise())
 
     return Promise.all(requests)
         .then((results) => {
+
+            const time = Date.now()
 
             var welcome
             results[0].forEach((doc) => {
                 welcome = doc.data()
             });
             jsonResult.welcome = welcome
+            jsonResult.welcome.timestamp = time
 
             var personalInfo
             results[1].forEach((doc) => {
                 personalInfo = doc.data()
             })
             jsonResult.personal_info = personalInfo
-
-            var career = { schools: [], jobs: [] }
+            jsonResult.personal_info.timestamp = time
 
             results[2].forEach((doc) => {
                 var d = doc.data()
                 d["id"] = doc.id
-                career.schools.push(d)
+                d["timestamp"] = time
+                jsonResult.career.push(d)
             })
 
             results[3].forEach((doc) => {
                 var d = doc.data()
                 d["id"] = doc.id
-                career.jobs.push(d)
-            })
-            jsonResult.career = career
-
-            results[4].forEach((doc) => {
-                var d = doc.data()
-                d["id"] = doc.id
+                d["timestamp"] = time
                 jsonResult.languages.push(d)
             })
 
@@ -190,5 +81,26 @@ exports.getAll = functions.https.onRequest((request, response) => {
 
         }).catch((error) => {
             response.status(401).json(jsonResult)
+        })
+})
+
+exports.addCareer = functions.https.onRequest((request, response) => {
+    var career = {
+        endTime: "01.03.2014",
+        function: "sd",
+        description: "sd",
+        startTime: "01.03.2015",
+        placeName: "sds",
+        latitude: 0,
+        longitude: 0,
+        endTimeDescription: "sd",
+        type: 1,
+        startTimeDescription: "sd"
+    }
+    db.collection('career').add(career)
+        .then(result => {
+            response.status(200).send("Success")
+        }).catch(err => {
+            response.status(401).send("Error")
         })
 })

@@ -15,7 +15,7 @@ class Welcome {
     @PrimaryKey
     @ColumnInfo(name = "id")
     var id = 1
-    @Expose
+    @SerializedName("timestamp")
     @ColumnInfo(name = "timestamp")
     var timestamp = -1L
     @SerializedName("title")

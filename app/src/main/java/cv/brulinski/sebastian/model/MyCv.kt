@@ -5,13 +5,13 @@ import com.google.gson.annotations.SerializedName
 class MyCv {
 
     @SerializedName("status")
-    var status = -1
+    var status = 0
     @SerializedName("welcome")
-    var welcome: Welcome? = null
+    var welcome: Welcome? = Welcome()
     @SerializedName("personal_info")
-    var personalInfo: PersonalInfo? = null
+    var personalInfo: PersonalInfo? = PersonalInfo()
     @SerializedName("career")
-    var career: Career? = null
+    var career: List<Career>? = listOf()
     @SerializedName("languages")
-    var languages: ArrayList<Language>? = null
+    var languages: List<Language>? = listOf()
 }

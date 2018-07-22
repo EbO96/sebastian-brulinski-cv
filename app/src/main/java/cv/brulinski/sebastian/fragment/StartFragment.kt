@@ -49,8 +49,4 @@ class StartFragment : Fragment() {
             throw ClassCastException("$context must implement StartFragmentCallback")
         }
     }
-
-    override fun onResume() {
-        super.onResume()
-    }
 }

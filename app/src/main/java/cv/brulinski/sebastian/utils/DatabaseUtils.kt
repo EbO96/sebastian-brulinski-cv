@@ -30,34 +30,23 @@ fun deletePersonalInfo() {
     }
 }
 
-fun List<School>.insertSchools() {
-    doAsync {
-        database.insertSchools(this)
-    }
-}
-
-fun List<Job>.insertJobs() {
-    doAsync {
-        database.insertJobs(this)
-    }
-}
-
 fun List<Language>.insertLanguages() {
     doAsync {
         database.insertLanguages(this)
     }
 }
 
-fun MyCv.insert() {
+fun List<Career>.insert() {
     doAsync {
-        career?.apply {
-            schools.insertSchools()
-            jobs.insertJobs()
-        }
-        welcome?.insert()
-        personalInfo?.insert()
-        languages?.insertLanguages()
+        database.insertCareer(this)
     }
+}
+
+fun MyCv.insert() {
+    career?.insert()
+    welcome?.insert()
+    personalInfo?.insert()
+    languages?.insertLanguages()
 }
 
 

@@ -3,34 +3,31 @@ package cv.brulinski.sebastian.adapter.recycler
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import cv.brulinski.sebastian.R
-import cv.brulinski.sebastian.adapter.recycler.education_view_holder.EducationHeaderViewHolder
-import cv.brulinski.sebastian.adapter.recycler.education_view_holder.EducationViewHolder
+import cv.brulinski.sebastian.adapter.recycler.career_view_holder.CareerHeaderViewHolder
+import cv.brulinski.sebastian.adapter.recycler.career_view_holder.CareerItemViewHolder
 import cv.brulinski.sebastian.adapter.recycler.empty.EmptyRecyclerViewHolder
-import cv.brulinski.sebastian.adapter.recycler.job_experience_view_holder.JobExperienceHeaderViewHolder
-import cv.brulinski.sebastian.adapter.recycler.job_experience_view_holder.JobExperienceViewHolder
 import cv.brulinski.sebastian.interfaces.OnBindViewInViewHolder
 import cv.brulinski.sebastian.interfaces.OnItemClickListener
-import cv.brulinski.sebastian.model.recycler.CareerRecyclerItem
-import cv.brulinski.sebastian.utils.*
+import cv.brulinski.sebastian.model.RecyclerItem
+import cv.brulinski.sebastian.utils.TYPE_HEADER
+import cv.brulinski.sebastian.utils.TYPE_ITEM
 import inflateViewHolderView
 
 class CareerRecyclerAdapter(private val onItemClickListener: OnItemClickListener? = null) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    var items = arrayListOf<CareerRecyclerItem>()
+    var items = arrayListOf<RecyclerItem>()
         set(value) {
             field = value
             notifyDataSetChanged()
         }
 
-    override fun getItemViewType(position: Int) = items[position].type()
+    override fun getItemViewType(position: Int) = items[position].itemType
             ?: -1
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            EDUCATION_ITEM_HEADER -> EducationHeaderViewHolder(parent inflateViewHolderView R.layout.education_header_item)
-            EDUCATION_ITEM -> EducationViewHolder(parent inflateViewHolderView R.layout.education_item)
-            JOB_EXPERIENCE_HEADER -> JobExperienceHeaderViewHolder(parent inflateViewHolderView R.layout.job_header_item)
-            JOB_EXPERIENCE -> JobExperienceViewHolder(parent inflateViewHolderView R.layout.education_item)
+            TYPE_HEADER -> CareerHeaderViewHolder(parent inflateViewHolderView R.layout.career_item_header)
+            TYPE_ITEM -> CareerItemViewHolder(parent inflateViewHolderView R.layout.career_item)
             else -> EmptyRecyclerViewHolder(parent inflateViewHolderView R.layout.empty_list_item)
         }
     }

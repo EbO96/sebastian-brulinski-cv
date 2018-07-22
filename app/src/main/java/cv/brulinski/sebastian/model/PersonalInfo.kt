@@ -18,7 +18,7 @@ class PersonalInfo {
     @PrimaryKey
     @ColumnInfo(name = "id")
     var id = 1
-    @Expose
+    @SerializedName("timestamp")
     @ColumnInfo(name = "timestamp")
     var timestamp = -1L
     @ColumnInfo(name = "name")

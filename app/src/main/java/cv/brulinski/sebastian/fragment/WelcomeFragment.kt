@@ -2,28 +2,18 @@ package cv.brulinski.sebastian.fragment
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import cv.brulinski.sebastian.R
-import cv.brulinski.sebastian.interfaces.OnContentRefreshed
 import cv.brulinski.sebastian.model.Welcome
-import cv.brulinski.sebastian.repository.MainRepository
 import kotlinx.android.synthetic.main.fragment_welcome.*
 import java.lang.ClassCastException
 
-class WelcomeFragment : Fragment(), LifecycleOwner {
+class WelcomeFragment : Fragment() {
 
-    interface WelcomeFragmentCallback : OnContentRefreshed {
-        fun goToPersonalInfoScreen()
-        fun onWelcomeFragmentResume()
-        fun getWelcome(): LiveData<Welcome>?
-        fun refreshWelcome()
+    interface WelcomeFragmentCallback {
     }
 
     //Callback to parent activity
@@ -36,18 +26,12 @@ class WelcomeFragment : Fragment(), LifecycleOwner {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        nextButton.setOnClickListener {
-            welcomeFragmentCallback.goToPersonalInfoScreen()
-        }
-        welcomeFragmentCallback.apply {
-            getWelcome()?.observe(this@WelcomeFragment, Observer {
-                it?.apply {
-                    welcomeTitleTextView.text = title
-                    welcomeDescriptionTextView.text = description
-                }
-                onRefreshed()
-            })
-        }
+
+    }
+
+    fun update(welcome: Welcome) {
+        welcomeTitleTextView?.text = welcome.title
+        welcomeDescriptionTextView?.text = welcome.description
     }
 
     override fun onAttach(context: Context?) {

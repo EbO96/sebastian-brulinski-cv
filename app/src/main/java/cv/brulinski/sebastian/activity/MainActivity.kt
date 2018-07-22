@@ -5,6 +5,8 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.viewpager.widget.ViewPager
@@ -12,13 +14,15 @@ import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter
 import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Companion.Page.*
 import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Companion.pageMap
+import cv.brulinski.sebastian.dependency_injection.component.DaggerPagesComponent
+import cv.brulinski.sebastian.dependency_injection.component.PagesComponent
+import cv.brulinski.sebastian.dependency_injection.module.PagesModule
 import cv.brulinski.sebastian.fragment.CareerFragment
 import cv.brulinski.sebastian.fragment.PersonalInfoFragment
 import cv.brulinski.sebastian.fragment.StartFragment
 import cv.brulinski.sebastian.fragment.WelcomeFragment
-import cv.brulinski.sebastian.utils.delay
+import cv.brulinski.sebastian.model.MyCv
 import cv.brulinski.sebastian.utils.goTo
-import cv.brulinski.sebastian.utils.pages
 import cv.brulinski.sebastian.utils.string
 import cv.brulinski.sebastian.view_model.MainViewModel
 import kotlinx.android.synthetic.main.activity_main.*
@@ -26,9 +30,8 @@ import setBaseToolbar
 
 class MainActivity : AppCompatActivity(),
         StartFragment.StartFragmentCallback,
-        WelcomeFragment.WelcomeFragmentCallback,
+        SwipeRefreshLayout.OnRefreshListener, WelcomeFragment.WelcomeFragmentCallback,
         PersonalInfoFragment.PersonalInfoCallback,
-        SwipeRefreshLayout.OnRefreshListener,
         CareerFragment.CareerFragmentCallback {
 
     //ViewPager adapter
@@ -37,17 +40,37 @@ class MainActivity : AppCompatActivity(),
     private var forwardButton: MenuItem? = null
     //ViewModel
     private var mainViewModel: MainViewModel? = null
+    //MyCv
+    private var myCv: LiveData<MyCv>? = null
+    //Dagger ViewPager pages component
+    private lateinit var pagesComponent: PagesComponent
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setBaseToolbar(title = R.string.start.string(), enableHomeButton = true)
         setupViewPager()
+        pagesComponent = DaggerPagesComponent.builder().pagesModule(PagesModule(mainActivityViewPagerAdapter, viewPager)).build()
+        pagesComponent.inject(this)
         homeForwardButton(pageMap[START_SCREEN] ?: 0)
         //ViewModel
         mainViewModel = ViewModelProvider.AndroidViewModelFactory.getInstance(application).create(MainViewModel::class.java)
+        myCv = mainViewModel?.myCv
+        myCv?.observe(this, Observer {
+            it?.apply {
+                welcome?.let { welcome ->
+                    pagesComponent.getWelcomeScreen().update(welcome)
+                }
+                personalInfo?.let { personalInfo ->
+                    pagesComponent.getPersonalInfoScreen().update(personalInfo)
+                }
+                career?.let { career ->
+                    pagesComponent.getCareerFragment().update(career)
+                }
+            }
+            refreshLayout.isRefreshing = false
+        })
         refreshLayout.setOnRefreshListener(this)
-        lockUnlockRefreshLayout()
     }
 
     private fun setupViewPager() {
@@ -79,24 +102,8 @@ class MainActivity : AppCompatActivity(),
 
         override fun onPageSelected(position: Int) {
             mainActivityViewPagerAdapter.getPageTitle(position).asToolbarTitle()
-            viewPager.paging = false
             homeForwardButton(position)
-            lockUnlockRefreshLayout()
         }
-    }
-
-    private fun lockUnlockRefreshLayout() {
-        refreshLayout.isEnabled = viewPager.pages({
-            false
-        }, {
-            true
-        }, {
-            true
-        }, {
-            true
-        }, {
-            false
-        })
     }
 
     private fun String.asToolbarTitle() {
@@ -128,40 +135,11 @@ class MainActivity : AppCompatActivity(),
     /*
     WelcomeFragment callbacks
      */
-    override fun goToPersonalInfoScreen() {
-        viewPager goTo PERSONAL_INFO_SCREEN
-    }
-
-    override fun onWelcomeFragmentResume() {
-        homeForwardButton(viewPager.currentItem)
-    }
-
-    override fun getWelcome() = mainViewModel?.welcome
-
-    override fun refreshWelcome() {
-        mainViewModel?.refreshWelcome()
-    }
 
     /*
     PersonalInfo callbacks
      */
-    override fun getPersonalInfo() = mainViewModel?.personalInfo
 
-    override fun goToCareerScreen() {
-        viewPager goTo CAREER
-    }
-
-    override fun onRefreshed() {
-        200L.delay {
-            refreshLayout.isRefreshing = false
-        }
-    }
-
-    override fun getCareer() = mainViewModel?.career
-
-    override fun refreshCareer() {
-        mainViewModel?.refreshCareer()
-    }
 
     private fun homeForwardButton(pagePosition: Int) = supportActionBar?.apply {
         val enabled = pagePosition != pageMap[START_SCREEN]
@@ -186,10 +164,8 @@ class MainActivity : AppCompatActivity(),
             R.id.pageForward -> {
                 when (viewPager.currentItem) {
                     pageMap[WELCOME_SCREEN] -> {
-                        goToPersonalInfoScreen()
                     }
                     pageMap[PERSONAL_INFO_SCREEN] -> {
-                        goToCareerScreen()
                     }
                     pageMap[CAREER] -> {
 
@@ -202,22 +178,7 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onRefresh() {
-        viewPager.pages({
-            //START
-            refreshLayout.isRefreshing = false
-        }, {
-            //WELCOME
-            mainViewModel?.refreshWelcome()
-        }, {
-            //PERSONAL INFO
-            mainViewModel?.refreshPersonalInfo()
-        }, {
-            //CAREER
-            mainViewModel?.refreshCareer()
-        }, {
-            //ELSE
-            refreshLayout.isRefreshing = false
-        })
+        mainViewModel?.refreshAll()
     }
 
     override fun onResume() {

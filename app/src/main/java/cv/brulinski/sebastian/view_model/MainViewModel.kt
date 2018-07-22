@@ -7,19 +7,7 @@ import cv.brulinski.sebastian.repository.MainRepository
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository by lazy { MainRepository() }
-    val welcome by lazy { repository.getWelcome() }
-    val career by lazy { repository.getCareer() }
-    val personalInfo by lazy { repository.getPersonalInfo() }
+    val myCv by lazy { repository.getCv() }
 
-    fun refreshWelcome() {
-        repository.refreshWelcome()
-    }
-
-    fun refreshPersonalInfo() {
-        repository.refreshPersonalInfo()
-    }
-
-    fun refreshCareer() {
-        repository.refreshCareer()
-    }
+    fun refreshAll() = repository.refreshAll()
 }
