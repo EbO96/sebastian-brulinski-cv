@@ -75,6 +75,12 @@ function getPersonalInfoPromise() {
         .get()
 }
 
+function getLanguagesPromise() {
+    return db
+        .collection('languages')
+        .get()
+}
+
 exports.getSchools = functions.https.onRequest((request, response) => {
     var resultJson = []
     return getSchoolsPromise()
@@ -135,5 +141,54 @@ exports.getCareer = functions.https.onRequest((request, response) => {
 })
 
 exports.getAll = functions.https.onRequest((request, response) => {
-    
+    var requests = []
+    var jsonResult = { status: -1, welcome: {}, personal_info: {}, career: {}, languages: [] }
+    requests.push(getWelcomePromise())
+    requests.push(getPersonalInfoPromise())
+    requests.push(getSchoolsPromise())
+    requests.push(getJobsPromise())
+    requests.push(getLanguagesPromise())
+
+    return Promise.all(requests)
+        .then((results) => {
+
+            var welcome
+            results[0].forEach((doc) => {
+                welcome = doc.data()
+            });
+            jsonResult.welcome = welcome
+
+            var personalInfo
+            results[1].forEach((doc) => {
+                personalInfo = doc.data()
+            })
+            jsonResult.personal_info = personalInfo
+
+            var career = { schools: [], jobs: [] }
+
+            results[2].forEach((doc) => {
+                var d = doc.data()
+                d["id"] = doc.id
+                career.schools.push(d)
+            })
+
+            results[3].forEach((doc) => {
+                var d = doc.data()
+                d["id"] = doc.id
+                career.jobs.push(d)
+            })
+            jsonResult.career = career
+
+            results[4].forEach((doc) => {
+                var d = doc.data()
+                d["id"] = doc.id
+                jsonResult.languages.push(d)
+            })
+
+            jsonResult.status = 1
+            response.status(200).json(jsonResult)
+
+        }).catch((error) => {
+            response.status(401).json(jsonResult)
+        })
 })

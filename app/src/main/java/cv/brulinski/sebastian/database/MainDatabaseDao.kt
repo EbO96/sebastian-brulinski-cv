@@ -22,6 +22,9 @@ interface MainDatabaseDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertJobs(jobs: List<Job>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertLanguages(language: List<Language>)
+
     @Query("DELETE FROM Welcome")
     fun deleteWelcome()
 
@@ -45,5 +48,8 @@ interface MainDatabaseDao {
 
     @Query("SELECT * FROM Job")
     fun getJobs(): LiveData<List<Job>>
+
+    @Query("SELECT * FROM Language")
+    fun getLanguages(): LiveData<Language>
 
 }

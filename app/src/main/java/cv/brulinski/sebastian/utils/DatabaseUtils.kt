@@ -42,5 +42,23 @@ fun List<Job>.insertJobs() {
     }
 }
 
+fun List<Language>.insertLanguages() {
+    doAsync {
+        database.insertLanguages(this)
+    }
+}
+
+fun MyCv.insert() {
+    doAsync {
+        career?.apply {
+            schools.insertSchools()
+            jobs.insertJobs()
+        }
+        welcome?.insert()
+        personalInfo?.insert()
+        languages?.insertLanguages()
+    }
+}
+
 
 

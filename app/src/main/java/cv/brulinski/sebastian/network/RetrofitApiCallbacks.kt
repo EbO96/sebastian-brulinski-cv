@@ -20,4 +20,7 @@ interface RetrofitApiCallbacks {
 
     @GET("getCareer")
     fun getCareer(): Observable<Career>
+
+    @GET("getAll")
+    fun getAll(): Observable<MyCv>
 }

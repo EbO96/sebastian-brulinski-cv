@@ -34,12 +34,17 @@ class MainRepository {
 
     private var schoolsFetchedFromDb = false
     private var jobsFetchedFromDb = false
+    private val myCv = MutableLiveData<MyCv>()
     private val welcome = MutableLiveData<Welcome>()
     private val personalInfo = MutableLiveData<PersonalInfo>()
     private val career = MutableLiveData<Career>()
     private val storage = FirebaseStorage.getInstance()
     private val profilePictureReference = storage.getReference("profile_picture/profile.jpg")
     private val profilePictureBcgReference = storage.getReference("profile_bcg/bcg.jpg")
+
+    fun getCv(){
+        
+    }
 
     fun getWelcome(): LiveData<Welcome> {
         getDatabaseWelcome({
@@ -205,6 +210,18 @@ class MainRepository {
                     }
                 }, {
                     careerFetchingError()
+                    it.printStackTrace()
+                })
+    }
+
+    private fun fetchCv() {
+        retrofit
+                .getAll()
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    it.insert()
+                }, {
                     it.printStackTrace()
                 })
     }
