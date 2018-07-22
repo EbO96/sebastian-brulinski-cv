@@ -1,6 +1,7 @@
 package cv.brulinski.sebastian.fragment
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,9 +15,11 @@ import cv.brulinski.sebastian.model.RecyclerItem
 import cv.brulinski.sebastian.utils.TYPE_HEADER
 import cv.brulinski.sebastian.utils.TYPE_ITEM
 import cv.brulinski.sebastian.utils.date
+import cv.brulinski.sebastian.utils.delay
 import kotlinx.android.synthetic.main.fragment_career.*
 import setup
 import java.lang.ClassCastException
+import java.util.*
 
 class CareerFragment : Fragment() {
 

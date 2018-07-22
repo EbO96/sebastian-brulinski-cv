@@ -1,5 +1,7 @@
 package cv.brulinski.sebastian.model
 
+import android.os.Parcel
+import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
@@ -9,7 +11,7 @@ import com.google.gson.annotations.SerializedName
 import cv.brulinski.sebastian.utils.TYPE_ITEM
 
 @Entity
-class Career : RecyclerItem(), Cloneable {
+class Career() : RecyclerItem(), Cloneable, Parcelable {
 
     @Ignore
     @Expose
@@ -64,8 +66,54 @@ class Career : RecyclerItem(), Cloneable {
     @ColumnInfo(name = "timestamp")
     var timestamp = -1L
 
+    constructor(parcel: Parcel) : this() {
+        itemType = parcel.readInt()
+        id = parcel.readString()
+        type = parcel.readInt()
+        placeName = parcel.readString()
+        function = parcel.readString()
+        description = parcel.readString()
+        startTimeDescription = parcel.readString()
+        startTime = parcel.readString()
+        endTimeDescription = parcel.readString()
+        endTime = parcel.readString()
+        latitude = parcel.readDouble()
+        longitude = parcel.readDouble()
+        timestamp = parcel.readLong()
+    }
+
     @Ignore
     public override fun clone(): Career {
         return super.clone() as Career
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeInt(itemType)
+        parcel.writeString(id)
+        parcel.writeInt(type)
+        parcel.writeString(placeName)
+        parcel.writeString(function)
+        parcel.writeString(description)
+        parcel.writeString(startTimeDescription)
+        parcel.writeString(startTime)
+        parcel.writeString(endTimeDescription)
+        parcel.writeString(endTime)
+        parcel.writeDouble(latitude)
+        parcel.writeDouble(longitude)
+        parcel.writeLong(timestamp)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<Career> {
+        override fun createFromParcel(parcel: Parcel): Career {
+            return Career(parcel)
+        }
+
+        override fun newArray(size: Int): Array<Career?> {
+            return arrayOfNulls(size)
+        }
     }
 }

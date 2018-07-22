@@ -68,9 +68,9 @@ class MainActivity : AppCompatActivity(),
                     pagesComponent.getCareerFragment().update(career)
                 }
             }
-            refreshLayout.isRefreshing = false
+           // refreshLayout.isRefreshing = false
         })
-        refreshLayout.setOnRefreshListener(this)
+       // refreshLayout.setOnRefreshListener(this)
     }
 
     private fun setupViewPager() {
@@ -121,7 +121,7 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun electronicVersionClick() {
-        viewPager goTo WELCOME_SCREEN
+        //viewPager goTo WELCOME_SCREEN
     }
 
     override fun printCvClick() {
@@ -158,7 +158,7 @@ class MainActivity : AppCompatActivity(),
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         return when (item?.itemId) {
             android.R.id.home -> {
-                viewPager.toPrevious()
+               // viewPager.toPrevious()
                 true
             }
             R.id.pageForward -> {
@@ -190,7 +190,7 @@ class MainActivity : AppCompatActivity(),
         viewPager.apply {
             if (currentItem == pageMap[START_SCREEN] ?: 0)
                 super.onBackPressed()
-            else viewPager.toPrevious()
+           // else viewPager.toPrevious()
         }
     }
 }

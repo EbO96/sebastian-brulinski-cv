@@ -1,6 +1,7 @@
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,6 +20,7 @@ infix fun ViewGroup.inflateViewHolderView(resLayout: Int) =
         LayoutInflater.from(this.context).inflate(resLayout, this, false)
 
 fun RecyclerView.setup(adapter: RecyclerView.Adapter<RecyclerView.ViewHolder>, divider: Boolean = false) {
+    ViewCompat.setNestedScrollingEnabled(this, false)
     val lm = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
     layoutManager = lm
     itemAnimator = DefaultItemAnimator()

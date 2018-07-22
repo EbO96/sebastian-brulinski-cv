@@ -5,7 +5,6 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import androidx.viewpager.widget.ViewPager
 import cv.brulinski.sebastian.R
-import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter
 import cv.brulinski.sebastian.utils.toPage
 
 class MyViewPager(context: Context, attrs: AttributeSet?) : ViewPager(context, attrs) {
@@ -22,18 +21,18 @@ class MyViewPager(context: Context, attrs: AttributeSet?) : ViewPager(context, a
         toPage(if (page < 0) 0 else page)
     }
 
-    override fun onTouchEvent(ev: MotionEvent): Boolean {
-        return paging && super.onTouchEvent(ev)
-    }
+//    override fun onTouchEvent(ev: MotionEvent): Boolean {
+//        return paging && super.onTouchEvent(ev) || true
+//    }
 
-    override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
-        return paging && super.onTouchEvent(ev)
-    }
-
-    override fun setCurrentItem(item: Int) {
-        previousPage = currentItem
-        super.setCurrentItem(item)
-    }
+//    override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
+//        return paging && super.onTouchEvent(ev) || true
+//    }
+//
+//    override fun setCurrentItem(item: Int) {
+//        previousPage = currentItem
+//        super.setCurrentItem(item)
+//    }
 
     override fun setCurrentItem(item: Int, smoothScroll: Boolean) {
         previousPage = currentItem

@@ -14,7 +14,7 @@ fun MyViewPager.toPage(pos: Int, smooth: Boolean = true) {
     setCurrentItem(pos, smooth)
 }
 
-fun <T> MyViewPager.pages(start: () -> T,
+fun <T> ViewPager.pages(start: () -> T,
                           welcome: () -> T,
                           personalInfo: () -> T,
                           career: () -> T,
