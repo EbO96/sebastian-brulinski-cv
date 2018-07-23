@@ -12,7 +12,6 @@ import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import cv.brulinski.sebastian.activity.SplashActivity
 import cv.brulinski.sebastian.dependency_injection.app.App
-import cv.brulinski.sebastian.model.Career
 import cv.brulinski.sebastian.model.MyCv
 import cv.brulinski.sebastian.repository.MainRepository.Type.BCG
 import cv.brulinski.sebastian.repository.MainRepository.Type.PROFILE
@@ -38,7 +37,7 @@ class MainRepository {
     private val databaseCv = MyCv()
 
     fun getCv(): LiveData<MyCv> {
-        if (getPrefsValue(SplashActivity.firstLaunch) as Boolean)
+        if (getPrefsValue(SplashActivity.firstLaunch) == true)
             fetchCv()
         else
             getDatabaseCv()
@@ -130,7 +129,7 @@ class MainRepository {
     private fun fetchCv(refresh: Boolean = false) {
         retrofit
                 .getAll()
-                .subscribeOn(Schedulers.computation())
+                .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     false.putPrefsValue(SplashActivity.firstLaunch)

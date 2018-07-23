@@ -1,10 +1,7 @@
 package cv.brulinski.sebastian.database
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import cv.brulinski.sebastian.model.Career
 import cv.brulinski.sebastian.model.Language
 import cv.brulinski.sebastian.model.PersonalInfo
@@ -21,6 +18,9 @@ interface MainDatabaseDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertLanguages(language: List<Language>)
+
+    @Query("DELETE FROM Career")
+    fun deleteCareer()
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertCareer(career: List<Career>)

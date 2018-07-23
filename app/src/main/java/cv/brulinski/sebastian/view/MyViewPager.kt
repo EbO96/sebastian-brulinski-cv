@@ -2,10 +2,9 @@ package cv.brulinski.sebastian.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.MotionEvent
 import androidx.viewpager.widget.ViewPager
 import cv.brulinski.sebastian.R
-import cv.brulinski.sebastian.utils.toPage
+import cv.brulinski.sebastian.utils.view_pager.toPage
 
 class MyViewPager(context: Context, attrs: AttributeSet?) : ViewPager(context, attrs) {
 

@@ -38,6 +38,7 @@ fun List<Language>.insertLanguages() {
 
 fun List<Career>.insert() {
     doAsync {
+        database.deleteCareer()
         database.insertCareer(this)
     }
 }

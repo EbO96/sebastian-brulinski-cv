@@ -22,11 +22,14 @@
 
     <!-- my_toolbar toolbar style. -->
     <style name="MyToolbarStyle" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
-        <item name="android:textAppearance">@style/MyToolbarTextAppearance</item>
+        <item name="android:textColor">@color/whiteBackgroundTextColor</item>
+        <item name="android:textColorPrimary">@color/whiteBackgroundTextColor</item>
+        <item name="android:textColorSecondary">@color/whiteBackgroundTextColor</item>
     </style>
 
     <style name="MyToolbarTextAppearance" parent="TextAppearance.AppCompat">
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColor">@color/whiteBackgroundTextColor</item>
+        <item name="android:textColorSecondary">@color/whiteBackgroundTextColor</item>
     </style>
 
     <style name="MyCardViewStyle" parent="Base.CardView">
@@ -49,7 +52,7 @@
     </style>
 
     <style name="WelcomeScreenTitleTextStyle">
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColor">@color/whiteBackgroundTextColor</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textAlignment">gravity</item>
         <item name="android:gravity">center_vertical|center_horizontal</item>

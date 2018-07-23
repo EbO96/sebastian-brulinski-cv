@@ -14,4 +14,6 @@
     <string name="years">lata</string>
     <string name="print_version">WERSJA DO DRUKU</string>
     <string name="phone_version">PRZEGLĄDAJ</string>
+    <string name="refresh">Odśwież</string>
+    <string name="refreshing">Odświeżanie</string>
 </resources>

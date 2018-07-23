@@ -4,40 +4,39 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.viewpager.widget.ViewPager
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter
-import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Companion.Page.*
+import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Companion.Page.WELCOME_SCREEN
 import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Companion.pageMap
 import cv.brulinski.sebastian.dependency_injection.component.DaggerPagesComponent
 import cv.brulinski.sebastian.dependency_injection.component.PagesComponent
 import cv.brulinski.sebastian.dependency_injection.module.PagesModule
 import cv.brulinski.sebastian.fragment.CareerFragment
 import cv.brulinski.sebastian.fragment.PersonalInfoFragment
-import cv.brulinski.sebastian.fragment.StartFragment
 import cv.brulinski.sebastian.fragment.WelcomeFragment
 import cv.brulinski.sebastian.model.MyCv
-import cv.brulinski.sebastian.utils.goTo
+import cv.brulinski.sebastian.utils.log
 import cv.brulinski.sebastian.utils.string
+import cv.brulinski.sebastian.utils.toast
+import cv.brulinski.sebastian.utils.view_pager.MyMainViewPager
+import cv.brulinski.sebastian.utils.view_pager.ViewPagerStates
+import cv.brulinski.sebastian.utils.view_pager.toLeft
+import cv.brulinski.sebastian.utils.view_pager.toRight
 import cv.brulinski.sebastian.view_model.MainViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 import setBaseToolbar
 
 class MainActivity : AppCompatActivity(),
-        StartFragment.StartFragmentCallback,
-        SwipeRefreshLayout.OnRefreshListener, WelcomeFragment.WelcomeFragmentCallback,
+        WelcomeFragment.WelcomeFragmentCallback,
         PersonalInfoFragment.PersonalInfoCallback,
         CareerFragment.CareerFragmentCallback {
 
     //ViewPager adapter
-    private lateinit var mainActivityViewPagerAdapter: MainActivityViewPagerAdapter
-    //Menu item forward button
-    private var forwardButton: MenuItem? = null
+    private var mainActivityViewPagerAdapter: MainActivityViewPagerAdapter? = null
     //ViewModel
     private var mainViewModel: MainViewModel? = null
     //MyCv
@@ -50,46 +49,42 @@ class MainActivity : AppCompatActivity(),
         setContentView(R.layout.activity_main)
         setBaseToolbar(title = R.string.start.string(), enableHomeButton = true)
         setupViewPager()
-        pagesComponent = DaggerPagesComponent.builder().pagesModule(PagesModule(mainActivityViewPagerAdapter, viewPager)).build()
-        pagesComponent.inject(this)
-        homeForwardButton(pageMap[START_SCREEN] ?: 0)
-        //ViewModel
-        mainViewModel = ViewModelProvider.AndroidViewModelFactory.getInstance(application).create(MainViewModel::class.java)
-        myCv = mainViewModel?.myCv
-        myCv?.observe(this, Observer {
-            it?.apply {
-                welcome?.let { welcome ->
-                    pagesComponent.getWelcomeScreen().update(welcome)
-                }
-                personalInfo?.let { personalInfo ->
-                    pagesComponent.getPersonalInfoScreen().update(personalInfo)
-                }
-                career?.let { career ->
-                    pagesComponent.getCareerFragment().update(career)
-                }
-            }
-           // refreshLayout.isRefreshing = false
-        })
-       // refreshLayout.setOnRefreshListener(this)
     }
 
     private fun setupViewPager() {
-        val fragments = ArrayList<Fragment>().apply {
-            add(StartFragment())
-            add(WelcomeFragment())
-            add(PersonalInfoFragment())
-            add(CareerFragment())
-        }
-        val pagesTitles = ArrayList<String>().apply {
-            add(R.string.start.string().apply { asToolbarTitle() })
-            add(R.string.welcome.string())
-            add(R.string.personal_details.string())
-            add(R.string.career.string())
-        }
-        viewPager.apply {
-            mainActivityViewPagerAdapter = MainActivityViewPagerAdapter(fragments, pagesTitles, supportFragmentManager).apply { adapter = this }
-            offscreenPageLimit = fragments.size
-            addOnPageChangeListener(viewPagerPageListener())
+        val myMainViewPager = MyMainViewPager(supportFragmentManager, viewPager, viewPagerPageListener()).setup()
+        mainActivityViewPagerAdapter = myMainViewPager.mainActivityViewPagerAdapter
+        myMainViewPager.observeForever { it ->
+            it?.let {
+                when (it) {
+                    ViewPagerStates.VIEW_PAGER_PAGES_CREATED -> {
+                        "vp".log("created")
+                        mainActivityViewPagerAdapter?.let { adapter ->
+                            pagesComponent = DaggerPagesComponent.builder().pagesModule(PagesModule(adapter, viewPager)).build()
+                            pagesComponent.inject(this)
+                            //ViewModel
+                            mainViewModel = ViewModelProvider.AndroidViewModelFactory.getInstance(application).create(MainViewModel::class.java)
+                            myCv = mainViewModel?.myCv
+                            myCv?.observe(this, Observer {
+                                it?.apply {
+                                    welcome?.let { welcome ->
+                                        pagesComponent.getWelcomeScreen().update(welcome)
+                                    }
+                                    personalInfo?.let { personalInfo ->
+                                        pagesComponent.getPersonalInfoScreen().update(personalInfo)
+                                    }
+                                    career?.let { career ->
+                                        pagesComponent.getCareerFragment().update(career)
+                                    }
+                                }
+                            })
+                        }
+                    }
+                    ViewPagerStates.VIEW_PAGER_PAGES_DESTROYED -> {
+                        "vp".log("destroyed")
+                    }
+                }
+            }
         }
     }
 
@@ -101,8 +96,7 @@ class MainActivity : AppCompatActivity(),
         }
 
         override fun onPageSelected(position: Int) {
-            mainActivityViewPagerAdapter.getPageTitle(position).asToolbarTitle()
-            homeForwardButton(position)
+            mainActivityViewPagerAdapter?.getPageTitle(position)?.asToolbarTitle()
         }
     }
 
@@ -114,25 +108,6 @@ class MainActivity : AppCompatActivity(),
      */
 
     /*
-    StartFragment callbacks
-     */
-    override fun pdfVersionClick() {
-
-    }
-
-    override fun electronicVersionClick() {
-        //viewPager goTo WELCOME_SCREEN
-    }
-
-    override fun printCvClick() {
-
-    }
-
-    override fun onStartFragmentResume() {
-        homeForwardButton(viewPager.currentItem)
-    }
-
-    /*
     WelcomeFragment callbacks
      */
 
@@ -140,57 +115,36 @@ class MainActivity : AppCompatActivity(),
     PersonalInfo callbacks
      */
 
-
-    private fun homeForwardButton(pagePosition: Int) = supportActionBar?.apply {
-        val enabled = pagePosition != pageMap[START_SCREEN]
-        setHomeButtonEnabled(enabled)
-        setDisplayHomeAsUpEnabled(enabled)
-        setDisplayShowHomeEnabled(enabled)
-        forwardButton?.isVisible = enabled
-    }
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main_activity_menu, menu)
-        forwardButton = menu?.findItem(R.id.pageForward)?.apply { isVisible = false }
         return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         return when (item?.itemId) {
             android.R.id.home -> {
-               // viewPager.toPrevious()
+                viewPager.toLeft()
                 true
             }
             R.id.pageForward -> {
-                when (viewPager.currentItem) {
-                    pageMap[WELCOME_SCREEN] -> {
-                    }
-                    pageMap[PERSONAL_INFO_SCREEN] -> {
-                    }
-                    pageMap[CAREER] -> {
-
-                    }
-                }
+                viewPager.toRight()
+                true
+            }
+            R.id.refreshContent -> {
+                "${getString(R.string.refreshing)}...".toast()
+                mainViewModel?.refreshAll()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
-    override fun onRefresh() {
-        mainViewModel?.refreshAll()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        homeForwardButton(viewPager.currentItem)
-    }
 
     override fun onBackPressed() {
         viewPager.apply {
-            if (currentItem == pageMap[START_SCREEN] ?: 0)
+            if (currentItem == pageMap[WELCOME_SCREEN] ?: 0)
                 super.onBackPressed()
-           // else viewPager.toPrevious()
+            else viewPager.toLeft()
         }
     }
 }
