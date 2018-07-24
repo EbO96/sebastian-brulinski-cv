@@ -1,9 +1,12 @@
 package cv.brulinski.sebastian.activity
 
 import android.os.Bundle
+import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -28,6 +31,7 @@ import cv.brulinski.sebastian.utils.view_pager.toLeft
 import cv.brulinski.sebastian.utils.view_pager.toRight
 import cv.brulinski.sebastian.view_model.MainViewModel
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_main_content.*
 import setBaseToolbar
 
 class MainActivity : AppCompatActivity(),
@@ -49,6 +53,11 @@ class MainActivity : AppCompatActivity(),
         setContentView(R.layout.activity_main)
         setBaseToolbar(title = R.string.start.string(), enableHomeButton = true)
         setupViewPager()
+        setupNavigationDrawer()
+    }
+
+    private fun setupNavigationDrawer() {
+        mainDrawerLayout.addDrawerListener(drawerListener())
     }
 
     private fun setupViewPager() {
@@ -100,6 +109,22 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
+    private fun drawerListener() = object : DrawerLayout.DrawerListener {
+        override fun onDrawerStateChanged(newState: Int) {
+        }
+
+        override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+            val slideX = drawerView.width * slideOffset
+            mainContent.translationX = slideX
+        }
+
+        override fun onDrawerClosed(drawerView: View) {
+        }
+
+        override fun onDrawerOpened(drawerView: View) {
+        }
+    }
+
     private fun String.asToolbarTitle() {
         supportActionBar?.title = this
     }
@@ -142,9 +167,11 @@ class MainActivity : AppCompatActivity(),
 
     override fun onBackPressed() {
         viewPager.apply {
-            if (currentItem == pageMap[WELCOME_SCREEN] ?: 0)
-                super.onBackPressed()
-            else viewPager.toLeft()
+            when {
+                mainDrawerLayout.isDrawerOpen(Gravity.START) -> mainDrawerLayout.closeDrawer(Gravity.START)
+                currentItem == pageMap[WELCOME_SCREEN] ?: 0 -> super.onBackPressed()
+                else -> toLeft()
+            }
         }
     }
 }

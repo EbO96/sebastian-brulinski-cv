@@ -4,7 +4,6 @@ import androidx.viewpager.widget.ViewPager
 import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Companion.Page
 import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Companion.pageMap
 import cv.brulinski.sebastian.view.MyViewPager
-import kotlinx.android.synthetic.main.activity_main.view.*
 
 infix fun MyViewPager.goTo(page: Page) {
     setCurrentItem(pageMap[page] ?: 0, true)
@@ -24,5 +23,5 @@ fun <T> ViewPager.pages(welcome: () -> T,
     else -> other()
 }
 
-fun ViewPager.toLeft(smooth: Boolean = true) = viewPager.setCurrentItem(currentItem - 1, smooth)
-fun ViewPager.toRight(smooth: Boolean = true) = viewPager.setCurrentItem(currentItem + 1, smooth)
+fun ViewPager.toLeft(smooth: Boolean = true) = setCurrentItem(currentItem - 1, smooth)
+fun ViewPager.toRight(smooth: Boolean = true) = setCurrentItem(currentItem + 1, smooth)
