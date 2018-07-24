@@ -1,5 +1,7 @@
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -26,4 +28,13 @@ fun RecyclerView.setup(adapter: RecyclerView.Adapter<RecyclerView.ViewHolder>, d
     itemAnimator = DefaultItemAnimator()
     this.adapter = adapter
     if (divider) addItemDecoration(DividerItemDecoration(context, lm.orientation))
+}
+
+fun TextView.setText(text: String, hideTextViewWhenTextEmpty: Boolean) {
+    if (hideTextViewWhenTextEmpty)
+        visibility = if (text.isNotBlank()) {
+            View.VISIBLE
+        } else View.GONE
+    this.text = text
+
 }
