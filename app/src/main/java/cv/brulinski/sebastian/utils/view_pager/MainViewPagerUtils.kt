@@ -5,8 +5,8 @@ import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Co
 import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Companion.pageMap
 import cv.brulinski.sebastian.view.MyViewPager
 
-infix fun MyViewPager.goTo(page: Page) {
-    setCurrentItem(pageMap[page] ?: 0, true)
+fun ViewPager.goTo(page: Page, smooth: Boolean = true) {
+    setCurrentItem(pageMap[page] ?: 0, smooth)
 }
 
 fun MyViewPager.toPage(pos: Int, smooth: Boolean = true) {

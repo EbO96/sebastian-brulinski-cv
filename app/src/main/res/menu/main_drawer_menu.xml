@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <group android:id="@+id/navigation">
+        <item
+            android:id="@+id/preambuleItem"
+            android:title="@string/preambule"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/personalDetailsItem"
+            android:title="@string/personal_details"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/careerItem"
+            android:title="@string/career"
+            app:showAsAction="never" />
+
+    </group>
+
+</menu>

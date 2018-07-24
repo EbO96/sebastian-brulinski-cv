@@ -7,4 +7,5 @@
     <dimen name="profile_size_card">64dp</dimen>
     <dimen name="divider">1dp</dimen>
     <dimen name="start_screen_drawable_size">96dp</dimen>
+    <dimen name="main_drawer_header_height">192dp</dimen>
 </resources>

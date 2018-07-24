@@ -13,7 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager.widget.ViewPager
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter
-import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Companion.Page.WELCOME_SCREEN
+import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Companion.Page.*
 import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Companion.pageMap
 import cv.brulinski.sebastian.dependency_injection.component.DaggerPagesComponent
 import cv.brulinski.sebastian.dependency_injection.component.PagesComponent
@@ -23,12 +23,10 @@ import cv.brulinski.sebastian.fragment.PersonalInfoFragment
 import cv.brulinski.sebastian.fragment.WelcomeFragment
 import cv.brulinski.sebastian.model.MyCv
 import cv.brulinski.sebastian.utils.log
+import cv.brulinski.sebastian.utils.navigation_drawer.close
 import cv.brulinski.sebastian.utils.string
 import cv.brulinski.sebastian.utils.toast
-import cv.brulinski.sebastian.utils.view_pager.MyMainViewPager
-import cv.brulinski.sebastian.utils.view_pager.ViewPagerStates
-import cv.brulinski.sebastian.utils.view_pager.toLeft
-import cv.brulinski.sebastian.utils.view_pager.toRight
+import cv.brulinski.sebastian.utils.view_pager.*
 import cv.brulinski.sebastian.view_model.MainViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
@@ -53,11 +51,31 @@ class MainActivity : AppCompatActivity(),
         setContentView(R.layout.activity_main)
         setBaseToolbar(title = R.string.start.string(), enableHomeButton = true)
         setupViewPager()
-        setupNavigationDrawer()
+        mainDrawerLayout.setupNavigationDrawer()
     }
 
-    private fun setupNavigationDrawer() {
-        mainDrawerLayout.addDrawerListener(drawerListener())
+    private fun DrawerLayout.setupNavigationDrawer() {
+        addDrawerListener(drawerListener())
+        mainNavigationView.setNavigationItemSelectedListener {
+            when (it.itemId) {
+                R.id.preambuleItem -> {
+                    mainDrawerLayout.close {
+                        viewPager.goTo(WELCOME_SCREEN)
+                    }
+                }
+                R.id.personalDetailsItem -> {
+                    mainDrawerLayout.close {
+                        viewPager.goTo(PERSONAL_INFO_SCREEN)
+                    }
+                }
+                R.id.careerItem -> {
+                    mainDrawerLayout.close {
+                        viewPager.goTo(CAREER)
+                    }
+                }
+            }
+            true
+        }
     }
 
     private fun setupViewPager() {
