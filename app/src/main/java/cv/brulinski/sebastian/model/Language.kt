@@ -1,8 +1,11 @@
 package cv.brulinski.sebastian.model
 
+import android.graphics.Bitmap
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
 @Entity
@@ -32,4 +35,12 @@ class Language {
     @ColumnInfo(name = "timestamp")
     @SerializedName("timestamp")
     var timestamp = -1L
+
+    @ColumnInfo(name = "image_url")
+    @SerializedName("imageUrl")
+    var imageUrl = ""
+
+    @Expose
+    @Ignore
+    var flag: Bitmap? = null
 }

@@ -83,28 +83,34 @@ class MainRepository {
             Type.values().forEach { type ->
                 if (!loadFromDevice(type) || refresh)
                     type.getRef().downloadUrl.addOnSuccessListener {
-                        Picasso
-                                .with(App.component.getContext())
-                                .load(it)
-                                .into(object : Target {
-                                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-                                    }
-
-                                    override fun onBitmapFailed(errorDrawable: Drawable?) {
-                                    }
-
-                                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                                        bitmap?.apply {
-                                            notifyProfileGraphics(type, this)
-                                            saveToDevice(type, this)
-                                        }
-                                    }
-                                })
+                        fetchBitmap(url = it.toString(), bitmap = {
+                            it?.apply {
+                                notifyProfileGraphics(type, this)
+                                saveToDevice(type, this)
+                            }
+                        })
                     }.addOnFailureListener {
                         it.printStackTrace()
                     }
             }
         }
+    }
+
+    private fun fetchBitmap(url: String, bitmap: (Bitmap?) -> Unit) {
+        Picasso.with(ctx)
+                .load(url)
+                .into(object : Target {
+                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
+
+                    }
+
+                    override fun onBitmapFailed(errorDrawable: Drawable?) {
+                    }
+
+                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                        bitmap(bitmap)
+                    }
+                })
     }
 
     private fun notifyProfileGraphics(type: MainRepository.Type, bitmap: Bitmap?) {

@@ -22,7 +22,6 @@ import cv.brulinski.sebastian.fragment.CareerFragment
 import cv.brulinski.sebastian.fragment.PersonalInfoFragment
 import cv.brulinski.sebastian.fragment.WelcomeFragment
 import cv.brulinski.sebastian.model.MyCv
-import cv.brulinski.sebastian.utils.log
 import cv.brulinski.sebastian.utils.navigation_drawer.close
 import cv.brulinski.sebastian.utils.string
 import cv.brulinski.sebastian.utils.toast
@@ -73,6 +72,11 @@ class MainActivity : AppCompatActivity(),
                         viewPager.goTo(CAREER)
                     }
                 }
+                R.id.languagesItem -> {
+                    mainDrawerLayout.close {
+                        viewPager.goTo(LANGUAGES)
+                    }
+                }
             }
             true
         }
@@ -85,7 +89,6 @@ class MainActivity : AppCompatActivity(),
             it?.let {
                 when (it) {
                     ViewPagerStates.VIEW_PAGER_PAGES_CREATED -> {
-                        "vp".log("created")
                         mainActivityViewPagerAdapter?.let { adapter ->
                             pagesComponent = DaggerPagesComponent.builder().pagesModule(PagesModule(adapter, viewPager)).build()
                             pagesComponent.inject(this)
@@ -108,7 +111,6 @@ class MainActivity : AppCompatActivity(),
                         }
                     }
                     ViewPagerStates.VIEW_PAGER_PAGES_DESTROYED -> {
-                        "vp".log("destroyed")
                     }
                 }
             }

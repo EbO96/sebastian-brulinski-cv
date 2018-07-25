@@ -18,6 +18,11 @@
             android:title="@string/career"
             app:showAsAction="never" />
 
+        <item
+            android:id="@+id/languagesItem"
+            android:title="@string/languages"
+            app:showAsAction="never" />
+
     </group>
 
 </menu>
