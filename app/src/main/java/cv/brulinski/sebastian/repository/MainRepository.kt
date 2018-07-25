@@ -4,18 +4,17 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.drawable.Drawable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.storage.FirebaseStorage
-import com.squareup.picasso.Picasso
-import com.squareup.picasso.Target
 import cv.brulinski.sebastian.activity.SplashActivity
 import cv.brulinski.sebastian.dependency_injection.app.App
+import cv.brulinski.sebastian.model.Language
 import cv.brulinski.sebastian.model.MyCv
 import cv.brulinski.sebastian.repository.MainRepository.Type.BCG
 import cv.brulinski.sebastian.repository.MainRepository.Type.PROFILE
 import cv.brulinski.sebastian.utils.*
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import java.io.FileNotFoundException
@@ -83,12 +82,14 @@ class MainRepository {
             Type.values().forEach { type ->
                 if (!loadFromDevice(type) || refresh)
                     type.getRef().downloadUrl.addOnSuccessListener {
-                        fetchBitmap(url = it.toString(), bitmap = {
-                            it?.apply {
-                                notifyProfileGraphics(type, this)
-                                saveToDevice(type, this)
-                            }
-                        })
+                        fetchBitmap(it.toString()).subscribeOn(AndroidSchedulers.mainThread())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe {
+                                    it?.let {
+                                        notifyProfileGraphics(type, it)
+                                        saveToDevice(type, it)
+                                    }
+                                }
                     }.addOnFailureListener {
                         it.printStackTrace()
                     }
@@ -96,21 +97,24 @@ class MainRepository {
         }
     }
 
-    private fun fetchBitmap(url: String, bitmap: (Bitmap?) -> Unit) {
-        Picasso.with(ctx)
-                .load(url)
-                .into(object : Target {
-                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-
+    private fun List<Language>.fetchFlags(result: (List<Language>) -> Unit) {
+        val observables = ArrayList<Observable<Bitmap>>()
+        forEach {
+            observables.add(fetchBitmap(it.imageUrl))
+        }
+        val flags = arrayListOf<Bitmap?>()
+        Observable.merge(observables)
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext {
+                    flags.add(it)
+                }.doOnComplete {
+                    withIndex().forEach {
+                        it.value.flag = flags[it.index]
                     }
-
-                    override fun onBitmapFailed(errorDrawable: Drawable?) {
-                    }
-
-                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                        bitmap(bitmap)
-                    }
-                })
+                    result(this)
+                }
+                .subscribe()
     }
 
     private fun notifyProfileGraphics(type: MainRepository.Type, bitmap: Bitmap?) {
@@ -137,11 +141,10 @@ class MainRepository {
                 .getAll()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
+                .subscribe({ cv ->
                     false.putPrefsValue(SplashActivity.firstLaunch)
-                    myCv.value = it
                     fetchProfileGraphics(refresh)
-                    it.insert()
+                    cv.insert()
                 }, {
                     it.printStackTrace()
                 })

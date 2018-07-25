@@ -4,6 +4,7 @@ import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.ViewPager
 import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter
 import cv.brulinski.sebastian.fragment.CareerFragment
+import cv.brulinski.sebastian.fragment.LanguagesFragment
 import cv.brulinski.sebastian.fragment.PersonalInfoFragment
 import cv.brulinski.sebastian.fragment.WelcomeFragment
 import dagger.Module
@@ -30,4 +31,10 @@ class PagesModule(var fragmentStatePagerAdapter: FragmentStatePagerAdapter, var 
     fun provideCareerScreen(): CareerFragment = fragmentStatePagerAdapter.instantiateItem(viewPager,
             MainActivityViewPagerAdapter.pageMap[MainActivityViewPagerAdapter.Companion.Page.CAREER]
                     ?: 0) as CareerFragment
+
+    @Provides
+    @Singleton
+    fun provideLanguagesScreen(): LanguagesFragment = fragmentStatePagerAdapter.instantiateItem(viewPager,
+            MainActivityViewPagerAdapter.pageMap[MainActivityViewPagerAdapter.Companion.Page.LANGUAGES]
+                    ?: 0) as LanguagesFragment
 }

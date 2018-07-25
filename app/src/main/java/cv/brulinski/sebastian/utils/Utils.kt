@@ -47,3 +47,9 @@ fun <T> Long.delay(trigger: () -> T) {
         trigger()
     }, this)
 }
+
+fun Int.iterate(step: (Int) -> Unit) {
+    for (x in 1..this) {
+        step(x)
+    }
+}

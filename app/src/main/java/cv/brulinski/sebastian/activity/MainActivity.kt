@@ -104,7 +104,10 @@ class MainActivity : AppCompatActivity(),
                                         pagesComponent.getPersonalInfoScreen().update(personalInfo)
                                     }
                                     career?.let { career ->
-                                        pagesComponent.getCareerFragment().update(career)
+                                        pagesComponent.getCareerScreen().update(career)
+                                    }
+                                    languages?.let { languages ->
+                                        pagesComponent.getLanguagesScreen().update(languages)
                                     }
                                 }
                             })

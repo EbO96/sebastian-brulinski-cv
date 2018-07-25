@@ -43,4 +43,8 @@ class Language {
     @Expose
     @Ignore
     var flag: Bitmap? = null
+
+    @Expose
+    @ColumnInfo(name = "flagBase64")
+    var flagBase64 = ""
 }
