@@ -1,23 +1,17 @@
 package cv.brulinski.sebastian.repository
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.google.firebase.storage.FirebaseStorage
+import androidx.lifecycle.Observer
+import cv.brulinski.sebastian.R.string
 import cv.brulinski.sebastian.activity.SplashActivity
-import cv.brulinski.sebastian.dependency_injection.app.App
-import cv.brulinski.sebastian.model.Language
-import cv.brulinski.sebastian.model.MyCv
-import cv.brulinski.sebastian.repository.MainRepository.Type.BCG
-import cv.brulinski.sebastian.repository.MainRepository.Type.PROFILE
+import cv.brulinski.sebastian.model.*
 import cv.brulinski.sebastian.utils.*
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import java.io.FileNotFoundException
 
 @SuppressLint("CheckResult")
 class MainRepository {
@@ -28,159 +22,163 @@ class MainRepository {
     }
 
     private val myCv = MutableLiveData<MyCv>()
-    private val storage = FirebaseStorage.getInstance()
-    private val profilePictureReference = storage.getReference("profile_picture/profile.jpg")
-    private val profilePictureBcgReference = storage.getReference("profile_bcg/bcg.jpg")
-
-    private var getDatabaseCvCounter = 0
-    private val databaseCv = MyCv()
 
     fun getCv(): LiveData<MyCv> {
+
         if (getPrefsValue(SplashActivity.firstLaunch) == true)
             fetchCv()
         else
-            getDatabaseCv()
+            fetchAllFromDatabase()
+                    .subscribeOn(AndroidSchedulers.mainThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe {
+                        myCv.value = it
+                    }
         return myCv
     }
 
     fun refreshAll() {
-        fetchCv(true)
+        fetchCv()
     }
 
-    private fun getDatabaseCv() {
-        database.getWelcome().observeForever {
-            databaseCv.welcome = it
-            isAllDatabaseGetCompleted()
-        }
-        database.getPersonalInfo().observeForever {
-            databaseCv.personalInfo = it
-            isAllDatabaseGetCompleted()
-        }
+    private fun HashMap<String, String>.fetchBitmaps(): Observable<HashMap<String, String>> {
+        val observables = arrayListOf<Observable<Bitmap>>()
+        values.forEach { url ->
+            observables.add(fetchBitmap(url))
 
-        database.getCareer().observeForever {
-            databaseCv.career = it
-            isAllDatabaseGetCompleted()
         }
-
-        database.getLanguages().observeForever {
-            databaseCv.languages = it
-            isAllDatabaseGetCompleted()
-        }
-    }
-
-    private fun isAllDatabaseGetCompleted() {
-        getDatabaseCvCounter++
-        if (getDatabaseCvCounter == 4) {
-            myCv.value = databaseCv
-            getDatabaseCvCounter = 0
-            fetchProfileGraphics()
-        }
-    }
-
-    private fun fetchProfileGraphics(refresh: Boolean = false) {
-        ProfilePictureManager().apply {
-            Type.values().forEach { type ->
-                if (!loadFromDevice(type) || refresh)
-                    type.getRef().downloadUrl.addOnSuccessListener {
-                        fetchBitmap(it.toString()).subscribeOn(AndroidSchedulers.mainThread())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe {
-                                    it?.let {
-                                        notifyProfileGraphics(type, it)
-                                        saveToDevice(type, it)
-                                    }
-                                }
-                    }.addOnFailureListener {
-                        it.printStackTrace()
+        var counter = 0
+        return Observable.create { emitter ->
+            val map = HashMap<String, String>()
+            Observable.merge(observables)
+                    .subscribeOn(AndroidSchedulers.mainThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnNext {
+                        it?.apply {
+                            val key = keys.toList()[counter]
+                            map[key] = toBase64String()
+                        }
+                        counter++
                     }
-            }
+                    .doOnComplete {
+                        emitter.onNext(map)
+                        emitter.onComplete()
+                    }
+                    .subscribe()
         }
     }
 
-    private fun List<Language>.fetchFlags(result: (List<Language>) -> Unit) {
-        val observables = ArrayList<Observable<Bitmap>>()
-        forEach {
-            observables.add(fetchBitmap(it.imageUrl))
-        }
-        val flags = arrayListOf<Bitmap?>()
-        Observable.merge(observables)
-                .subscribeOn(AndroidSchedulers.mainThread())
+    private fun fetchCv() {
+        fetchAllFromRemoteServer()
+                .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext {
-                    flags.add(it)
-                }.doOnComplete {
-                    withIndex().forEach {
-                        it.value.flag = flags[it.index]
-                    }
-                    result(this)
-                }
-                .subscribe()
-    }
-
-    private fun notifyProfileGraphics(type: MainRepository.Type, bitmap: Bitmap?) {
-        bitmap?.let {
-            when (type) {
-                MainRepository.Type.PROFILE -> {
-                    myCv.apply {
-                        value?.personalInfo?.profilePicture = bitmap
-                        postValue(value)
-                    }
-                }
-                MainRepository.Type.BCG -> {
-                    myCv.apply {
-                        value?.personalInfo?.profileBcg = bitmap
-                        postValue(value)
-                    }
-                }
-            }
-        }
-    }
-
-    private fun fetchCv(refresh: Boolean = false) {
-        retrofit
-                .getAll()
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ cv ->
+                .subscribe({
+                    it.insert()
+                    myCv.value = it
                     false.putPrefsValue(SplashActivity.firstLaunch)
-                    fetchProfileGraphics(refresh)
-                    cv.insert()
                 }, {
                     it.printStackTrace()
                 })
     }
 
-    private fun Type.getRef() = when (this) {
-        MainRepository.Type.PROFILE -> profilePictureReference
-        MainRepository.Type.BCG -> profilePictureBcgReference
+    private fun fetchAllFromRemoteServer(): Observable<MyCv> {
+        return Observable.create { emitter ->
+            retrofit
+                    .getAll()
+                    .subscribeOn(Schedulers.computation())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({ cv ->
+
+                        val urlMap = HashMap<String, String>()
+                        val errorImageUrl = string.error_image_url.string()
+                        urlMap["profilePicture"] = cv.personalInfo?.profilePhotoUrl ?: errorImageUrl
+                        urlMap["profileBcg"] = cv.personalInfo?.profileBcgUrl ?: errorImageUrl
+                        cv.languages?.forEach {
+                            urlMap[it.id] = it.imageUrl ?: errorImageUrl
+                        }
+
+                        urlMap.fetchBitmaps()
+                                .subscribeOn(Schedulers.computation())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe {
+                                    it.apply {
+                                        cv.personalInfo?.profilePictureBase64 = it["profilePicture"]
+                                        cv.personalInfo?.profilePictureBcgBase64 = it["profileBcg"]
+                                    }
+                                    cv.languages?.forEach { language ->
+                                        language.flagBase64 = it[language.id]
+                                    }
+                                    emitter.onNext(cv)
+                                    emitter.onComplete()
+                                }
+                    }, {
+                        emitter.onError(it)
+                        it.printStackTrace()
+                    })
+        }
     }
 
-    private inner class ProfilePictureManager {
+    private fun fetchAllFromDatabase(): Observable<MyCv> {
+        val observers = arrayListOf<Observable<Any>>().apply {
+            add(fetchFromDatabase {
+                database.getWelcome()
+            })
+            add(fetchFromDatabase {
+                database.getPersonalInfo()
+            })
+            add(fetchFromDatabase {
+                database.getCareer()
+            })
+            add(fetchFromDatabase {
+                database.getLanguages()
+            })
+        }
+        return Observable.create { emitter ->
+            val cv = MyCv()
+            Observable.merge(observers)
+                    .subscribeOn(AndroidSchedulers.mainThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnNext { objectFromDb ->
+                        when (objectFromDb) {
+                            is Welcome -> {
+                                cv.welcome = objectFromDb
+                            }
+                            is PersonalInfo -> {
+                                cv.personalInfo = objectFromDb
+                            }
+                            is List<*> -> {
+                                objectFromDb.last()?.let {
+                                    if (it is Career) {
+                                        cv.career = objectFromDb as List<Career>
+                                    } else if (it is Language) {
+                                        cv.languages = objectFromDb as List<Language>
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .doOnComplete {
+                        emitter.onNext(cv)
+                        emitter.onComplete()
+                    }
+                    .subscribe()
+        }
+    }
 
-        private val profilePhotoFileName = "profile.jpg"
-        private val profileBcgFileName = "bcg.jpg"
-
-        fun loadFromDevice(type: Type): Boolean {
-            try {
-                App.component.getContext().openFileInput(type.getFileName()).use {
-                    notifyProfileGraphics(type, BitmapFactory.decodeStream(it))
-                    return true
+    private fun fetchFromDatabase(fetch: () -> LiveData<*>): Observable<Any> {
+        return Observable.create { emitter ->
+            fetch().apply {
+                var obs: Observer<Any>? = null
+                val observer = Observer<Any> {
+                    emitter.onNext(it)
+                    emitter.onComplete()
+                    obs?.let {
+                        removeObserver(it)
+                    }
                 }
-            } catch (e: FileNotFoundException) {
-                e.printStackTrace()
-                return false
+                obs = observer
+                observeForever(observer)
             }
-        }
-
-        fun saveToDevice(type: Type, bitmap: Bitmap) {
-            App.component.getContext().openFileOutput(type.getFileName(), Context.MODE_PRIVATE).use {
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
-            }
-        }
-
-        private fun Type.getFileName() = when (this) {
-            PROFILE -> profilePhotoFileName
-            BCG -> profileBcgFileName
         }
     }
 }

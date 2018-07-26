@@ -46,5 +46,5 @@ class Language {
 
     @Expose
     @ColumnInfo(name = "flagBase64")
-    var flagBase64 = ""
+    var flagBase64: String? = ""
 }

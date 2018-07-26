@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="error_image_url" translatable="false">https://firebasestorage.googleapis.com/v0/b/sebastian-brulinski-cv-app.appspot.com/o/error%2Fwarning.png?alt=media&amp;token=6bc5db73-6e0e-437e-a9c5-8a0d82d0510a</string>
+</resources>

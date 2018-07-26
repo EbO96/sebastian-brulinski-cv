@@ -1,7 +1,6 @@
 package cv.brulinski.sebastian.model
 
 import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
@@ -39,6 +38,9 @@ class PersonalInfo {
     @ColumnInfo(name = "profileUrl")
     @SerializedName("profileUrl")
     var profilePhotoUrl = ""
+    @ColumnInfo(name = " profileBcgUrl")
+    @SerializedName("profileBcgUrl")
+    var profileBcgUrl = ""
     @ColumnInfo(name = "phoneNumber")
     @SerializedName("phoneNumber")
     var phoneNumber = ""
@@ -63,4 +65,10 @@ class PersonalInfo {
     @Expose
     @Ignore
     var profileBcg: Bitmap? = null
+    @Expose
+    @ColumnInfo(name = "profilePictureBase64")
+    var profilePictureBase64: String? = ""
+    @Expose
+    @ColumnInfo(name = "profilePictureBcgBase64")
+    var profilePictureBcgBase64: String? = ""
 }

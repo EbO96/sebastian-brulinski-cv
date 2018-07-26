@@ -86,21 +86,37 @@ exports.getAll = functions.https.onRequest((request, response) => {
 
 exports.addCareer = functions.https.onRequest((request, response) => {
     var career = {
-        endTime: "01.03.2014",
-        function: "sd",
-        description: "sd",
-        startTime: "01.03.2015",
-        placeName: "sds",
+        endTime: "",
+        function: "",
+        description: "",
+        startTime: "",
+        placeName: "",
         latitude: 0,
         longitude: 0,
-        endTimeDescription: "sd",
+        endTimeDescription: "",
         type: 1,
-        startTimeDescription: "sd"
+        startTimeDescription: ""
     }
-    db.collection('career').add(career)
+    return db.collection('career').add(career)
         .then(result => {
             response.status(200).send("Success")
-        }).catch(err => {
+        }).catch(error => {
+            response.status(401).send("Error")
+        })
+})
+
+exports.addLanguage = functions.https.onRequest((request, response) => {
+    var language = {
+        name: "",
+        description: "",
+        level: 0,
+        levelScale: 5,
+        imageUrl: ""
+    }
+    return db.collection('languages').add(language)
+        .then(result => {
+            response.status(200).send("Success")
+        }).catch(error => {
             response.status(401).send("Error")
         })
 })

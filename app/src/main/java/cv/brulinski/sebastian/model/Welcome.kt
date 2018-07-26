@@ -10,7 +10,7 @@ import com.google.gson.annotations.SerializedName
  * Welcome screen content
  */
 @Entity
-class Welcome {
+class Welcome: Any() {
 
     @PrimaryKey
     @ColumnInfo(name = "id")
