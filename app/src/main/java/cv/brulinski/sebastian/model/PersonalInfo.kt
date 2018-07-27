@@ -60,12 +60,6 @@ class PersonalInfo {
     @SerializedName("longitude")
     var longitude = 0.0
     @Expose
-    @Ignore
-    var profilePicture: Bitmap? = null
-    @Expose
-    @Ignore
-    var profileBcg: Bitmap? = null
-    @Expose
     @ColumnInfo(name = "profilePictureBase64")
     var profilePictureBase64: String? = ""
     @Expose

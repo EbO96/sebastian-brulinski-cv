@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 class MyCv {
 
     @SerializedName("status")
-    var status = 0
+    var status = -1
     @SerializedName("welcome")
     var welcome: Welcome? = Welcome()
     @SerializedName("personal_info")

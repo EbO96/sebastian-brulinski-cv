@@ -41,10 +41,6 @@ class Language {
     var imageUrl = ""
 
     @Expose
-    @Ignore
-    var flag: Bitmap? = null
-
-    @Expose
     @ColumnInfo(name = "flagBase64")
     var flagBase64: String? = ""
 }

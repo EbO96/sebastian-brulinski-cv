@@ -1,6 +1,5 @@
 package cv.brulinski.sebastian.fragment
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Paint
 import android.os.Bundle
@@ -15,6 +14,7 @@ import cv.brulinski.sebastian.model.PersonalInfo
 import cv.brulinski.sebastian.utils.age
 import cv.brulinski.sebastian.utils.ageSufix
 import cv.brulinski.sebastian.utils.date
+import cv.brulinski.sebastian.utils.loadBitmapsIntoImageViews
 import kotlinx.android.synthetic.main.fragment_personal_info.*
 import java.lang.ClassCastException
 
@@ -49,8 +49,7 @@ class PersonalInfoFragment : Fragment(), LifecycleOwner {
 
     fun update(personalInfo: PersonalInfo) {
         personalInfo.apply {
-            profilePicture?.let { profileImageView?.setImageBitmap(it) }
-            profileBcg?.let { bcgImageView?.setImageBitmap(it) }
+            loadBitmapsIntoImageViews(Pair(profileImageView, profilePictureBase64), Pair(bcgImageView, profilePictureBcgBase64)).subscribe()
             val nameAndSurname = "$name $surname"
             nameAndSurnameTextView?.text = nameAndSurname
             val bornDate = "$birthDay.$birthMonth.$birthYear".trim()
