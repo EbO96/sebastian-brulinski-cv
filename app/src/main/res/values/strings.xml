@@ -18,4 +18,5 @@
     <string name="refreshing">Odświeżanie</string>
     <string name="preambule">Wstęp</string>
     <string name="languages">Języki</string>
+    <string name="data_fetching_error">Błąd pobierania danych</string>
 </resources>

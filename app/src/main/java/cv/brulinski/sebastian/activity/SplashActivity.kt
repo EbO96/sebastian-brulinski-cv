@@ -9,9 +9,6 @@ class SplashActivity : AppCompatActivity() {
 
     private val auth by lazy { FirebaseAuth.getInstance() }
 
-    companion object {
-        val firstLaunch = "first_launch"
-    }
 
     override fun onStart() {
         super.onStart()
@@ -19,7 +16,6 @@ class SplashActivity : AppCompatActivity() {
             auth.signInAnonymously()
                     .addOnCompleteListener(this) { task ->
                         if (task.isSuccessful) {
-                            true.putPrefsValue(firstLaunch)
                             startMain()
                         }
                     }

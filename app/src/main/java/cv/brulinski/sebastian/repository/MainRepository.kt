@@ -6,7 +6,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import cv.brulinski.sebastian.R.string
-import cv.brulinski.sebastian.activity.SplashActivity
 import cv.brulinski.sebastian.model.*
 import cv.brulinski.sebastian.utils.*
 import io.reactivex.Observable
@@ -24,16 +23,17 @@ class MainRepository {
     private val myCv = MutableLiveData<MyCv>()
 
     fun getCv(): LiveData<MyCv> {
-
-        if (getPrefsValue(SplashActivity.firstLaunch) == true)
-            fetchCv()
-        else
-            fetchAllFromDatabase()
-                    .subscribeOn(AndroidSchedulers.mainThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe {
-                        myCv.value = it
+        fetchAllFromDatabase()
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { cv ->
+                    var dbNotEmpty = false
+                    cv?.welcome?.timestamp?.let {
+                        dbNotEmpty = it != -1L
                     }
+                    if (dbNotEmpty) myCv.value = cv
+                    else fetchCv()
+                }
         return myCv
     }
 
@@ -44,27 +44,28 @@ class MainRepository {
     private fun HashMap<String, String>.fetchBitmaps(): Observable<HashMap<String, String>> {
         val observables = arrayListOf<Observable<Bitmap>>()
         values.forEach { url ->
-            observables.add(fetchBitmap(url))
-
+            observables.add(downloadBitmap(url))
         }
         var counter = 0
         return Observable.create { emitter ->
             val map = HashMap<String, String>()
             Observable.merge(observables)
-                    .subscribeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .doOnNext {
+                    .doOnComplete {
+                        emitter.onNext(map)
+                        emitter.onComplete()
+                    }
+                    .subscribe({
                         it?.apply {
                             val key = keys.toList()[counter]
                             map[key] = toBase64String()
                         }
                         counter++
-                    }
-                    .doOnComplete {
-                        emitter.onNext(map)
-                        emitter.onComplete()
-                    }
-                    .subscribe()
+                    }, {
+                        emitter.onError(it)
+                    })
+
         }
     }
 
@@ -72,13 +73,14 @@ class MainRepository {
         fetchAllFromRemoteServer()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
+                .doOnNext {
                     it.insert()
                     myCv.value = it
-                    false.putPrefsValue(SplashActivity.firstLaunch)
-                }, {
+                }
+                .doOnError {
+                    ctx.getString(string.data_fetching_error).toast()
                     it.printStackTrace()
-                })
+                }.subscribe()
     }
 
     private fun fetchAllFromRemoteServer(): Observable<MyCv> {
@@ -100,7 +102,7 @@ class MainRepository {
                         urlMap.fetchBitmaps()
                                 .subscribeOn(Schedulers.computation())
                                 .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe {
+                                .doOnNext {
                                     it.apply {
                                         cv.personalInfo?.profilePictureBase64 = it["profilePicture"]
                                         cv.personalInfo?.profilePictureBcgBase64 = it["profileBcg"]
@@ -111,6 +113,10 @@ class MainRepository {
                                     emitter.onNext(cv)
                                     emitter.onComplete()
                                 }
+                                .doOnError {
+                                    emitter.onError(it)
+                                }
+                                .subscribe()
                     }, {
                         emitter.onError(it)
                         it.printStackTrace()
@@ -119,7 +125,7 @@ class MainRepository {
     }
 
     private fun fetchAllFromDatabase(): Observable<MyCv> {
-        val observers = arrayListOf<Observable<Any>>().apply {
+        val observers = arrayListOf<Observable<Any?>>().apply {
             add(fetchFromDatabase {
                 database.getWelcome()
             })
@@ -147,13 +153,14 @@ class MainRepository {
                                 cv.personalInfo = objectFromDb
                             }
                             is List<*> -> {
-                                objectFromDb.last()?.let {
-                                    if (it is Career) {
-                                        cv.career = objectFromDb as List<Career>
-                                    } else if (it is Language) {
-                                        cv.languages = objectFromDb as List<Language>
+                                if (objectFromDb.isNotEmpty())
+                                    objectFromDb.last()?.let {
+                                        if (it is Career) {
+                                            cv.career = objectFromDb as List<Career>
+                                        } else if (it is Language) {
+                                            cv.languages = objectFromDb as List<Language>
+                                        }
                                     }
-                                }
                             }
                         }
                     }
@@ -165,12 +172,12 @@ class MainRepository {
         }
     }
 
-    private fun fetchFromDatabase(fetch: () -> LiveData<*>): Observable<Any> {
+    private fun fetchFromDatabase(fetch: () -> LiveData<*>): Observable<Any?> {
         return Observable.create { emitter ->
             fetch().apply {
                 var obs: Observer<Any>? = null
                 val observer = Observer<Any> {
-                    emitter.onNext(it)
+                    it?.let { emitter.onNext(it) }
                     emitter.onComplete()
                     obs?.let {
                         removeObserver(it)

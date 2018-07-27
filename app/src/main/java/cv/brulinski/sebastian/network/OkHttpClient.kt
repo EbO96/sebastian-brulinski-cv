@@ -10,9 +10,7 @@ val okHttpClient: OkHttpClient = OkHttpClient.Builder()
             chain.proceed(request)
         }
         .connectTimeout(30, TimeUnit.SECONDS)
-        .readTimeout(20, TimeUnit.SECONDS)
+        .readTimeout(60, TimeUnit.SECONDS)
         .writeTimeout(20, TimeUnit.SECONDS)
-        .dispatcher(Dispatcher().apply {
-            maxRequests = 100
-        })
+        .dispatcher(Dispatcher())
         .build()
