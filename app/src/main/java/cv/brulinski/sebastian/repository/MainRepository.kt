@@ -76,6 +76,7 @@ class MainRepository {
                 .doOnNext {
                     it.insert()
                     myCv.value = it
+                    settings.firstLaunch = false
                 }
                 .doOnError {
                     ctx.getString(string.data_fetching_error).toast()
@@ -91,32 +92,38 @@ class MainRepository {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({ cv ->
 
-                        val urlMap = HashMap<String, String>()
-                        val errorImageUrl = string.error_image_url.string()
-                        urlMap["profilePicture"] = cv.personalInfo?.profilePhotoUrl ?: errorImageUrl
-                        urlMap["profileBcg"] = cv.personalInfo?.profileBcgUrl ?: errorImageUrl
-                        cv.languages?.forEach {
-                            urlMap[it.id] = it.imageUrl ?: errorImageUrl
-                        }
+                        myCv.value = cv
 
-                        urlMap.fetchBitmaps()
-                                .subscribeOn(Schedulers.computation())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .doOnNext {
-                                    it.apply {
-                                        cv.personalInfo?.profilePictureBase64 = it["profilePicture"]
-                                        cv.personalInfo?.profilePictureBcgBase64 = it["profileBcg"]
+                        if (settings.fetchGraphics || settings.firstLaunch) {
+                            val urlMap = HashMap<String, String>()
+                            val errorImageUrl = string.error_image_url.string()
+                            urlMap["profilePicture"] = cv.personalInfo?.profilePhotoUrl ?: errorImageUrl
+                            urlMap["profileBcg"] = cv.personalInfo?.profileBcgUrl ?: errorImageUrl
+                            cv.languages?.forEach {
+                                urlMap[it.id] = it.imageUrl ?: errorImageUrl
+                            }
+
+                            urlMap.fetchBitmaps()
+                                    .subscribeOn(Schedulers.computation())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .doOnNext {
+                                        it.apply {
+                                            cv.personalInfo?.profilePictureBase64 = it["profilePicture"]
+                                            cv.personalInfo?.profilePictureBcgBase64 = it["profileBcg"]
+                                        }
+                                        cv.languages?.forEach { language ->
+                                            language.flagBase64 = it[language.id]
+                                        }
+                                        emitter.onNext(cv)
+                                        emitter.onComplete()
                                     }
-                                    cv.languages?.forEach { language ->
-                                        language.flagBase64 = it[language.id]
+                                    .doOnError {
+                                        emitter.onError(it)
                                     }
-                                    emitter.onNext(cv)
-                                    emitter.onComplete()
-                                }
-                                .doOnError {
-                                    emitter.onError(it)
-                                }
-                                .subscribe()
+                                    .subscribe()
+                        } else {
+                            emitter.onComplete()
+                        }
                     }, {
                         emitter.onError(it)
                         it.printStackTrace()

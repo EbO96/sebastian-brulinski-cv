@@ -60,14 +60,14 @@ fun downloadBitmap(url: String): Observable<Bitmap> {
     }
 }
 
-fun String.base64ToBitmap() = Observable.create<Bitmap> {
+fun String.base64ToBitmap() = Observable.create<Bitmap> { emitter ->
     try {
         val byteArray = Base64.decode(this, Base64.DEFAULT)
         val stream = ByteArrayInputStream(byteArray)
-        it.onNext(BitmapFactory.decodeStream(stream))
-        it.onComplete()
+        BitmapFactory.decodeStream(stream)?.let { emitter.onNext(it) }
+        emitter.onComplete()
     } catch (e: Exception) {
-        it.onError(e)
+        emitter.onError(e)
     }
 }
 

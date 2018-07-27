@@ -23,12 +23,14 @@ import cv.brulinski.sebastian.fragment.PersonalInfoFragment
 import cv.brulinski.sebastian.fragment.WelcomeFragment
 import cv.brulinski.sebastian.model.MyCv
 import cv.brulinski.sebastian.utils.navigation_drawer.close
+import cv.brulinski.sebastian.utils.settings
 import cv.brulinski.sebastian.utils.string
 import cv.brulinski.sebastian.utils.toast
 import cv.brulinski.sebastian.utils.view_pager.*
 import cv.brulinski.sebastian.view_model.MainViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
+import kotlinx.android.synthetic.main.activity_main_drawer_header.view.*
 import setBaseToolbar
 
 class MainActivity : AppCompatActivity(),
@@ -51,6 +53,13 @@ class MainActivity : AppCompatActivity(),
         setBaseToolbar(title = R.string.start.string(), enableHomeButton = true)
         setupViewPager()
         mainDrawerLayout.setupNavigationDrawer()
+
+        mainNavigationView.getHeaderView(0)?.apply {
+            fetchGraphicsSwitch.isChecked = settings.fetchGraphics ?: true
+            fetchGraphicsSwitch.setOnCheckedChangeListener { _, checked ->
+                settings.fetchGraphics = checked
+            }
+        }
     }
 
     private fun DrawerLayout.setupNavigationDrawer() {

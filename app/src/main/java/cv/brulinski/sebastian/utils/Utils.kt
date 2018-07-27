@@ -7,6 +7,8 @@ import cv.brulinski.sebastian.dependency_injection.app.App
 
 val ctx by lazy { App.component.getContext() }
 
+val settings by lazy { App.component.getAppSettings() }
+
 fun Int.string() = ctx.getString(this)
 
 fun doAsync(unit: () -> Unit) {

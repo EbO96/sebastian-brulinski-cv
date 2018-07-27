@@ -37,7 +37,7 @@ class LanguagesFragment : Fragment() {
     }
 
     fun update(languages: List<Language>) {
-        languagesRecyclerAdapter.items = languages
+        languagesRecyclerAdapter.items = languages.sortedBy { it.level }.reversed()
     }
 
     override fun onDestroy() {

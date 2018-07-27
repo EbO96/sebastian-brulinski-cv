@@ -3,7 +3,7 @@ package cv.brulinski.sebastian.activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
-import cv.brulinski.sebastian.utils.putPrefsValue
+import cv.brulinski.sebastian.utils.settings
 
 class SplashActivity : AppCompatActivity() {
 
@@ -16,6 +16,7 @@ class SplashActivity : AppCompatActivity() {
             auth.signInAnonymously()
                     .addOnCompleteListener(this) { task ->
                         if (task.isSuccessful) {
+                            settings.firstLaunch = true
                             startMain()
                         }
                     }
