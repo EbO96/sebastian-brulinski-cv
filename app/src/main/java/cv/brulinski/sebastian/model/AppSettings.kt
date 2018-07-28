@@ -21,7 +21,7 @@ class AppSettings {
         }
 
     init {
-        firstLaunch = (getPrefsValue(firstLaunchKey) as Boolean) ?: true
-        fetchGraphics = (getPrefsValue(fetchGraphicsKey) as Boolean) ?: true
+        firstLaunch = (getPrefsValue(firstLaunchKey) as? Boolean) ?: true
+        fetchGraphics = (getPrefsValue(fetchGraphicsKey) as? Boolean) ?: true
     }
 }
