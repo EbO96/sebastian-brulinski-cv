@@ -15,6 +15,7 @@ import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter
 import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Companion.Page.*
 import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Companion.pageMap
+import cv.brulinski.sebastian.dependency_injection.app.App
 import cv.brulinski.sebastian.dependency_injection.component.DaggerPagesComponent
 import cv.brulinski.sebastian.dependency_injection.component.PagesComponent
 import cv.brulinski.sebastian.dependency_injection.module.PagesModule
@@ -22,13 +23,15 @@ import cv.brulinski.sebastian.fragment.CareerFragment
 import cv.brulinski.sebastian.fragment.PersonalInfoFragment
 import cv.brulinski.sebastian.fragment.WelcomeFragment
 import cv.brulinski.sebastian.model.MyCv
+import cv.brulinski.sebastian.utils.delay
 import cv.brulinski.sebastian.utils.navigation_drawer.close
 import cv.brulinski.sebastian.utils.settings
 import cv.brulinski.sebastian.utils.string
-import cv.brulinski.sebastian.utils.toast
 import cv.brulinski.sebastian.utils.view_pager.*
 import cv.brulinski.sebastian.view_model.MainViewModel
+import inflate
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.activity_main_drawer_header.view.*
 import setBaseToolbar
@@ -38,6 +41,8 @@ class MainActivity : AppCompatActivity(),
         PersonalInfoFragment.PersonalInfoCallback,
         CareerFragment.CareerFragmentCallback {
 
+    //Loading screen - displayed during first fetching
+    private val loadingScreen by lazy { R.layout.data_loading_screen.inflate(this) }
     //ViewPager adapter
     private var mainActivityViewPagerAdapter: MainActivityViewPagerAdapter? = null
     //ViewModel
@@ -60,6 +65,13 @@ class MainActivity : AppCompatActivity(),
                 settings.fetchGraphics = checked
             }
         }
+
+        App.startFetchingData.observe(this, Observer { status ->
+            when (status) {
+                App.FetchDataStatus.START -> loadingScreen.show()
+                App.FetchDataStatus.END, App.FetchDataStatus.ERROR, null -> loadingScreen.hide()
+            }
+        })
     }
 
     private fun DrawerLayout.setupNavigationDrawer() {
@@ -105,6 +117,8 @@ class MainActivity : AppCompatActivity(),
                             mainViewModel = ViewModelProvider.AndroidViewModelFactory.getInstance(application).create(MainViewModel::class.java)
                             myCv = mainViewModel?.myCv
                             myCv?.observe(this, Observer {
+                                App.startFetchingData.value = App.FetchDataStatus.END
+                                loadingScreen.hide()
                                 it?.apply {
                                     welcome?.let { welcome ->
                                         pagesComponent.getWelcomeScreen().update(welcome)
@@ -160,12 +174,31 @@ class MainActivity : AppCompatActivity(),
     private fun String.asToolbarTitle() {
         supportActionBar?.title = this
     }
-    /*
-    VIEWPAGER FRAGMENTS CALLBACKS BELOW
-     */
 
     /*
-    WelcomeFragment callbacks
+    Loading screen show/hide methods
+     */
+    private fun View.show() {
+        mainRootContainer?.apply {
+            if (indexOfChild(this@show) == -1 && settings.firstLaunch) {
+                addView(this@show)
+                this@MainActivity.mainDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+            }
+        }
+    }
+
+    private fun View.hide() {
+        1000L.delay {
+            mainRootContainer?.apply {
+                if (indexOfChild(this@hide) != -1) {
+                    removeView(this@hide)
+                    this@MainActivity.mainDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+                }
+            }
+        }
+    }
+    /*
+    VIEWPAGER FRAGMENTS CALLBACKS BELOW
      */
 
     /*
@@ -188,7 +221,6 @@ class MainActivity : AppCompatActivity(),
                 true
             }
             R.id.refreshContent -> {
-                "${getString(R.string.refreshing)}...".toast()
                 mainViewModel?.refreshAll()
                 true
             }
@@ -196,11 +228,10 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
-
     override fun onBackPressed() {
         viewPager.apply {
             when {
-                mainDrawerLayout.isDrawerOpen(Gravity.START) -> mainDrawerLayout.closeDrawer(Gravity.START)
+                this@MainActivity.mainDrawerLayout.isDrawerOpen(Gravity.START) -> this@MainActivity.mainDrawerLayout.closeDrawer(Gravity.START)
                 currentItem == pageMap[WELCOME_SCREEN] ?: 0 -> super.onBackPressed()
                 else -> toLeft()
             }

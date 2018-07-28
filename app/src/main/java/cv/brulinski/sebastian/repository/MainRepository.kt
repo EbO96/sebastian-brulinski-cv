@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import cv.brulinski.sebastian.R.string
+import cv.brulinski.sebastian.dependency_injection.app.App
 import cv.brulinski.sebastian.model.*
 import cv.brulinski.sebastian.utils.*
 import io.reactivex.Observable
@@ -15,25 +16,25 @@ import io.reactivex.schedulers.Schedulers
 @SuppressLint("CheckResult")
 class MainRepository {
 
-    private enum class Type {
-        PROFILE,
-        BCG
-    }
-
     private val myCv = MutableLiveData<MyCv>()
+
 
     fun getCv(): LiveData<MyCv> {
         fetchAllFromDatabase()
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { cv ->
+                .subscribe({ cv ->
                     var dbNotEmpty = false
                     cv?.welcome?.timestamp?.let {
                         dbNotEmpty = it != -1L
                     }
                     if (dbNotEmpty) myCv.value = cv
-                    else fetchCv()
-                }
+                    else {
+                        fetchCv()
+                    }
+                }, {
+                    App.startFetchingData.value = App.FetchDataStatus.ERROR
+                })
         return myCv
     }
 
@@ -70,6 +71,8 @@ class MainRepository {
     }
 
     private fun fetchCv() {
+        if (settings.firstLaunch)
+            App.startFetchingData.value = App.FetchDataStatus.START
         fetchAllFromRemoteServer()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -151,7 +154,11 @@ class MainRepository {
             Observable.merge(observers)
                     .subscribeOn(AndroidSchedulers.mainThread())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .doOnNext { objectFromDb ->
+                    .doOnComplete {
+                        emitter.onNext(cv)
+                        emitter.onComplete()
+                    }
+                    .subscribe({ objectFromDb ->
                         when (objectFromDb) {
                             is Welcome -> {
                                 cv.welcome = objectFromDb
@@ -170,28 +177,29 @@ class MainRepository {
                                     }
                             }
                         }
-                    }
-                    .doOnComplete {
-                        emitter.onNext(cv)
-                        emitter.onComplete()
-                    }
-                    .subscribe()
+                    }, {
+                        emitter.onError(it)
+                    })
         }
     }
 
     private fun fetchFromDatabase(fetch: () -> LiveData<*>): Observable<Any?> {
         return Observable.create { emitter ->
-            fetch().apply {
-                var obs: Observer<Any>? = null
-                val observer = Observer<Any> {
-                    it?.let { emitter.onNext(it) }
-                    emitter.onComplete()
-                    obs?.let {
-                        removeObserver(it)
+            try {
+                fetch().apply {
+                    var obs: Observer<Any>? = null
+                    val observer = Observer<Any> {
+                        it?.let { emitter.onNext(it) }
+                        emitter.onComplete()
+                        obs?.let {
+                            removeObserver(it)
+                        }
                     }
+                    obs = observer
+                    observeForever(observer)
                 }
-                obs = observer
-                observeForever(observer)
+            } catch (e: Exception) {
+                emitter.onError(e)
             }
         }
     }

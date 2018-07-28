@@ -1,3 +1,4 @@
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +10,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cv.brulinski.sebastian.R
+import cv.brulinski.sebastian.utils.ctx
 
 fun AppCompatActivity.setBaseToolbar(enableHomeButton: Boolean = false, title: String = "") {
     setSupportActionBar(findViewById(R.id.myToolbar))
@@ -20,6 +22,9 @@ fun AppCompatActivity.setBaseToolbar(enableHomeButton: Boolean = false, title: S
 
 infix fun ViewGroup.inflateViewHolderView(resLayout: Int) =
         LayoutInflater.from(this.context).inflate(resLayout, this, false)
+
+fun Int.inflate(context: Context? = null) =
+        LayoutInflater.from(context ?: ctx).inflate(this, null, false)
 
 fun RecyclerView.setup(adapter: RecyclerView.Adapter<RecyclerView.ViewHolder>, divider: Boolean = false) {
     ViewCompat.setNestedScrollingEnabled(this, false)
