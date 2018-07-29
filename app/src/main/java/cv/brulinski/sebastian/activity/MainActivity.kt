@@ -51,6 +51,8 @@ class MainActivity : AppCompatActivity(),
     private var myCv: LiveData<MyCv>? = null
     //Dagger ViewPager pages component
     private lateinit var pagesComponent: PagesComponent
+    //Menu items
+    private var refreshMenuItem: MenuItem? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,6 +98,11 @@ class MainActivity : AppCompatActivity(),
                 R.id.languagesItem -> {
                     mainDrawerLayout.close {
                         viewPager.goTo(LANGUAGES)
+                    }
+                }
+                R.id.skillsItem -> {
+                    mainDrawerLayout.close {
+                        viewPager.goTo(SKILLS)
                     }
                 }
             }
@@ -206,6 +213,7 @@ class MainActivity : AppCompatActivity(),
      */
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        refreshMenuItem = menu?.findItem(R.id.refreshContent)
         menuInflater.inflate(R.menu.main_activity_menu, menu)
         return super.onCreateOptionsMenu(menu)
     }

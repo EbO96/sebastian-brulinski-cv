@@ -5,10 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.viewpager.widget.ViewPager
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter
-import cv.brulinski.sebastian.fragment.CareerFragment
-import cv.brulinski.sebastian.fragment.LanguagesFragment
-import cv.brulinski.sebastian.fragment.PersonalInfoFragment
-import cv.brulinski.sebastian.fragment.WelcomeFragment
+import cv.brulinski.sebastian.fragment.*
 import cv.brulinski.sebastian.interfaces.ViewPagerUtilsFragmentCreatedListener
 import cv.brulinski.sebastian.utils.string
 
@@ -39,13 +36,15 @@ class MyMainViewPager(private val fragmentManager: FragmentManager,
                 WelcomeFragment.newInstance(this),
                 PersonalInfoFragment.newInstance(this),
                 CareerFragment.newInstance(this),
-                LanguagesFragment.newInstance(this)
+                LanguagesFragment.newInstance(this),
+                SkillsFragment.newInstance(this)
         )
         numberOfPages = fragments.size
         val titles = arrayListOf("",
                 R.string.personal_details.string(),
                 R.string.career.string(),
-                R.string.languages.string())
+                R.string.languages.string(),
+                R.string.skills.string())
 
         viewPager.apply {
             mainActivityViewPagerAdapter = MainActivityViewPagerAdapter(fragments, titles, fragmentManager).apply {

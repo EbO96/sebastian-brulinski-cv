@@ -2,10 +2,7 @@ package cv.brulinski.sebastian.dependency_injection.component
 
 import cv.brulinski.sebastian.activity.MainActivity
 import cv.brulinski.sebastian.dependency_injection.module.PagesModule
-import cv.brulinski.sebastian.fragment.CareerFragment
-import cv.brulinski.sebastian.fragment.LanguagesFragment
-import cv.brulinski.sebastian.fragment.PersonalInfoFragment
-import cv.brulinski.sebastian.fragment.WelcomeFragment
+import cv.brulinski.sebastian.fragment.*
 import dagger.Component
 import javax.inject.Singleton
 
@@ -20,6 +17,8 @@ interface PagesComponent {
     fun getCareerScreen(): CareerFragment
 
     fun getLanguagesScreen(): LanguagesFragment
+
+    fun getSkillsScreen(): SkillsFragment
 
     fun inject(mainActivity: MainActivity)
 }

@@ -14,4 +14,6 @@ class MyCv {
     var career: List<Career>? = listOf()
     @SerializedName("languages")
     var languages: List<Language>? = listOf()
+    @SerializedName("skills")
+    var skills: List<Skill>? = listOf()
 }

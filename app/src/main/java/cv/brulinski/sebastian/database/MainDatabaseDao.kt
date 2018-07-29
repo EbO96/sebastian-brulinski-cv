@@ -5,10 +5,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import cv.brulinski.sebastian.model.Career
-import cv.brulinski.sebastian.model.Language
-import cv.brulinski.sebastian.model.PersonalInfo
-import cv.brulinski.sebastian.model.Welcome
+import cv.brulinski.sebastian.model.*
 
 @Dao
 interface MainDatabaseDao {
@@ -21,6 +18,9 @@ interface MainDatabaseDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertLanguages(language: List<Language>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertSkills(skill: List<Skill>)
 
     @Query("DELETE FROM Career")
     fun deleteCareer()
@@ -47,5 +47,8 @@ interface MainDatabaseDao {
 
     @Query("SELECT * FROM Career")
     fun getCareer(): LiveData<List<Career>>
+
+    @Query("SELECT * FROM Skill")
+    fun getSkills(): LiveData<List<Skill>>
 
 }

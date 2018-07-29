@@ -95,38 +95,43 @@ class MainRepository {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({ cv ->
 
-                        myCv.value = cv
+                        if (cv.status == 1) {
+                            myCv.value = cv
 
-                        if (settings.fetchGraphics || settings.firstLaunch) {
-                            val urlMap = HashMap<String, String>()
-                            val errorImageUrl = string.error_image_url.string()
-                            urlMap["profilePicture"] = cv.personalInfo?.profilePhotoUrl ?: errorImageUrl
-                            urlMap["profileBcg"] = cv.personalInfo?.profileBcgUrl ?: errorImageUrl
-                            cv.languages?.forEach {
-                                urlMap[it.id] = it.imageUrl ?: errorImageUrl
+                            if (settings.fetchGraphics || settings.firstLaunch) {
+                                val urlMap = HashMap<String, String>()
+                                val errorImageUrl = string.error_image_url.string()
+                                urlMap["profilePicture"] = cv.personalInfo?.profilePhotoUrl ?: errorImageUrl
+                                urlMap["profileBcg"] = cv.personalInfo?.profileBcgUrl ?: errorImageUrl
+                                cv.languages?.forEach {
+                                    urlMap[it.id] = it.imageUrl ?: errorImageUrl
+                                }
+
+                                urlMap.fetchBitmaps()
+                                        .subscribeOn(Schedulers.computation())
+                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .doOnNext {
+                                            it.apply {
+                                                cv.personalInfo?.profilePictureBase64 = it["profilePicture"]
+                                                cv.personalInfo?.profilePictureBcgBase64 = it["profileBcg"]
+                                            }
+                                            cv.languages?.forEach { language ->
+                                                language.flagBase64 = it[language.id]
+                                            }
+                                            emitter.onNext(cv)
+                                            emitter.onComplete()
+                                        }
+                                        .doOnError {
+                                            emitter.onError(it)
+                                        }
+                                        .subscribe()
+                            } else {
+                                emitter.onComplete()
                             }
-
-                            urlMap.fetchBitmaps()
-                                    .subscribeOn(Schedulers.computation())
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .doOnNext {
-                                        it.apply {
-                                            cv.personalInfo?.profilePictureBase64 = it["profilePicture"]
-                                            cv.personalInfo?.profilePictureBcgBase64 = it["profileBcg"]
-                                        }
-                                        cv.languages?.forEach { language ->
-                                            language.flagBase64 = it[language.id]
-                                        }
-                                        emitter.onNext(cv)
-                                        emitter.onComplete()
-                                    }
-                                    .doOnError {
-                                        emitter.onError(it)
-                                    }
-                                    .subscribe()
                         } else {
-                            emitter.onComplete()
+                            emitter.onError(Throwable("Fetching error"))
                         }
+
                     }, {
                         emitter.onError(it)
                         it.printStackTrace()
@@ -147,6 +152,9 @@ class MainRepository {
             })
             add(fetchFromDatabase {
                 database.getLanguages()
+            })
+            add(fetchFromDatabase {
+                database.getSkills()
             })
         }
         return Observable.create { emitter ->
@@ -173,6 +181,8 @@ class MainRepository {
                                             cv.career = objectFromDb as List<Career>
                                         } else if (it is Language) {
                                             cv.languages = objectFromDb as List<Language>
+                                        } else if (it is Skill) {
+                                            cv.skills = objectFromDb as List<Skill>
                                         }
                                     }
                             }

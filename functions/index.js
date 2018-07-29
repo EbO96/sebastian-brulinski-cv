@@ -35,13 +35,20 @@ function getLanguagesPromise() {
         .get()
 }
 
+function getSkillsPromise() {
+    return db.
+        collection('skills')
+        .get()
+}
+
 exports.getAll = functions.https.onRequest((request, response) => {
     var requests = []
-    var jsonResult = { status: -1, welcome: { timestamp: -1 }, personal_info: { timestamp: -1 }, career: [], languages: [] }
+    var jsonResult = { status: -1, welcome: { timestamp: -1 }, personal_info: { timestamp: -1 }, career: [], languages: [], skills: [] }
     requests.push(getWelcomePromise())
     requests.push(getPersonalInfoPromise())
     requests.push(getCareerProomise())
     requests.push(getLanguagesPromise())
+    requests.push(getSkillsPromise())
 
     return Promise.all(requests)
         .then((results) => {
@@ -76,7 +83,14 @@ exports.getAll = functions.https.onRequest((request, response) => {
                 jsonResult.languages.push(d)
             })
 
-            jsonResult.status = 1
+            results[4].forEach((doc) => {
+                var d = doc.data()
+                d["id"] = doc.id
+                d["timestamp"] = time
+                jsonResult.skills.push(d)
+            })
+
+            jsonResult['status'] = 1
             response.status(200).json(jsonResult)
 
         }).catch((error) => {
@@ -114,6 +128,21 @@ exports.addLanguage = functions.https.onRequest((request, response) => {
         imageUrl: ""
     }
     return db.collection('languages').add(language)
+        .then(result => {
+            response.status(200).send("Success")
+        }).catch(error => {
+            response.status(401).send("Error")
+        })
+})
+
+exports.addSkill = functions.https.onRequest((request, response) => {
+    var skill = {
+        skillName: "",
+        skillDescription: "",
+        skillCategory: "",
+    }
+
+    return db.collection('skills').add(skill)
         .then(result => {
             response.status(200).send("Success")
         }).catch(error => {
