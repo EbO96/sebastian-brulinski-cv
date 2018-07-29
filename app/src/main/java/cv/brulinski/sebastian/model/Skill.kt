@@ -3,6 +3,7 @@ package cv.brulinski.sebastian.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
 /**
@@ -27,4 +28,10 @@ class Skill {
     @ColumnInfo(name = "timestamp")
     @SerializedName("timestamp")
     var timestamp = -1L
+    @ColumnInfo(name = "iconUrl")
+    @SerializedName("iconUrl")
+    var iconUrl = ""
+    @ColumnInfo(name = "iconBase64")
+    @Expose
+    var iconBase64: String? = ""
 }

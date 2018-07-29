@@ -21,23 +21,23 @@ class PagesModule(var fragmentStatePagerAdapter: FragmentStatePagerAdapter, var 
     @Singleton
     fun providePersonalInfoScreen(): PersonalInfoFragment = fragmentStatePagerAdapter.instantiateItem(viewPager,
             MainActivityViewPagerAdapter.pageMap[MainActivityViewPagerAdapter.Companion.Page.PERSONAL_INFO_SCREEN]
-                    ?: 0) as PersonalInfoFragment
+                    ?: 1) as PersonalInfoFragment
 
     @Provides
     @Singleton
     fun provideCareerScreen(): CareerFragment = fragmentStatePagerAdapter.instantiateItem(viewPager,
             MainActivityViewPagerAdapter.pageMap[MainActivityViewPagerAdapter.Companion.Page.CAREER]
-                    ?: 0) as CareerFragment
+                    ?: 2) as CareerFragment
 
     @Provides
     @Singleton
     fun provideLanguagesScreen(): LanguagesFragment = fragmentStatePagerAdapter.instantiateItem(viewPager,
             MainActivityViewPagerAdapter.pageMap[MainActivityViewPagerAdapter.Companion.Page.LANGUAGES]
-                    ?: 0) as LanguagesFragment
+                    ?: 3) as LanguagesFragment
 
     @Provides
     @Singleton
     fun provideSkillsScreen(): SkillsFragment = fragmentStatePagerAdapter.instantiateItem(viewPager,
             MainActivityViewPagerAdapter.pageMap[MainActivityViewPagerAdapter.Companion.Page.SKILLS]
-                    ?: 0) as SkillsFragment
+                    ?: 4) as SkillsFragment
 }

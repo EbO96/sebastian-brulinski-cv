@@ -41,10 +41,10 @@ class PersonalInfoFragment : Fragment(), LifecycleOwner {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewPagerUtilsFragmentCreatedListener?.onFragmentCreated()
         phoneTextView.apply {
             paintFlags = paintFlags or Paint.UNDERLINE_TEXT_FLAG
         }
+        viewPagerUtilsFragmentCreatedListener?.onFragmentCreated()
     }
 
     fun update(personalInfo: PersonalInfo) {

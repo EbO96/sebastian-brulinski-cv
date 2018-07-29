@@ -1,5 +1,7 @@
 package cv.brulinski.sebastian.interfaces
 
+import cv.brulinski.sebastian.model.MyRecyclerItem
+
 interface OnBindViewInViewHolder {
-    fun onBind(item: Any, position: Int, onItemClickListener: OnItemClickListener? = null)
+    fun onBind(item: MyRecyclerItem<*>, position: Int, onItemClickListener: OnItemClickListener? = null)
 }

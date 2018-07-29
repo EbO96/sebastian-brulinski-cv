@@ -9,6 +9,8 @@ import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.adapter.recycler.languages.LanguagesRecyclerAdapter
 import cv.brulinski.sebastian.interfaces.ViewPagerUtilsFragmentCreatedListener
 import cv.brulinski.sebastian.model.Language
+import cv.brulinski.sebastian.model.MyRecyclerItem
+import cv.brulinski.sebastian.utils.TYPE_ITEM
 import kotlinx.android.synthetic.main.fragment_languages.*
 import setup
 
@@ -31,13 +33,13 @@ class LanguagesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewPagerUtilsFragmentCreatedListener?.onFragmentCreated()
-
         recyclerView.setup(LanguagesRecyclerAdapter().apply { languagesRecyclerAdapter = this })
+        viewPagerUtilsFragmentCreatedListener?.onFragmentCreated()
     }
 
     fun update(languages: List<Language>) {
         languagesRecyclerAdapter.items = languages.sortedBy { it.level }.reversed()
+                .map { MyRecyclerItem(it, TYPE_ITEM) } as ArrayList<MyRecyclerItem<Language>>
     }
 
     override fun onDestroy() {

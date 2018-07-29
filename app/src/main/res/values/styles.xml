@@ -75,4 +75,9 @@
         <item name="android:gravity">center_vertical|start</item>
         <item name="android:drawablePadding">1dp</item>
     </style>
+
+    <style name="RootRecyclerStyle" parent="MyFragmentRootLayoutStyle">
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+    </style>
 </resources>

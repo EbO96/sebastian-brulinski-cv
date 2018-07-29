@@ -106,6 +106,9 @@ class MainRepository {
                                 cv.languages?.forEach {
                                     urlMap[it.id] = it.imageUrl ?: errorImageUrl
                                 }
+                                cv.skills?.forEach {
+                                    urlMap[it.id] = it.iconUrl ?: errorImageUrl
+                                }
 
                                 urlMap.fetchBitmaps()
                                         .subscribeOn(Schedulers.computation())
@@ -117,6 +120,9 @@ class MainRepository {
                                             }
                                             cv.languages?.forEach { language ->
                                                 language.flagBase64 = it[language.id]
+                                            }
+                                            cv.skills?.forEach { skill ->
+                                                skill.iconBase64 = it[skill.id]
                                             }
                                             emitter.onNext(cv)
                                             emitter.onComplete()

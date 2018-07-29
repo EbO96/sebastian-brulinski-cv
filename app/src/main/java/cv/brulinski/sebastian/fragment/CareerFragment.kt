@@ -7,11 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import cv.brulinski.sebastian.R
-import cv.brulinski.sebastian.adapter.recycler.CareerRecyclerAdapter
+import cv.brulinski.sebastian.adapter.recycler.career.CareerRecyclerAdapter
 import cv.brulinski.sebastian.interfaces.OnItemClickListener
 import cv.brulinski.sebastian.interfaces.ViewPagerUtilsFragmentCreatedListener
 import cv.brulinski.sebastian.model.Career
-import cv.brulinski.sebastian.model.RecyclerItem
+import cv.brulinski.sebastian.model.MyRecyclerItem
 import cv.brulinski.sebastian.utils.TYPE_HEADER
 import cv.brulinski.sebastian.utils.TYPE_ITEM
 import cv.brulinski.sebastian.utils.date
@@ -45,17 +45,15 @@ class CareerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewPagerUtilsFragmentCreatedListener?.onFragmentCreated()
         setupCareerRecycler()
+        viewPagerUtilsFragmentCreatedListener?.onFragmentCreated()
     }
 
     fun update(career: List<Career>) {
-        val items = arrayListOf<RecyclerItem>()
+        val items = arrayListOf<MyRecyclerItem<Career>>()
         career.sortedBy { it.startTime.date() }.forEach {
-            val header = it
-            header.itemType = TYPE_HEADER
-            val item = it.clone()
-            item.itemType = TYPE_ITEM
+            val header = MyRecyclerItem(it, TYPE_HEADER)
+            val item = MyRecyclerItem(it, TYPE_ITEM)
             items.add(header)
             items.add(item)
         }

@@ -139,6 +139,9 @@ class MainActivity : AppCompatActivity(),
                                     languages?.let { languages ->
                                         pagesComponent.getLanguagesScreen().update(languages)
                                     }
+                                    skills?.let { skills ->
+                                        pagesComponent.getSkillsScreen().update(skills)
+                                    }
                                 }
                             })
                         }

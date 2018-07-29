@@ -140,6 +140,7 @@ exports.addSkill = functions.https.onRequest((request, response) => {
         skillName: "",
         skillDescription: "",
         skillCategory: "",
+        iconUrl: ""
     }
 
     return db.collection('skills').add(skill)
