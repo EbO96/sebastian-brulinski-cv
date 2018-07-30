@@ -24,6 +24,7 @@ import cv.brulinski.sebastian.fragment.PersonalInfoFragment
 import cv.brulinski.sebastian.fragment.WelcomeFragment
 import cv.brulinski.sebastian.model.MyCv
 import cv.brulinski.sebastian.utils.delay
+import cv.brulinski.sebastian.utils.log
 import cv.brulinski.sebastian.utils.navigation_drawer.close
 import cv.brulinski.sebastian.utils.settings
 import cv.brulinski.sebastian.utils.string
@@ -53,6 +54,10 @@ class MainActivity : AppCompatActivity(),
     private lateinit var pagesComponent: PagesComponent
     //Menu items
     private var refreshMenuItem: MenuItem? = null
+    //Main ViewPager
+    private var myMainViewPager: MyMainViewPager? = null
+    //Flags
+    private var pagesProgress = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -111,9 +116,9 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun setupViewPager() {
-        val myMainViewPager = MyMainViewPager(supportFragmentManager, viewPager, viewPagerPageListener()).setup()
-        mainActivityViewPagerAdapter = myMainViewPager.mainActivityViewPagerAdapter
-        myMainViewPager.observeForever { it ->
+        myMainViewPager = MyMainViewPager(supportFragmentManager, viewPager, viewPagerPageListener()).setup()
+        mainActivityViewPagerAdapter = myMainViewPager?.mainActivityViewPagerAdapter
+        myMainViewPager?.observeForever { it ->
             it?.let {
                 when (it) {
                     ViewPagerStates.VIEW_PAGER_PAGES_CREATED -> {
@@ -158,6 +163,12 @@ class MainActivity : AppCompatActivity(),
         }
 
         override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+
+            val pages = myMainViewPager?.getNumberOfPages() ?: 0
+            if (pages != 0) {
+                pagesProgress = Math.abs((100 / pages)) * (position + 1)
+                contentProgressBar.progress = pagesProgress
+            }
         }
 
         override fun onPageSelected(position: Int) {

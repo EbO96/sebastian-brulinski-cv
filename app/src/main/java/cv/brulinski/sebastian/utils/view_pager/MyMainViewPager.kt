@@ -57,4 +57,6 @@ class MyMainViewPager(private val fragmentManager: FragmentManager,
         }
         return this
     }
+
+    fun getNumberOfPages() = numberOfPages ?: 0
 }
