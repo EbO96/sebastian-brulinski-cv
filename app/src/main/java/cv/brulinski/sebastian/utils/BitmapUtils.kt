@@ -7,6 +7,7 @@ import android.util.Base64
 import android.widget.ImageView
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
+import cv.brulinski.sebastian.repository.MainRepository
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -40,6 +41,13 @@ fun downloadBitmap(url: String): Observable<Bitmap> {
     return Observable.create { emitter ->
         try {
             if (url.isNotEmpty()) {
+                if (url == MainRepository.errorImageUrl) {
+                    MainRepository.errorBitmap?.let {
+                        emitter.onNext(it)
+                        emitter.onComplete()
+                        return@create
+                    }
+                }
                 val path = URL(url)
                 val connection = (path.openConnection() as HttpURLConnection).apply {
                     doInput = true
@@ -48,12 +56,14 @@ fun downloadBitmap(url: String): Observable<Bitmap> {
                 val inputStream = connection.inputStream
                 val bitmap = BitmapFactory.decodeStream(inputStream)
                 bitmap?.let {
+                    if (url == MainRepository.errorImageUrl && MainRepository.errorBitmap == null)
+                        MainRepository.errorBitmap = it
                     emitter.onNext(it)
                 }
-                emitter.onComplete()
             } else {
                 emitter.onError(Throwable("Wrong image url"))
             }
+            emitter.onComplete()
         } catch (e: IOException) {
             emitter.onError(e)
         }

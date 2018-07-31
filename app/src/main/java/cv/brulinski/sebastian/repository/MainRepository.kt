@@ -18,6 +18,10 @@ class MainRepository {
 
     private val myCv = MutableLiveData<MyCv>()
 
+    companion object {
+        val errorImageUrl by lazy { string.error_image_url.string() }
+        var errorBitmap: Bitmap? = null
+    }
 
     fun getCv(): LiveData<MyCv> {
         fetchAllFromDatabase()
@@ -42,10 +46,10 @@ class MainRepository {
         fetchCv()
     }
 
-    private fun HashMap<String, String>.fetchBitmaps(): Observable<HashMap<String, String>> {
+    private fun HashMap<String, String?>.fetchBitmaps(): Observable<HashMap<String, String>> {
         val observables = arrayListOf<Observable<Bitmap>>()
         values.forEach { url ->
-            observables.add(downloadBitmap(url))
+            observables.add(downloadBitmap(url.checkUrl()))
         }
         var counter = 0
         return Observable.create { emitter ->
@@ -57,6 +61,7 @@ class MainRepository {
                         emitter.onNext(map)
                         emitter.onComplete()
                     }
+                    .onErrorReturnItem(Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888))
                     .subscribe({
                         it?.apply {
                             val key = keys.toList()[counter]
@@ -76,15 +81,14 @@ class MainRepository {
         fetchAllFromRemoteServer()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext {
+                .subscribe({
                     it.insert()
                     myCv.value = it
                     settings.firstLaunch = false
-                }
-                .doOnError {
+                }, {
                     ctx.getString(string.data_fetching_error).toast()
                     it.printStackTrace()
-                }.subscribe()
+                })
     }
 
     private fun fetchAllFromRemoteServer(): Observable<MyCv> {
@@ -99,21 +103,20 @@ class MainRepository {
                             myCv.value = cv
 
                             if (settings.fetchGraphics || settings.firstLaunch) {
-                                val urlMap = HashMap<String, String>()
-                                val errorImageUrl = string.error_image_url.string()
-                                urlMap["profilePicture"] = cv.personalInfo?.profilePhotoUrl ?: errorImageUrl
-                                urlMap["profileBcg"] = cv.personalInfo?.profileBcgUrl ?: errorImageUrl
+                                val urlMap = HashMap<String, String?>()
+                                urlMap["profilePicture"] = cv.personalInfo?.profilePhotoUrl
+                                urlMap["profileBcg"] = cv.personalInfo?.profileBcgUrl
                                 cv.languages?.forEach {
-                                    urlMap[it.id] = it.imageUrl ?: errorImageUrl
+                                    urlMap[it.id] = it.imageUrl
                                 }
                                 cv.skills?.forEach {
-                                    urlMap[it.id] = it.iconUrl ?: errorImageUrl
+                                    urlMap[it.id] = it.iconUrl
                                 }
 
                                 urlMap.fetchBitmaps()
                                         .subscribeOn(Schedulers.computation())
                                         .observeOn(AndroidSchedulers.mainThread())
-                                        .doOnNext {
+                                        .subscribe({
                                             it.apply {
                                                 cv.personalInfo?.profilePictureBase64 = it["profilePicture"]
                                                 cv.personalInfo?.profilePictureBcgBase64 = it["profileBcg"]
@@ -126,11 +129,9 @@ class MainRepository {
                                             }
                                             emitter.onNext(cv)
                                             emitter.onComplete()
-                                        }
-                                        .doOnError {
+                                        }, {
                                             emitter.onError(it)
-                                        }
-                                        .subscribe()
+                                        })
                             } else {
                                 emitter.onComplete()
                             }
@@ -218,5 +219,9 @@ class MainRepository {
                 emitter.onError(e)
             }
         }
+    }
+
+    private fun (String?).checkUrl(): String {
+        return this.let { if (it.isNullOrBlank()) errorImageUrl else it } ?: errorImageUrl
     }
 }

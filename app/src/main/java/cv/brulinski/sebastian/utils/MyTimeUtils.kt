@@ -18,11 +18,11 @@ fun String.date(): Date? = try {
 }
 
 fun Date.age(): Int {
-    val born = Calendar.getInstance()
+    val born = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault())
     born.time = this
     val current = Calendar.getInstance()
     val birth = LocalDate(born[Calendar.YEAR], born[Calendar.MONTH], born[Calendar.DAY_OF_MONTH])
-    val now = LocalDate(current[Calendar.YEAR], current[Calendar.MONTH], current[Calendar.DAY_OF_MONTH])
+    val now = LocalDate(current.time)
     return Years.yearsBetween(birth, now).years
 }
 
