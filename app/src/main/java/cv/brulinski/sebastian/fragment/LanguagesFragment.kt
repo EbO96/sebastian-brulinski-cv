@@ -11,6 +11,7 @@ import cv.brulinski.sebastian.interfaces.ViewPagerUtilsFragmentCreatedListener
 import cv.brulinski.sebastian.model.Language
 import cv.brulinski.sebastian.model.MyRecyclerItem
 import cv.brulinski.sebastian.utils.TYPE_ITEM
+import cv.brulinski.sebastian.utils.getBitmapsForObjects
 import kotlinx.android.synthetic.main.fragment_languages.*
 import setup
 
@@ -38,8 +39,11 @@ class LanguagesFragment : Fragment() {
     }
 
     fun update(languages: List<Language>) {
-        languagesRecyclerAdapter.items = languages.sortedBy { it.level }.reversed()
-                .map { MyRecyclerItem(it, TYPE_ITEM) } as ArrayList<MyRecyclerItem<Language>>
+//        languagesRecyclerAdapter.items = languages.sortedBy { it.level }.reversed()
+//                .map { MyRecyclerItem(it, TYPE_ITEM) } as ArrayList<MyRecyclerItem<Language>>
+        getBitmapsForObjects(languages) {
+            languagesRecyclerAdapter.items = it
+        }
     }
 
     override fun onDestroy() {

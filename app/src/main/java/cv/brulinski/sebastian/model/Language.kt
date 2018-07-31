@@ -7,9 +7,10 @@ import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import cv.brulinski.sebastian.interfaces.BitmapLoadable
 
 @Entity
-class Language {
+class Language : BitmapLoadable {
 
     @PrimaryKey
     @ColumnInfo(name = "id")
@@ -43,4 +44,24 @@ class Language {
     @Expose
     @ColumnInfo(name = "flagBase64")
     var flagBase64: String? = ""
+
+    @Expose
+    @Ignore
+    var flagBitmap: Bitmap? = null
+
+    override fun getTypeId() = id
+
+    override fun getTypeBitmap() = flagBitmap
+
+    override fun getTypeBitmapBase64() = flagBase64
+
+    override fun setTypeBitmapBase64(bitmap: String?) {
+        flagBase64 = bitmap
+    }
+
+    override fun setTypeBitmap(bitmap: Bitmap?) {
+        flagBitmap = bitmap
+    }
+
+    override fun getTypeSkillCategory(): String? = null
 }

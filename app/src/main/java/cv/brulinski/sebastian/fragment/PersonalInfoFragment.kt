@@ -49,7 +49,7 @@ class PersonalInfoFragment : Fragment(), LifecycleOwner {
 
     fun update(personalInfo: PersonalInfo) {
         personalInfo.apply {
-            loadBitmapsIntoImageViews(Pair(profileImageView, profilePictureBase64), Pair(bcgImageView, profilePictureBcgBase64)).subscribe()
+            loadBitmapsIntoImageViews(Pair(profileImageView, profilePictureBase64), Pair(bcgImageView, profilePictureBcgBase64))?.subscribe()
             val nameAndSurname = "$name $surname"
             nameAndSurnameTextView?.text = nameAndSurname
             val bornDate = "$birthDay.$birthMonth.$birthYear".trim()

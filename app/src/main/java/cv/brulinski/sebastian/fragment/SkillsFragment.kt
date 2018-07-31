@@ -1,5 +1,7 @@
 package cv.brulinski.sebastian.fragment
 
+import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,10 +10,8 @@ import androidx.fragment.app.Fragment
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.adapter.recycler.skills.SkillsRecyclerAdapter
 import cv.brulinski.sebastian.interfaces.ViewPagerUtilsFragmentCreatedListener
-import cv.brulinski.sebastian.model.MyRecyclerItem
 import cv.brulinski.sebastian.model.Skill
-import cv.brulinski.sebastian.utils.TYPE_HEADER
-import cv.brulinski.sebastian.utils.TYPE_ITEM
+import cv.brulinski.sebastian.utils.getBitmapsForObjects
 import kotlinx.android.synthetic.main.fragment_skills.*
 import setup
 
@@ -45,16 +45,11 @@ class SkillsFragment : Fragment() {
         }
     }
 
+    @SuppressLint("CheckResult")
     fun update(skills: List<Skill>) {
-        val items = arrayListOf<MyRecyclerItem<Skill>>()
-        skills.groupBy { it.skillCategory }.forEach {
-            val header = MyRecyclerItem(it.value[0], TYPE_HEADER)
-            items.add(header)
-            it.value.map { MyRecyclerItem(it, TYPE_ITEM) }.let {
-                items.addAll(it)
-            }
+        getBitmapsForObjects(skills) {
+            skillsRecyclerAdapter?.items = it
         }
-        skillsRecyclerAdapter?.items = items
     }
 
     override fun onDestroy() {

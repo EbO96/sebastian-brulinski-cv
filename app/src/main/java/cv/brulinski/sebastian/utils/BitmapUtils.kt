@@ -1,12 +1,12 @@
 package cv.brulinski.sebastian.utils
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.drawable.Drawable
 import android.util.Base64
 import android.widget.ImageView
-import com.squareup.picasso.Picasso
-import com.squareup.picasso.Target
+import cv.brulinski.sebastian.interfaces.BitmapLoadable
+import cv.brulinski.sebastian.model.MyRecyclerItem
 import cv.brulinski.sebastian.repository.MainRepository
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -16,26 +16,6 @@ import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
-
-fun fetchBitmap(url: String): Observable<Bitmap> {
-    return Observable.create { emitter ->
-        Picasso.with(ctx)
-                .load(url)
-                .into(object : Target {
-                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-
-                    }
-
-                    override fun onBitmapFailed(errorDrawable: Drawable?) {
-                    }
-
-                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                        bitmap?.apply { emitter.onNext(this) }
-                        emitter.onComplete()
-                    }
-                })
-    }
-}
 
 fun downloadBitmap(url: String): Observable<Bitmap> {
     return Observable.create { emitter ->
@@ -81,7 +61,7 @@ fun String.base64ToBitmap() = Observable.create<Bitmap> { emitter ->
     }
 }
 
-fun loadBitmapsIntoImageViews(vararg pairs: Pair<ImageView, String?>) = Observable.create<Boolean> { emitter ->
+fun loadBitmapsIntoImageViews(vararg pairs: Pair<ImageView, String?>): Observable<Boolean>? = Observable.create<Boolean> { emitter ->
     val observables = arrayListOf<Observable<Bitmap>?>()
     pairs.forEach {
         observables.add(it.second?.base64ToBitmap())
@@ -103,6 +83,84 @@ fun loadBitmapsIntoImageViews(vararg pairs: Pair<ImageView, String?>) = Observab
             })
 }
 
+fun <T> loadBitmapsInto(map: HashMap<T, String>): Observable<HashMap<T, Bitmap>>? = Observable.create<HashMap<T, Bitmap>> { emitter ->
+    val observables = arrayListOf<Observable<Bitmap>?>()
+
+    map.forEach { (_, base64Bitmap) ->
+        observables.add(base64Bitmap.base64ToBitmap())
+    }
+
+    val result = HashMap<T, Bitmap>()
+    var count = 0
+    val keys = map.keys.toList()
+    Observable.merge(observables)
+            .subscribeOn(Schedulers.newThread())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnComplete {
+                emitter.onNext(result)
+                emitter.onComplete()
+            }
+            .subscribe({
+                val id = keys[count]
+                result[id] = it
+                count++
+            }, {
+                emitter.onError(it)
+            })
+}
+
+@SuppressLint("CheckResult")
+fun <T : BitmapLoadable> getBitmapsForObjects(elements: List<T>, listElements: (ArrayList<MyRecyclerItem<T>>) -> Unit) {
+    val map = HashMap<T, String>()
+    elements.forEach {
+        it.getTypeBitmapBase64()?.let { bitmapBase64 ->
+            if (bitmapBase64.isNotEmpty()) map[it] = bitmapBase64
+        }
+    }
+    val itemsWithBitmaps = ArrayList<T>()
+
+    fun makeList() {
+        val items = arrayListOf<MyRecyclerItem<T>>()
+        if (itemsWithBitmaps.isNotEmpty() && itemsWithBitmaps[0].getTypeSkillCategory() != null) {
+            itemsWithBitmaps.groupBy { it.getTypeSkillCategory() }.forEach {
+                val header = MyRecyclerItem(it.value[0], TYPE_HEADER)
+                items.add(header)
+                it.value.map { MyRecyclerItem(it, TYPE_ITEM) }.let {
+                    items.addAll(it)
+                }
+            }
+        } else {
+            if (itemsWithBitmaps.isNotEmpty())
+                itemsWithBitmaps.forEach {
+                    items.add(MyRecyclerItem(it, TYPE_ITEM))
+                }
+            else {
+                items.addAll(elements.map { MyRecyclerItem(it, TYPE_ITEM) })
+            }
+        }
+        listElements(items)
+    }
+
+    if (map.isNotEmpty()) {
+        loadBitmapsInto(map)?.apply {
+            subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnComplete {
+                        makeList()
+                    }
+                    .subscribe({
+                        it.forEach { (t, bitmap) ->
+                            t.setTypeBitmap(bitmap)
+                            itemsWithBitmaps.add(t)
+                        }
+                    }, {
+                        it.printStackTrace()
+                    })
+        } ?: run {
+            makeList()
+        }
+    } else makeList()
+}
 
 fun Bitmap.toBase64String() = let {
     val byteArrayOutStream = ByteArrayOutputStream()

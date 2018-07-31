@@ -13,7 +13,9 @@ open class SkillViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), 
     override fun onBind(item: MyRecyclerItem<*>, position: Int, onItemClickListener: OnItemClickListener?) {
         (item.item as? Skill)?.apply {
             itemView.apply {
-                loadBitmapsIntoImageViews(Pair(iconImageView, iconBase64)).subscribe()
+                iconBitmap?.let {
+                    iconImageView.setImageBitmap(it)
+                }
                 skillNameTextView.text = skillName
                 skillDescriptionTextView.text = skillDescription
             }

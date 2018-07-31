@@ -7,6 +7,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import cv.brulinski.sebastian.R.string
 import cv.brulinski.sebastian.dependency_injection.app.App
+import cv.brulinski.sebastian.interfaces.BitmapLoadable
+import cv.brulinski.sebastian.interfaces.OnGetCvObjects
 import cv.brulinski.sebastian.model.*
 import cv.brulinski.sebastian.utils.*
 import io.reactivex.Observable
@@ -100,6 +102,7 @@ class MainRepository {
                     .subscribe({ cv ->
 
                         if (cv.status == 1) {
+                            copyExistingBitmaps(cv, Skill::class.java, Language::class.java)
                             myCv.value = cv
 
                             if (settings.fetchGraphics || settings.firstLaunch) {
@@ -143,6 +146,40 @@ class MainRepository {
                         emitter.onError(it)
                         it.printStackTrace()
                     })
+        }
+    }
+
+    private fun <T : OnGetCvObjects> copyExistingBitmaps(t: T, vararg c: Class<*>) {
+        c.forEach { clazz ->
+            var remoteCv: List<BitmapLoadable>? = null
+            val localCv = when {
+                clazz.name == Skill::class.java.name -> {
+                    remoteCv = t.getTypeSkills()
+                    myCv.value?.getTypeSkills()
+                }
+                clazz.name == Language::class.java.name -> {
+                    remoteCv = t.getTypeLanguages()
+                    myCv.value?.getTypeLanguages()
+                }
+                else -> null
+            }
+
+            localCv?.let { listOfCvObjects ->
+
+                val localIdObjectMap = listOfCvObjects.groupBy { it.getTypeId() }
+                val remoteIdObjectMap = remoteCv?.groupBy { it.getTypeId() }
+
+                localIdObjectMap.forEach { (id, localObject) ->
+                    remoteIdObjectMap?.get(id)?.filter { remoteObject -> remoteObject.getTypeId() == id }?.let {
+                        localObject.forEach { localObject ->
+                            if (it.isNotEmpty()) {
+                                it[0].setTypeBitmap(localObject.getTypeBitmap())
+                                it[0].setTypeBitmapBase64(localObject.getTypeBitmapBase64())
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
