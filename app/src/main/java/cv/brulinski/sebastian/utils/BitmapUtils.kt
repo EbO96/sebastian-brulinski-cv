@@ -120,22 +120,27 @@ fun <T : BitmapLoadable> getBitmapsForObjects(elements: List<T>, listElements: (
     val itemsWithBitmaps = ArrayList<T>()
 
     fun makeList() {
-        val items = arrayListOf<MyRecyclerItem<T>>()
+        var items = arrayListOf<MyRecyclerItem<T>>()
         if (itemsWithBitmaps.isNotEmpty() && itemsWithBitmaps[0].getTypeSkillCategory() != null) {
+            val sortedListMap = HashMap<T, List<T>>()
             itemsWithBitmaps.groupBy { it.getTypeSkillCategory() }.forEach {
-                val header = MyRecyclerItem(it.value[0], TYPE_HEADER)
+                val headerItem = it.value[0]
+                sortedListMap[headerItem] = it.value
+            }
+            sortedListMap.toSortedMap(compareBy { it.getTypeSkillCategory() }).forEach {
+                val header = MyRecyclerItem(it.key, TYPE_HEADER)
                 items.add(header)
                 it.value.map { MyRecyclerItem(it, TYPE_ITEM) }.let {
-                    items.addAll(it)
+                    items.addAll(it.sortedBy { it.item.getSortKey() })
                 }
             }
         } else {
-            if (itemsWithBitmaps.isNotEmpty())
-                itemsWithBitmaps.forEach {
+            if (itemsWithBitmaps.isNotEmpty()) {
+                itemsWithBitmaps.sortedBy { it.getSortKey() }.forEach {
                     items.add(MyRecyclerItem(it, TYPE_ITEM))
                 }
-            else {
-                items.addAll(elements.map { MyRecyclerItem(it, TYPE_ITEM) })
+            } else {
+                items.addAll(elements.map { MyRecyclerItem(it, TYPE_ITEM) }.sortedBy { it.item.getSortKey() })
             }
         }
         listElements(items)

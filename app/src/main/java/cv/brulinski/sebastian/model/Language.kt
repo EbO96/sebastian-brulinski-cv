@@ -49,6 +49,8 @@ class Language : BitmapLoadable {
     @Ignore
     var flagBitmap: Bitmap? = null
 
+    override fun getSortKey() = "$level"
+
     override fun getTypeId() = id
 
     override fun getTypeBitmap() = flagBitmap

@@ -41,14 +41,16 @@ class Skill : BitmapLoadable {
     @Expose
     var iconBitmap: Bitmap? = null
 
+    override fun getSortKey() = skillName
+
     override fun getTypeId() = id
 
     override fun getTypeBitmap() = iconBitmap
 
     override fun getTypeBitmapBase64() = iconBase64
 
-    override fun setTypeBitmapBase64(bitmapBase64: String?) {
-        iconBase64 = bitmapBase64
+    override fun setTypeBitmapBase64(bitmap: String?) {
+        iconBase64 = bitmap
     }
 
     override fun setTypeBitmap(bitmap: Bitmap?) {
