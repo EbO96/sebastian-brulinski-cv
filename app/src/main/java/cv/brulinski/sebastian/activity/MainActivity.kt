@@ -24,7 +24,6 @@ import cv.brulinski.sebastian.fragment.PersonalInfoFragment
 import cv.brulinski.sebastian.fragment.WelcomeFragment
 import cv.brulinski.sebastian.model.MyCv
 import cv.brulinski.sebastian.utils.delay
-import cv.brulinski.sebastian.utils.log
 import cv.brulinski.sebastian.utils.navigation_drawer.close
 import cv.brulinski.sebastian.utils.settings
 import cv.brulinski.sebastian.utils.string
@@ -58,6 +57,8 @@ class MainActivity : AppCompatActivity(),
     private var myMainViewPager: MyMainViewPager? = null
     //Flags
     private var pagesProgress = 0
+    //Number of pages
+    private var numberOfPages = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -122,6 +123,7 @@ class MainActivity : AppCompatActivity(),
             it?.let {
                 when (it) {
                     ViewPagerStates.VIEW_PAGER_PAGES_CREATED -> {
+                        numberOfPages = myMainViewPager?.getNumberOfPages() ?: 0
                         mainActivityViewPagerAdapter?.let { adapter ->
                             pagesComponent = DaggerPagesComponent.builder().pagesModule(PagesModule(adapter, viewPager)).build()
                             pagesComponent.inject(this)
@@ -158,17 +160,14 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
+    var o = 0
     private fun viewPagerPageListener() = object : ViewPager.OnPageChangeListener {
         override fun onPageScrollStateChanged(state: Int) {
         }
 
         override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-
-            val pages = myMainViewPager?.getNumberOfPages() ?: 0
-            if (pages != 0) {
-                pagesProgress = Math.abs((100 / pages)) * (position + 1)
-                contentProgressBar.progress = pagesProgress
-            }
+            val progress = 100 / (numberOfPages) * (position + 1)
+            contentProgressBar.progress = progress
         }
 
         override fun onPageSelected(position: Int) {

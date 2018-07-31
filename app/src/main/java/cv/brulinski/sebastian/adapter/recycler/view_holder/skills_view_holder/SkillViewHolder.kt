@@ -14,7 +14,6 @@ open class SkillViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), 
             itemView.apply {
                 iconBitmap?.let {
                     iconImageView.setImageBitmap(it)
-                    backgroundView.setBackgroundColor(avgBitmapColor)
                 }
                 skillNameTextView.text = skillName
                 skillDescriptionTextView.text = skillDescription
