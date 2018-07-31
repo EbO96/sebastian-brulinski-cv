@@ -120,7 +120,7 @@ fun <T : BitmapLoadable> getBitmapsForObjects(elements: List<T>, listElements: (
     val itemsWithBitmaps = ArrayList<T>()
 
     fun makeList() {
-        var items = arrayListOf<MyRecyclerItem<T>>()
+        val items = arrayListOf<MyRecyclerItem<T>>()
         if (itemsWithBitmaps.isNotEmpty() && itemsWithBitmaps[0].getTypeSkillCategory() != null) {
             val sortedListMap = HashMap<T, List<T>>()
             itemsWithBitmaps.groupBy { it.getTypeSkillCategory() }.forEach {
@@ -156,6 +156,9 @@ fun <T : BitmapLoadable> getBitmapsForObjects(elements: List<T>, listElements: (
                     .subscribe({
                         it.forEach { (t, bitmap) ->
                             t.setTypeBitmap(bitmap)
+                            doAsync {
+                                t.setAvgColor(bitmap.getAverageColor())
+                            }
                             itemsWithBitmaps.add(t)
                         }
                     }, {

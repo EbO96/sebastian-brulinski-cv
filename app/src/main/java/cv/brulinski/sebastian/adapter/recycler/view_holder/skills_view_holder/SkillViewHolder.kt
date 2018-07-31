@@ -6,7 +6,6 @@ import cv.brulinski.sebastian.interfaces.OnBindViewInViewHolder
 import cv.brulinski.sebastian.interfaces.OnItemClickListener
 import cv.brulinski.sebastian.model.MyRecyclerItem
 import cv.brulinski.sebastian.model.Skill
-import cv.brulinski.sebastian.utils.loadBitmapsIntoImageViews
 import kotlinx.android.synthetic.main.skill_item.view.*
 
 open class SkillViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), OnBindViewInViewHolder {
@@ -15,6 +14,7 @@ open class SkillViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), 
             itemView.apply {
                 iconBitmap?.let {
                     iconImageView.setImageBitmap(it)
+                    backgroundView.setBackgroundColor(avgBitmapColor)
                 }
                 skillNameTextView.text = skillName
                 skillDescriptionTextView.text = skillDescription

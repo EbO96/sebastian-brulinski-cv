@@ -8,6 +8,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
+        android:id="@+id/backgroundView"
         android:layout_height="wrap_content">
 
         <ImageView
@@ -45,7 +46,7 @@
             app:layout_constraintStart_toStartOf="@+id/iconImageView"
             app:layout_constraintTop_toBottomOf="@+id/nameTextView"
             app:levelDotColor="@color/colorAccent"
-            app:rangeDotColor="@color/colorPrimaryDark" />
+            app:rangeDotColor="@color/colorAccentLight" />
 
         <TextView
             android:id="@+id/descriptionTextView"

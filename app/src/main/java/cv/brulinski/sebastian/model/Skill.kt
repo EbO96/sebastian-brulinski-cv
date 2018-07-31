@@ -41,6 +41,10 @@ class Skill : BitmapLoadable {
     @Expose
     var iconBitmap: Bitmap? = null
 
+    @ColumnInfo(name = "avgBitmapColor")
+    @Expose
+    var avgBitmapColor: Int = -1
+
     override fun getSortKey() = skillName
 
     override fun getTypeId() = id
@@ -55,6 +59,10 @@ class Skill : BitmapLoadable {
 
     override fun setTypeBitmap(bitmap: Bitmap?) {
         iconBitmap = bitmap
+    }
+
+    override fun setAvgColor(color: Int) {
+        avgBitmapColor = color
     }
 
     override fun getTypeSkillCategory() = skillCategory

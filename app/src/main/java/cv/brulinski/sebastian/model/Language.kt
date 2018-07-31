@@ -49,6 +49,14 @@ class Language : BitmapLoadable {
     @Ignore
     var flagBitmap: Bitmap? = null
 
+    @ColumnInfo(name = "avgBitmapColor")
+    @Expose
+    var avgBitmapColor: Int = -1
+
+    override fun setAvgColor(color: Int) {
+        avgBitmapColor = color
+    }
+
     override fun getSortKey() = "$level"
 
     override fun getTypeId() = id
