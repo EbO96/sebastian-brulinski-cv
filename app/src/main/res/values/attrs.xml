@@ -18,4 +18,9 @@
         <attr name="range" format="integer"/>
     </declare-styleable>
 
+    <declare-styleable name="SlideDrawer">
+        <attr name="mainContent" format="reference" />
+        <attr name="closeButtonDrawable" format="reference" />
+    </declare-styleable>
+
 </resources>

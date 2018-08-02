@@ -1,7 +1,6 @@
 package cv.brulinski.sebastian.activity
 
 import android.os.Bundle
-import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -24,16 +23,18 @@ import cv.brulinski.sebastian.fragment.PersonalInfoFragment
 import cv.brulinski.sebastian.fragment.WelcomeFragment
 import cv.brulinski.sebastian.model.MyCv
 import cv.brulinski.sebastian.utils.delay
+import cv.brulinski.sebastian.utils.drawable
 import cv.brulinski.sebastian.utils.navigation_drawer.close
 import cv.brulinski.sebastian.utils.settings
 import cv.brulinski.sebastian.utils.string
 import cv.brulinski.sebastian.utils.view_pager.*
+import cv.brulinski.sebastian.view.SlideDrawer
 import cv.brulinski.sebastian.view_model.MainViewModel
 import inflate
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.view.*
+import kotlinx.android.synthetic.main.activity_main_1.*
 import kotlinx.android.synthetic.main.activity_main_content.*
-import kotlinx.android.synthetic.main.activity_main_drawer_header.view.*
 import setBaseToolbar
 
 class MainActivity : AppCompatActivity(),
@@ -62,17 +63,35 @@ class MainActivity : AppCompatActivity(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_main_1)
         setBaseToolbar(title = R.string.start.string(), enableHomeButton = true)
+        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_menu_24dp.drawable())
         setupViewPager()
-        mainDrawerLayout.setupNavigationDrawer()
+        slideDrawer({
+            drawerTitle = R.string.table_of_contents.string()
+            itemsDividerEnabled = true
+            menuItemsDividerColor = R.color.colorAccent
+        }, {
+            val items = arrayListOf(SlideDrawer.DrawerMenuItem(R.string.introduction.string()),
+                    SlideDrawer.DrawerMenuItem(R.string.personal_details.string()),
+                    SlideDrawer.DrawerMenuItem(R.string.career.string()),
+                    SlideDrawer.DrawerMenuItem(R.string.languages.string()),
+                    SlideDrawer.DrawerMenuItem(R.string.skills.string()))
+            setMenu(items)
+            setMenuItemClickListener(object : SlideDrawer.MenuItemsClickListener {
+                override fun onClick(position: Int, drawerMenuItem: SlideDrawer.DrawerMenuItem) {
+                    viewPager.toPage(position)
+                }
+            })
+        })
+        // mainDrawerLayout.setupNavigationDrawer()
 
-        mainNavigationView.getHeaderView(0)?.apply {
-            fetchGraphicsSwitch.isChecked = settings.fetchGraphics ?: true
-            fetchGraphicsSwitch.setOnCheckedChangeListener { _, checked ->
-                settings.fetchGraphics = checked
-            }
-        }
+//        mainNavigationView.getHeaderView(0)?.apply {
+//            fetchGraphicsSwitch.isChecked = settings.fetchGraphics ?: true
+//            fetchGraphicsSwitch.setOnCheckedChangeListener { _, checked ->
+//                settings.fetchGraphics = checked
+//            }
+//        }
 
         App.startFetchingData.observe(this, Observer { status ->
             when (status) {
@@ -234,11 +253,7 @@ class MainActivity : AppCompatActivity(),
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         return when (item?.itemId) {
             android.R.id.home -> {
-                viewPager.toLeft()
-                true
-            }
-            R.id.pageForward -> {
-                viewPager.toRight()
+                slideDrawer.open()
                 true
             }
             R.id.refreshContent -> {
@@ -252,7 +267,7 @@ class MainActivity : AppCompatActivity(),
     override fun onBackPressed() {
         viewPager.apply {
             when {
-                this@MainActivity.mainDrawerLayout.isDrawerOpen(Gravity.START) -> this@MainActivity.mainDrawerLayout.closeDrawer(Gravity.START)
+                slideDrawer.isOpen() -> slideDrawer.close()
                 currentItem == pageMap[WELCOME_SCREEN] ?: 0 -> super.onBackPressed()
                 else -> toLeft()
             }

@@ -9,7 +9,7 @@ fun ViewPager.goTo(page: Page, smooth: Boolean = true) {
     setCurrentItem(pageMap[page] ?: 0, smooth)
 }
 
-fun MyViewPager.toPage(pos: Int, smooth: Boolean = true) {
+fun ViewPager.toPage(pos: Int, smooth: Boolean = true) {
     setCurrentItem(pos, smooth)
 }
 

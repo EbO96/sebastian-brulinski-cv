@@ -22,4 +22,6 @@
     <string name="fetch_graphics_durng_refreshing">Pobierz grafiki przy odświeżaniu</string>
     <string name="fetching_cv">Pobieranie CV</string>
     <string name="skills">Umiejętności</string>
+    <string name="introduction">Wstęp</string>
+    <string name="table_of_contents">Spis treści</string>
 </resources>
