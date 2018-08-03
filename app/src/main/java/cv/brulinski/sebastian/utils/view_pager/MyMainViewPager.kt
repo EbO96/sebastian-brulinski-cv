@@ -40,7 +40,7 @@ class MyMainViewPager(private val fragmentManager: FragmentManager,
                 SkillsFragment.newInstance(this)
         )
         numberOfPages = fragments.size
-        val titles = arrayListOf("",
+        val titles = arrayListOf(R.string.introduction.string(),
                 R.string.personal_details.string(),
                 R.string.career.string(),
                 R.string.languages.string(),

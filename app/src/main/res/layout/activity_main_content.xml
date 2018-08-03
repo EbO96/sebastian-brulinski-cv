@@ -1,40 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/mainRootContainer"
+    android:id="@+id/mainContent"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    tools:context=".activity.MainActivity"
+    tools:ignore="UselessParent"
+    tools:showIn="@layout/activity_main">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/mainContent"
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:context=".activity.MainActivity"
-        tools:ignore="UselessParent"
-        tools:showIn="@layout/activity_main">
+        android:layout_gravity="top"
+        app:layout_anchor="@id/bar"
+        app:layout_anchorGravity="top" />
 
-        <include layout="@layout/my_toolbar" />
+    <com.google.android.material.bottomappbar.BottomAppBar
+        android:id="@+id/bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:backgroundTintMode="src_in"
+        app:backgroundTint="#000000"
+        app:fabAlignmentMode="end"
+        app:hideOnScroll="true">
 
-        <ProgressBar
-            android:id="@+id/contentProgressBar"
-            style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
+        <TextView
+            android:id="@+id/pageTitleTextView"
             android:layout_width="match_parent"
-            android:layout_height="4dp"
-            android:indeterminate="false"
-            android:max="100"
-            android:progress="0" />
+            android:layout_height="match_parent"
+            android:textAlignment="gravity"
+            android:paddingEnd="8dp"
+            android:gravity="center_vertical|end"
+            android:textColor="@color/darkBackgroundTextColor"
+            android:textSize="18sp" />
+    </com.google.android.material.bottomappbar.BottomAppBar>
 
-        <androidx.viewpager.widget.ViewPager
-            android:id="@+id/viewPager"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_menu_24dp"
+        app:layout_anchor="@id/bar" />
 
-    </LinearLayout>
 
-</FrameLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -5,14 +5,13 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager.widget.ViewPager
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter
-import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Companion.Page.*
+import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Companion.Page.WELCOME_SCREEN
 import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Companion.pageMap
 import cv.brulinski.sebastian.dependency_injection.app.App
 import cv.brulinski.sebastian.dependency_injection.component.DaggerPagesComponent
@@ -23,19 +22,16 @@ import cv.brulinski.sebastian.fragment.PersonalInfoFragment
 import cv.brulinski.sebastian.fragment.WelcomeFragment
 import cv.brulinski.sebastian.model.MyCv
 import cv.brulinski.sebastian.utils.delay
-import cv.brulinski.sebastian.utils.drawable
-import cv.brulinski.sebastian.utils.navigation_drawer.close
-import cv.brulinski.sebastian.utils.settings
 import cv.brulinski.sebastian.utils.string
-import cv.brulinski.sebastian.utils.view_pager.*
+import cv.brulinski.sebastian.utils.view_pager.MyMainViewPager
+import cv.brulinski.sebastian.utils.view_pager.ViewPagerStates
+import cv.brulinski.sebastian.utils.view_pager.toLeft
+import cv.brulinski.sebastian.utils.view_pager.toPage
 import cv.brulinski.sebastian.view.SlideDrawer
 import cv.brulinski.sebastian.view_model.MainViewModel
 import inflate
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_main.view.*
-import kotlinx.android.synthetic.main.activity_main_1.*
 import kotlinx.android.synthetic.main.activity_main_content.*
-import setBaseToolbar
 
 class MainActivity : AppCompatActivity(),
         WelcomeFragment.WelcomeFragmentCallback,
@@ -63,14 +59,11 @@ class MainActivity : AppCompatActivity(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main_1)
-        setBaseToolbar(title = R.string.start.string(), enableHomeButton = true)
-        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_menu_24dp.drawable())
+        setContentView(R.layout.activity_main)
         setupViewPager()
+
         slideDrawer({
             drawerTitle = R.string.table_of_contents.string()
-            itemsDividerEnabled = true
-            menuItemsDividerColor = R.color.colorAccent
         }, {
             val items = arrayListOf(SlideDrawer.DrawerMenuItem(R.string.introduction.string()),
                     SlideDrawer.DrawerMenuItem(R.string.personal_details.string()),
@@ -84,14 +77,14 @@ class MainActivity : AppCompatActivity(),
                 }
             })
         })
-        // mainDrawerLayout.setupNavigationDrawer()
 
-//        mainNavigationView.getHeaderView(0)?.apply {
-//            fetchGraphicsSwitch.isChecked = settings.fetchGraphics ?: true
-//            fetchGraphicsSwitch.setOnCheckedChangeListener { _, checked ->
-//                settings.fetchGraphics = checked
-//            }
-//        }
+        fab.setOnClickListener {
+            slideDrawer.apply {
+                if (!isOpen()) open() else close()
+            }
+        }
+
+        bar.replaceMenu(R.menu.bottom_app_bar_menu)
 
         App.startFetchingData.observe(this, Observer { status ->
             when (status) {
@@ -99,40 +92,6 @@ class MainActivity : AppCompatActivity(),
                 App.FetchDataStatus.END, App.FetchDataStatus.ERROR, null -> loadingScreen.hide()
             }
         })
-    }
-
-    private fun DrawerLayout.setupNavigationDrawer() {
-        addDrawerListener(drawerListener())
-        mainNavigationView.setNavigationItemSelectedListener {
-            when (it.itemId) {
-                R.id.preambuleItem -> {
-                    mainDrawerLayout.close {
-                        viewPager.goTo(WELCOME_SCREEN)
-                    }
-                }
-                R.id.personalDetailsItem -> {
-                    mainDrawerLayout.close {
-                        viewPager.goTo(PERSONAL_INFO_SCREEN)
-                    }
-                }
-                R.id.careerItem -> {
-                    mainDrawerLayout.close {
-                        viewPager.goTo(CAREER)
-                    }
-                }
-                R.id.languagesItem -> {
-                    mainDrawerLayout.close {
-                        viewPager.goTo(LANGUAGES)
-                    }
-                }
-                R.id.skillsItem -> {
-                    mainDrawerLayout.close {
-                        viewPager.goTo(SKILLS)
-                    }
-                }
-            }
-            true
-        }
     }
 
     private fun setupViewPager() {
@@ -179,14 +138,12 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
-    var o = 0
     private fun viewPagerPageListener() = object : ViewPager.OnPageChangeListener {
         override fun onPageScrollStateChanged(state: Int) {
         }
 
         override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-            val progress = 100 / (numberOfPages) * (position + 1)
-            contentProgressBar.progress = progress
+
         }
 
         override fun onPageSelected(position: Int) {
@@ -194,46 +151,28 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
-    private fun drawerListener() = object : DrawerLayout.DrawerListener {
-        override fun onDrawerStateChanged(newState: Int) {
-        }
-
-        override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
-            val slideX = drawerView.width * slideOffset
-            mainContent.translationX = slideX
-        }
-
-        override fun onDrawerClosed(drawerView: View) {
-        }
-
-        override fun onDrawerOpened(drawerView: View) {
-        }
-    }
-
     private fun String.asToolbarTitle() {
-        supportActionBar?.title = this
+        pageTitleTextView.text = this
     }
 
     /*
     Loading screen show/hide methods
      */
     private fun View.show() {
-        mainRootContainer?.apply {
-            if (indexOfChild(this@show) == -1 && settings.firstLaunch) {
-                addView(this@show)
-                this@MainActivity.mainDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-            }
-        }
+//        mainRootContainer?.apply {
+//            if (indexOfChild(this@show) == -1 && settings.firstLaunch) {
+//                addView(this@show)
+//            }
+//        }
     }
 
     private fun View.hide() {
         1000L.delay {
-            mainRootContainer?.apply {
-                if (indexOfChild(this@hide) != -1) {
-                    removeView(this@hide)
-                    this@MainActivity.mainDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
-                }
-            }
+            //            mainRootContainer?.apply {
+//                if (indexOfChild(this@hide) != -1) {
+//                    removeView(this@hide)
+//                }
+//            }
         }
     }
     /*
@@ -266,11 +205,9 @@ class MainActivity : AppCompatActivity(),
 
     override fun onBackPressed() {
         viewPager.apply {
-            when {
-                slideDrawer.isOpen() -> slideDrawer.close()
-                currentItem == pageMap[WELCOME_SCREEN] ?: 0 -> super.onBackPressed()
-                else -> toLeft()
-            }
+            if (this@MainActivity.slideDrawer?.isOpen() != false) slideDrawer.close()
+            else if (currentItem == pageMap[WELCOME_SCREEN] ?: 0) super.onBackPressed()
+            else toLeft()
         }
     }
 }

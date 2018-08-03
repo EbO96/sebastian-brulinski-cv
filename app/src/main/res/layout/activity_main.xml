@@ -1,27 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<cv.brulinski.sebastian.view.SlideDrawer xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/mainDrawerLayout"
     android:layout_width="match_parent"
+    android:id="@+id/slideDrawer"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    tools:context=".activity.MainActivity">
+    app:closeButtonDrawable="@drawable/ic_close_24dp"
+    app:mainContent="@layout/activity_main_content">
 
-    <include layout="@layout/activity_main_content" />
-
-    <com.google.android.material.navigation.NavigationView
-        android:id="@+id/mainNavigationView"
-        android:layout_width="match_parent"
-        android:background="@color/colorPrimary"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:fitsSystemWindows="true"
-        app:headerLayout="@layout/activity_main_drawer_header"
-        app:menu="@menu/main_drawer_menu" />
-
-</androidx.drawerlayout.widget.DrawerLayout>
-
+</cv.brulinski.sebastian.view.SlideDrawer>
