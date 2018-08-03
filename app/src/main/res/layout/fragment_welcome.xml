@@ -1,44 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    style="@style/MyFragmentRootLayoutStyle"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_gravity="top"
-    android:fillViewport="true"
-    app:layout_anchor="@id/bar"
-    app:layout_anchorGravity="top"
-    tools:context=".fragment.WelcomeFragment">
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="@null"
+        android:scaleType="centerCrop"
+        android:src="@drawable/before_we_begin"
+        android:tint="@color/dimMedium" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/welcomeTitleTextView"
-            style="@style/WelcomeScreenTitleTextStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
             android:id="@+id/welcomeDescriptionTextView"
             style="@style/WelcomeScreenContentTextStyle"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_weight="1"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:textAlignment="center"
+            android:textAllCaps="false"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/welcomeTitleTextView"
-            app:layout_constraintStart_toStartOf="@+id/welcomeTitleTextView"
-            app:layout_constraintTop_toBottomOf="@+id/welcomeTitleTextView"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.32999998" />
+
+        <Button
+            android:id="@+id/welcomeNextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_weight="1"
+            android:text="@string/next"
+            app:layout_constraintEnd_toEndOf="@+id/welcomeDescriptionTextView"
+            app:layout_constraintStart_toStartOf="@+id/welcomeDescriptionTextView"
+            app:layout_constraintTop_toBottomOf="@+id/welcomeDescriptionTextView" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.core.widget.NestedScrollView>
+
+
+
+</FrameLayout>
+

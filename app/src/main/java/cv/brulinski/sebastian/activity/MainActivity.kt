@@ -9,6 +9,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager.widget.ViewPager
+import com.google.android.material.bottomappbar.BottomAppBar
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter
 import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Companion.Page.WELCOME_SCREEN
@@ -56,6 +57,8 @@ class MainActivity : AppCompatActivity(),
     private var pagesProgress = 0
     //Number of pages
     private var numberOfPages = 0
+    //Bottom app bar behavior
+    private lateinit var bottomAppBarBehavior: BottomAppBar.Behavior
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -147,12 +150,7 @@ class MainActivity : AppCompatActivity(),
         }
 
         override fun onPageSelected(position: Int) {
-            mainActivityViewPagerAdapter?.getPageTitle(position)?.asToolbarTitle()
         }
-    }
-
-    private fun String.asToolbarTitle() {
-        pageTitleTextView.text = this
     }
 
     /*
@@ -202,6 +200,8 @@ class MainActivity : AppCompatActivity(),
             else -> super.onOptionsItemSelected(item)
         }
     }
+
+    fun toPage(page: Int) = viewPager.toPage(page)
 
     override fun onBackPressed() {
         viewPager.apply {

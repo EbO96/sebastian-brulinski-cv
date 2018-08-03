@@ -52,22 +52,16 @@
     </style>
 
     <style name="WelcomeScreenTitleTextStyle">
-        <item name="android:textColor">@color/whiteBackgroundTextColor</item>
-        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/darkBackgroundTextColor</item>
         <item name="android:textAlignment">gravity</item>
         <item name="android:gravity">center_vertical|center_horizontal</item>
         <item name="android:textSize">24sp</item>
     </style>
 
-    <style name="WelcomeScreenContentTextStyle" parent="WelcomeScreenTitleTextStyle">
-        <item name="android:textSize">18sp</item>
+    <style name="WelcomeScreenContentTextStyle" parent="TextAppearance.AppCompat">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/darkBackgroundTextColor</item>
         <item name="android:textStyle">normal</item>
-    </style>
-
-    <style name="PersonalInfoTitleTextStyle" parent="WelcomeScreenTitleTextStyle">
-        <item name="android:textColor">@color/whiteBackgroundTextColor</item>
-        <item name="android:textStyle">normal</item>
-        <item name="android:padding">8dp</item>
     </style>
 
     <style name="PersonalInformationsStyle" parent="Base.V7.Widget.AppCompat.AutoCompleteTextView">
@@ -79,5 +73,15 @@
     <style name="RootRecyclerStyle" parent="MyFragmentRootLayoutStyle">
         <item name="android:paddingStart">8dp</item>
         <item name="android:paddingEnd">8dp</item>
+    </style>
+
+    <style name="PersonalInfoTextViewTitle" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">@android:color/darker_gray</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="PersonalInfoTextViewStyle" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">@color/whiteBackgroundTextColor</item>
+        <item name="android:textSize">16sp</item>
     </style>
 </resources>

@@ -4,11 +4,6 @@
         <attr name="enablePaging" format="boolean" />
     </declare-styleable>
 
-    <declare-styleable name="MyMaterialButton">
-        <attr name="buttonColor" format="color" />
-        <attr name="flat" format="boolean" />
-    </declare-styleable>
-
     <declare-styleable name="DotLevelView">
         <attr name="dotSize" format="dimension" />
         <attr name="dotMargin" format="dimension" />

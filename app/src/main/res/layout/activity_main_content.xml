@@ -29,18 +29,7 @@
         android:backgroundTintMode="src_in"
         app:backgroundTint="#000000"
         app:fabAlignmentMode="end"
-        app:hideOnScroll="true">
-
-        <TextView
-            android:id="@+id/pageTitleTextView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:textAlignment="gravity"
-            android:paddingEnd="8dp"
-            android:gravity="center_vertical|end"
-            android:textColor="@color/darkBackgroundTextColor"
-            android:textSize="18sp" />
-    </com.google.android.material.bottomappbar.BottomAppBar>
+        app:hideOnScroll="true"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"

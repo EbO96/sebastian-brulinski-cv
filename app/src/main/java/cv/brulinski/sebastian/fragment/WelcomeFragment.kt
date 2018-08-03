@@ -1,6 +1,5 @@
 package cv.brulinski.sebastian.fragment
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import cv.brulinski.sebastian.R
+import cv.brulinski.sebastian.activity.MainActivity
 import cv.brulinski.sebastian.interfaces.ViewPagerUtilsFragmentCreatedListener
 import cv.brulinski.sebastian.model.Welcome
 import kotlinx.android.synthetic.main.fragment_welcome.*
@@ -36,11 +36,14 @@ class WelcomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        welcomeNextButton.setOnClickListener {
+            (activity as? MainActivity)?.toPage(1)
+        }
         viewPagerUtilsFragmentCreatedListener?.onFragmentCreated()
     }
 
     fun update(welcome: Welcome) {
-        welcomeTitleTextView?.text = welcome.title
         welcomeDescriptionTextView?.text = welcome.description
     }
 

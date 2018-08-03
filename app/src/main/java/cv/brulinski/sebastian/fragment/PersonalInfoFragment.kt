@@ -1,7 +1,6 @@
 package cv.brulinski.sebastian.fragment
 
 import android.content.Context
-import android.graphics.Paint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -41,17 +40,23 @@ class PersonalInfoFragment : Fragment(), LifecycleOwner {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        phoneTextView.apply {
-            paintFlags = paintFlags or Paint.UNDERLINE_TEXT_FLAG
-        }
         viewPagerUtilsFragmentCreatedListener?.onFragmentCreated()
     }
 
     fun update(personalInfo: PersonalInfo) {
         personalInfo.apply {
-            loadBitmapsIntoImageViews(Pair(profileImageView, profilePictureBase64), Pair(bcgImageView, profilePictureBcgBase64))?.subscribe()
+            loadBitmapsIntoImageViews(Pair(profileImageView, profilePictureBase64))?.subscribe()
             val nameAndSurname = "$name $surname"
             nameAndSurnameTextView?.text = nameAndSurname
+            specialityTextView.text = speciality
+            numberTextView?.text = phoneNumber
+            numberTypeTextView.text = numberType
+            emailTextView?.text = email
+            emailTypeTextView.text = emailType
+            val a1 = "$cityName, $postalCode"
+            val a2 = "$country, $provinceName"
+            address1TextView?.text = a1
+            address2TextView?.text = a2
             val bornDate = "$birthDay.$birthMonth.$birthYear".trim()
             birthDateTextView?.text = bornDate
             ageTextView?.apply {
@@ -61,10 +66,6 @@ class PersonalInfoFragment : Fragment(), LifecycleOwner {
                         text = this
                     }
             }
-            phoneTextView?.text = phoneNumber
-            emailTextView?.text = email
-            cityNameTextView?.text = cityName
-            provinceNameTextView?.text = provinceName
         }
     }
 
