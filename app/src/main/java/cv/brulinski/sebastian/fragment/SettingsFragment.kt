@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import cv.brulinski.sebastian.R
+import cv.brulinski.sebastian.utils.settings
+import kotlinx.android.synthetic.main.fragment_settings.*
 
 class SettingsFragment : androidx.fragment.app.Fragment() {
 
@@ -15,6 +17,16 @@ class SettingsFragment : androidx.fragment.app.Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_settings, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        fetchGraphicsSwitch.apply {
+            isChecked = settings.fetchGraphics
+            setOnCheckedChangeListener { compoundButton, b ->
+                settings.fetchGraphics = b
+            }
+        }
     }
 
 }

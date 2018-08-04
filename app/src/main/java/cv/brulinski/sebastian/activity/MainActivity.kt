@@ -3,8 +3,6 @@ package cv.brulinski.sebastian.activity
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.StateListAnimator
-import android.content.res.ColorStateList
-import android.graphics.PorterDuff
 import android.os.Bundle
 import android.transition.Fade
 import android.view.MenuItem
@@ -13,6 +11,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.bottomappbar.BottomAppBar
 import cv.brulinski.sebastian.R
@@ -29,6 +28,7 @@ import cv.brulinski.sebastian.fragment.SettingsFragment
 import cv.brulinski.sebastian.fragment.WelcomeFragment
 import cv.brulinski.sebastian.model.MyCv
 import cv.brulinski.sebastian.utils.currentFragment
+import cv.brulinski.sebastian.utils.delay
 import cv.brulinski.sebastian.utils.set
 import cv.brulinski.sebastian.utils.string
 import cv.brulinski.sebastian.utils.view_pager.MyMainViewPager
@@ -45,7 +45,8 @@ class MainActivity : AppCompatActivity(),
         WelcomeFragment.WelcomeFragmentCallback,
         PersonalInfoFragment.PersonalInfoCallback,
         CareerFragment.CareerFragmentCallback,
-        Toolbar.OnMenuItemClickListener {
+        Toolbar.OnMenuItemClickListener,
+        SwipeRefreshLayout.OnRefreshListener {
 
     //Loading screen - displayed during first fetching
     private val loadingScreen by lazy { R.layout.data_loading_screen.inflate(this) }
@@ -121,6 +122,16 @@ class MainActivity : AppCompatActivity(),
 
         bar.replaceMenu(R.menu.bottom_app_bar_menu)
         bar.setOnMenuItemClickListener(this)
+        swipeRefreshLayout.setOnRefreshListener(this)
+
+        App.startFetchingData.observe(this, Observer {
+            when (it) {
+                App.FetchDataStatus.START -> {
+                }
+                App.FetchDataStatus.END -> swipeRefreshLayout.isRefreshing = false
+                App.FetchDataStatus.ERROR -> swipeRefreshLayout.isRefreshing = false
+            }
+        })
     }
 
     /*
@@ -223,6 +234,10 @@ class MainActivity : AppCompatActivity(),
     /*
     Override methods
      */
+
+    override fun onRefresh() {
+        mainViewModel?.refreshAll()
+    }
 
     override fun onMenuItemClick(item: MenuItem?) = when (item?.itemId) {
         R.id.settings -> {
