@@ -1,17 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nestedScroll"
     style="@style/MyFragmentRootLayoutStyle"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:paddingBottom="64dp"
     tools:context=".fragment.PersonalInfoFragment">
+
+    <ImageView
+        android:src="@drawable/screen_1"
+        android:scaleType="centerCrop"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
+        android:layout_marginBottom="64dp"
         android:layout_height="match_parent">
 
 
@@ -50,31 +55,22 @@
             android:orientation="horizontal"
             app:layout_constraintGuide_percent="0.625" />
 
-        <View
-            android:id="@+id/bcgView"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginBottom="8dp"
-            android:background="@color/colorAccent"
-            app:layout_constraintBottom_toTopOf="@+id/guideline"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.5" />
+            app:layout_constraintGuide_percent="0.48" />
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView"
             android:layout_width="128dp"
             android:layout_height="128dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
             app:cardCornerRadius="64dp"
             app:layout_constraintBottom_toTopOf="@+id/nameAndSurnameTextView"
             app:layout_constraintEnd_toEndOf="parent"
@@ -85,7 +81,7 @@
                 android:id="@+id/profileImageView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@color/colorAccent" />
+                android:src="@color/colorPrimary" />
         </androidx.cardview.widget.CardView>
 
         <TextView
@@ -93,24 +89,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginEnd="24dp"
+            android:textAlignment="textEnd"
             android:textColor="@color/darkBackgroundTextColor"
             android:textSize="24sp"
             app:layout_constraintBottom_toTopOf="@+id/specialityTextView"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/specialityTextView"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
             android:id="@+id/specialityTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
+            android:textAlignment="textEnd"
             android:textColor="@color/darkBackgroundTextColor"
-            app:layout_constraintBottom_toBottomOf="@+id/bcgView"
-            app:layout_constraintEnd_toEndOf="@+id/nameAndSurnameTextView"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="@+id/nameAndSurnameTextView" />
+            app:layout_constraintBottom_toTopOf="@+id/guideline"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <ImageView
             android:id="@+id/imageView3"
@@ -307,5 +303,5 @@
             app:layout_constraintTop_toBottomOf="@+id/imageView5" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.core.widget.NestedScrollView>
+</FrameLayout>
 

@@ -13,13 +13,20 @@
     tools:ignore="UselessParent"
     tools:showIn="@layout/activity_main">
 
-    <androidx.viewpager.widget.ViewPager
-        android:id="@+id/viewPager"
+    <FrameLayout
+        android:id="@+id/mainContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="top"
-        app:layout_anchor="@id/bar"
-        app:layout_anchorGravity="top" />
+        android:layout_height="match_parent">
+
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/viewPager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="top"
+            app:layout_anchor="@id/bar"
+            app:layout_anchorGravity="top" />
+    </FrameLayout>
+
 
     <com.google.android.material.bottomappbar.BottomAppBar
         android:id="@+id/bar"
@@ -29,14 +36,16 @@
         android:backgroundTintMode="src_in"
         app:backgroundTint="#000000"
         app:fabAlignmentMode="end"
-        app:hideOnScroll="true"/>
+        app:hideOnScroll="true" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_menu_24dp"
+        app:fabSize="normal"
+        android:src="@drawable/main_fab_button_drawable"
         app:layout_anchor="@id/bar" />
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:drawable="@drawable/ic_menu_24dp"
+        android:state_selected="false" />
+    <item
+        android:drawable="@drawable/ic_arrow_back_24dp"
+        android:state_selected="true" />
+
+</animated-selector>

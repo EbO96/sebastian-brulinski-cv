@@ -1,8 +1,13 @@
 package cv.brulinski.sebastian.activity
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
+import android.animation.StateListAnimator
 import android.os.Bundle
+import android.transition.Fade
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -18,8 +23,11 @@ import cv.brulinski.sebastian.dependency_injection.component.PagesComponent
 import cv.brulinski.sebastian.dependency_injection.module.PagesModule
 import cv.brulinski.sebastian.fragment.CareerFragment
 import cv.brulinski.sebastian.fragment.PersonalInfoFragment
+import cv.brulinski.sebastian.fragment.SettingsFragment
 import cv.brulinski.sebastian.fragment.WelcomeFragment
 import cv.brulinski.sebastian.model.MyCv
+import cv.brulinski.sebastian.utils.currentFragment
+import cv.brulinski.sebastian.utils.set
 import cv.brulinski.sebastian.utils.string
 import cv.brulinski.sebastian.utils.view_pager.MyMainViewPager
 import cv.brulinski.sebastian.utils.view_pager.ViewPagerStates
@@ -34,7 +42,8 @@ import kotlinx.android.synthetic.main.activity_main_content.*
 class MainActivity : AppCompatActivity(),
         WelcomeFragment.WelcomeFragmentCallback,
         PersonalInfoFragment.PersonalInfoCallback,
-        CareerFragment.CareerFragmentCallback {
+        CareerFragment.CareerFragmentCallback,
+        Toolbar.OnMenuItemClickListener {
 
     //Loading screen - displayed during first fetching
     private val loadingScreen by lazy { R.layout.data_loading_screen.inflate(this) }
@@ -79,20 +88,37 @@ class MainActivity : AppCompatActivity(),
         })
 
         fab.setOnClickListener {
-            slideDrawer.apply {
-                if (!isOpen()) open() else close()
+            if (currentFragment !is SettingsFragment)
+                slideDrawer.apply {
+                    if (!isOpen()) open() else close()
+                }
+            else {
+                backFromSettings()
             }
         }
 
+        val h = AnimatorSet()
+
+        val stateListAnimator = StateListAnimator()
+        val showAnimX = ObjectAnimator.ofFloat(fab, "scaleX", 0f, 1f)
+        val showAnimY = ObjectAnimator.ofFloat(fab, "scaleY", 0f, 1f)
+        val showAnimSet = AnimatorSet()
+        showAnimSet.playTogether(showAnimX, showAnimY)
+
+        val hideAnimX = ObjectAnimator.ofFloat(fab, "scaleX", 1f, 0f)
+        val hideAnimY = ObjectAnimator.ofFloat(fab, "scaleY", 1f, 0f)
+        val hideAnimSet = AnimatorSet()
+        hideAnimSet.playTogether(hideAnimX, hideAnimY)
+
+        h.playSequentially(hideAnimSet, showAnimSet)
+
+        stateListAnimator.addState(intArrayOf(-android.R.attr.state_selected), h)
+        stateListAnimator.addState(intArrayOf(android.R.attr.state_selected), h)
+
+        fab.stateListAnimator = stateListAnimator
+
         bar.replaceMenu(R.menu.bottom_app_bar_menu)
-        bar.setOnMenuItemClickListener {
-            when (it.itemId) {
-                R.id.settings -> {
-                    true
-                }
-                else -> false
-            }
-        }
+        bar.setOnMenuItemClickListener(this)
     }
 
     private fun setupViewPager() {
@@ -155,11 +181,42 @@ class MainActivity : AppCompatActivity(),
 
     fun toPage(page: Int) = viewPager.toPage(page)
 
+    private fun backFromSettings(): Boolean {
+        val fragment = supportFragmentManager.findFragmentById(this@MainActivity.mainContainer.id)
+        return if (fragment is SettingsFragment) {
+            supportFragmentManager.beginTransaction().remove(fragment).commit()
+            this@MainActivity.fab.setImageState(intArrayOf(-android.R.attr.state_selected), false)
+            //this@MainActivity.fab.drawable.state = intArrayOf(android.R.attr.state_selected)
+            currentFragment = null
+            true
+        } else false
+
+    }
+
+    override fun onMenuItemClick(item: MenuItem?) = when (item?.itemId) {
+        R.id.settings -> {
+            SettingsFragment().apply {
+                val fade = Fade()
+                enterTransition = fade
+                exitTransition = fade
+                this@apply.set(supportFragmentManager, this@MainActivity.mainContainer.id)
+                this@MainActivity.fab.setImageState(intArrayOf(android.R.attr.state_selected), false)
+               // this@MainActivity.fab.drawable.state = intArrayOf(-android.R.attr.state_selected)
+            }
+            true
+        }
+        else -> false
+    }
+
     override fun onBackPressed() {
         viewPager.apply {
-            if (this@MainActivity.slideDrawer?.isOpen() != false) slideDrawer.close()
-            else if (currentItem == pageMap[WELCOME_SCREEN] ?: 0) super.onBackPressed()
-            else toLeft()
+            when {
+                backFromSettings() -> {
+                }
+                this@MainActivity.slideDrawer?.isOpen() != false -> slideDrawer.close()
+                currentItem == pageMap[WELCOME_SCREEN] ?: 0 -> super.onBackPressed()
+                else -> toLeft()
+            }
         }
     }
 }
