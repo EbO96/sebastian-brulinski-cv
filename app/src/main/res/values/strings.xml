@@ -28,4 +28,5 @@
     <string name="mail">Email</string>
     <string name="name">Imię</string>
     <string name="surname">Nazwisko</string>
+    <string name="settings">Ustawienia</string>
 </resources>

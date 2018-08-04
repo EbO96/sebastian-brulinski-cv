@@ -1,14 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item
-        android:id="@+id/call"
-        app:showAsAction="always"
-        android:icon="@drawable/ic_call_24dp"
-        android:title="@string/call" />
-    <item
-        android:id="@+id/mail"
-        app:showAsAction="always"
-        android:icon="@drawable/ic_mail_outline_24dp"
-        android:title="@string/mail" />
+
+    <group android:id="@+id/callMailGroup">
+        <item
+            android:id="@+id/call"
+            android:icon="@drawable/ic_call_24dp"
+            android:title="@string/call"
+            app:showAsAction="always" />
+        <item
+            android:id="@+id/mail"
+            android:icon="@drawable/ic_mail_outline_24dp"
+            android:title="@string/mail"
+            app:showAsAction="always" />
+    </group>
+    <group android:id="@+id/settingsGroup">
+        <item
+            android:id="@+id/settings"
+            android:icon="@drawable/ic_settings_24dp"
+            android:title="@string/settings"
+            app:showAsAction="always" />
+    </group>
 </menu>

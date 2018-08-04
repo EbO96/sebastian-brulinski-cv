@@ -1,9 +1,7 @@
 package cv.brulinski.sebastian.activity
 
 import android.os.Bundle
-import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -22,7 +20,6 @@ import cv.brulinski.sebastian.fragment.CareerFragment
 import cv.brulinski.sebastian.fragment.PersonalInfoFragment
 import cv.brulinski.sebastian.fragment.WelcomeFragment
 import cv.brulinski.sebastian.model.MyCv
-import cv.brulinski.sebastian.utils.delay
 import cv.brulinski.sebastian.utils.string
 import cv.brulinski.sebastian.utils.view_pager.MyMainViewPager
 import cv.brulinski.sebastian.utils.view_pager.ViewPagerStates
@@ -88,13 +85,14 @@ class MainActivity : AppCompatActivity(),
         }
 
         bar.replaceMenu(R.menu.bottom_app_bar_menu)
-
-        App.startFetchingData.observe(this, Observer { status ->
-            when (status) {
-                App.FetchDataStatus.START -> loadingScreen.show()
-                App.FetchDataStatus.END, App.FetchDataStatus.ERROR, null -> loadingScreen.hide()
+        bar.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.settings -> {
+                    true
+                }
+                else -> false
             }
-        })
+        }
     }
 
     private fun setupViewPager() {
@@ -113,7 +111,6 @@ class MainActivity : AppCompatActivity(),
                             myCv = mainViewModel?.myCv
                             myCv?.observe(this, Observer {
                                 App.startFetchingData.value = App.FetchDataStatus.END
-                                loadingScreen.hide()
                                 it?.apply {
                                     welcome?.let { welcome ->
                                         pagesComponent.getWelcomeScreen().update(welcome)
@@ -150,54 +147,9 @@ class MainActivity : AppCompatActivity(),
         }
 
         override fun onPageSelected(position: Int) {
-        }
-    }
-
-    /*
-    Loading screen show/hide methods
-     */
-    private fun View.show() {
-//        mainRootContainer?.apply {
-//            if (indexOfChild(this@show) == -1 && settings.firstLaunch) {
-//                addView(this@show)
-//            }
-//        }
-    }
-
-    private fun View.hide() {
-        1000L.delay {
-            //            mainRootContainer?.apply {
-//                if (indexOfChild(this@hide) != -1) {
-//                    removeView(this@hide)
-//                }
-//            }
-        }
-    }
-    /*
-    VIEWPAGER FRAGMENTS CALLBACKS BELOW
-     */
-
-    /*
-    PersonalInfo callbacks
-     */
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        refreshMenuItem = menu?.findItem(R.id.refreshContent)
-        menuInflater.inflate(R.menu.main_activity_menu, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        return when (item?.itemId) {
-            android.R.id.home -> {
-                slideDrawer.open()
-                true
+            bar.menu.apply {
+                setGroupVisible(R.id.callMailGroup, position != 1)
             }
-            R.id.refreshContent -> {
-                mainViewModel?.refreshAll()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
         }
     }
 
