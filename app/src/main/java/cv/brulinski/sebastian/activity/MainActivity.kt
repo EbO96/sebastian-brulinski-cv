@@ -3,6 +3,8 @@ package cv.brulinski.sebastian.activity
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.StateListAnimator
+import android.content.res.ColorStateList
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.transition.Fade
 import android.view.MenuItem

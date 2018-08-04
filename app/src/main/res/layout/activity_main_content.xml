@@ -33,8 +33,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:backgroundTintMode="src_in"
-        app:backgroundTint="#000000"
+        app:backgroundTint="@android:color/black"
         app:fabAlignmentMode="end"
         app:hideOnScroll="true" />
 
@@ -42,9 +41,10 @@
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:fabSize="normal"
         android:src="@drawable/main_fab_button_drawable"
-        app:layout_anchor="@id/bar" />
+        app:fabSize="normal"
+        app:layout_anchor="@id/bar"
+        tools:srcCompat="@tools:sample/backgrounds/scenic[1]" />
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
