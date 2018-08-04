@@ -60,8 +60,9 @@
 
     <style name="WelcomeScreenContentTextStyle" parent="TextAppearance.AppCompat">
         <item name="android:textSize">16sp</item>
-        <item name="android:textColor">@color/darkBackgroundTextColor</item>
+        <item name="android:textColor">@color/whiteBackgroundTextColor</item>
         <item name="android:textStyle">normal</item>
+        <item name="android:textAlignment">textStart</item>
     </style>
 
     <style name="PersonalInformationsStyle" parent="Base.V7.Widget.AppCompat.AutoCompleteTextView">
@@ -83,5 +84,15 @@
     <style name="PersonalInfoTextViewStyle" parent="TextAppearance.AppCompat">
         <item name="android:textColor">@color/whiteBackgroundTextColor</item>
         <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="CareerItemCardStyle" parent="Base.CardView">
+        <item name="cardCornerRadius">0dp</item>
+        <item name="cardElevation">2dp</item>
+    </style>
+
+    <style name="HeaderTextStyle" parent="TextAppearance.AppCompat">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/whiteBackgroundTextColor</item>
     </style>
 </resources>

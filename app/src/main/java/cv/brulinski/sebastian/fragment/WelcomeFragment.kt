@@ -44,7 +44,7 @@ class WelcomeFragment : Fragment() {
     }
 
     fun update(welcome: Welcome) {
-        welcomeDescriptionTextView?.text = welcome.description
+        welcomeContentTextView?.text = welcome.description
     }
 
     override fun onDestroy() {

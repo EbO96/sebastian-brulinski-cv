@@ -35,7 +35,7 @@ class PersonalInfoFragment : Fragment(), LifecycleOwner {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_personal_info, container, false)
+        return inflater.inflate(R.layout.fragment_personal_info_1, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

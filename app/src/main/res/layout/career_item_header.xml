@@ -1,37 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+    style="@style/CareerItemCardStyle"
     android:layout_height="wrap_content"
     android:layout_marginTop="8dp"
-    android:background="@color/colorPrimaryDark"
-    android:orientation="vertical">
+    android:layout_marginStart="8dp"
+    android:layout_marginEnd="8dp">
 
-    <TextView
-        android:id="@+id/placeNameTextView"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="24sp" />
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/functionTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="8dp"
-        android:textAlignment="center"
-        android:textSize="18sp" />
+        <TextView
+            android:id="@+id/placeNameTextView"
+            style="@style/HeaderTextStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:textAlignment="center" />
 
-    <TextView
-        android:id="@+id/descriptionTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:textAlignment="center" />
-</LinearLayout>
+        <TextView
+            android:id="@+id/functionTextView"
+            style="@style/PersonalInfoTextViewTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="4dp"
+            android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/descriptionTextView"
+            style="@style/PersonalInfoTextViewTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="8dp"
+            android:textAlignment="center" />
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
