@@ -121,6 +121,16 @@ class MainActivity : AppCompatActivity(),
         bar.setOnMenuItemClickListener(this)
     }
 
+    /*
+    Public methods
+     */
+
+    fun toPage(page: Int) = viewPager.toPage(page)
+
+    /*
+    Private methods
+     */
+
     private fun setupViewPager() {
         myMainViewPager = MyMainViewPager(supportFragmentManager, viewPager, viewPagerPageListener()).setup()
         mainActivityViewPagerAdapter = myMainViewPager?.mainActivityViewPagerAdapter
@@ -179,30 +189,42 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
-    fun toPage(page: Int) = viewPager.toPage(page)
-
     private fun backFromSettings(): Boolean {
         val fragment = supportFragmentManager.findFragmentById(this@MainActivity.mainContainer.id)
         return if (fragment is SettingsFragment) {
             supportFragmentManager.beginTransaction().remove(fragment).commit()
             this@MainActivity.fab.setImageState(intArrayOf(-android.R.attr.state_selected), false)
-            //this@MainActivity.fab.drawable.state = intArrayOf(android.R.attr.state_selected)
             currentFragment = null
+            this@MainActivity.bar.menu.apply {
+                setGroupVisible(R.id.callMailGroup, viewPager.currentItem != 1)
+                setGroupVisible(R.id.settingsGroup, true)
+            }
             true
         } else false
 
     }
 
+    private fun goToSettings() {
+        SettingsFragment().apply {
+            val fade = Fade()
+            enterTransition = fade
+            exitTransition = fade
+            this@apply.set(supportFragmentManager, this@MainActivity.mainContainer.id)
+            this@MainActivity.fab.setImageState(intArrayOf(android.R.attr.state_selected), false)
+            this@MainActivity.bar.menu.apply {
+                setGroupVisible(R.id.callMailGroup, false)
+                setGroupVisible(R.id.settingsGroup, false)
+            }
+        }
+    }
+
+    /*
+    Override methods
+     */
+
     override fun onMenuItemClick(item: MenuItem?) = when (item?.itemId) {
         R.id.settings -> {
-            SettingsFragment().apply {
-                val fade = Fade()
-                enterTransition = fade
-                exitTransition = fade
-                this@apply.set(supportFragmentManager, this@MainActivity.mainContainer.id)
-                this@MainActivity.fab.setImageState(intArrayOf(android.R.attr.state_selected), false)
-               // this@MainActivity.fab.drawable.state = intArrayOf(-android.R.attr.state_selected)
-            }
+            goToSettings()
             true
         }
         else -> false
