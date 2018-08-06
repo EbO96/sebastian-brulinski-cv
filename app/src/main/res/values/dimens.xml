@@ -8,4 +8,6 @@
     <dimen name="divider">2dp</dimen>
     <dimen name="start_screen_drawable_size">96dp</dimen>
     <dimen name="main_drawer_header_height">192dp</dimen>
+    <dimen name="text_placeholder_height">8dp</dimen>
+    <integer name="shimmer_duration">8</integer>
 </resources>

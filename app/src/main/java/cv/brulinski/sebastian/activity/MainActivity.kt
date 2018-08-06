@@ -6,6 +6,7 @@ import android.animation.StateListAnimator
 import android.os.Bundle
 import android.transition.Fade
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.LiveData
@@ -13,6 +14,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.viewpager.widget.ViewPager
+import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.bottomappbar.BottomAppBar
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter
@@ -28,7 +30,6 @@ import cv.brulinski.sebastian.fragment.SettingsFragment
 import cv.brulinski.sebastian.fragment.WelcomeFragment
 import cv.brulinski.sebastian.model.MyCv
 import cv.brulinski.sebastian.utils.currentFragment
-import cv.brulinski.sebastian.utils.delay
 import cv.brulinski.sebastian.utils.set
 import cv.brulinski.sebastian.utils.string
 import cv.brulinski.sebastian.utils.view_pager.MyMainViewPager
@@ -40,6 +41,7 @@ import cv.brulinski.sebastian.view_model.MainViewModel
 import inflate
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
+import kotlinx.android.synthetic.main.fragment_welcome.*
 
 class MainActivity : AppCompatActivity(),
         WelcomeFragment.WelcomeFragmentCallback,

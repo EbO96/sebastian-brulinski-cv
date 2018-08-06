@@ -31,4 +31,5 @@ class MainActivityViewPagerAdapter(private val fragments: ArrayList<Fragment>,
     override fun getCount() = fragments.size
 
     override fun getPageTitle(position: Int) = pagesTitles[position]
+
 }

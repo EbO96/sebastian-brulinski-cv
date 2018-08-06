@@ -6,10 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.facebook.shimmer.ShimmerFrameLayout
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.activity.MainActivity
 import cv.brulinski.sebastian.interfaces.ViewPagerUtilsFragmentCreatedListener
 import cv.brulinski.sebastian.model.Welcome
+import cv.brulinski.sebastian.utils.delay
 import kotlinx.android.synthetic.main.fragment_welcome.*
 import java.lang.ClassCastException
 
@@ -41,11 +43,35 @@ class WelcomeFragment : Fragment() {
             (activity as? MainActivity)?.toPage(1)
         }
         viewPagerUtilsFragmentCreatedListener?.onFragmentCreated()
+        shimmerFrame.showShimmer()
     }
 
+
+    /*
+    Public methods
+     */
     fun update(welcome: Welcome) {
+        150L.delay { shimmerFrame.hideShimmer() }
         welcomeContentTextView?.text = welcome.description
     }
+
+
+    /*
+    Private methods
+     */
+    private fun ShimmerFrameLayout.showShimmer() {
+        startShimmerAnimation()
+        this.visibility = View.VISIBLE
+    }
+
+    private fun ShimmerFrameLayout.hideShimmer() {
+        stopShimmerAnimation()
+        this.visibility = View.GONE
+    }
+
+    /*
+    Override methods
+     */
 
     override fun onDestroy() {
         super.onDestroy()
