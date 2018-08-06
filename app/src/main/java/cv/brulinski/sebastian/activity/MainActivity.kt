@@ -39,6 +39,7 @@ import cv.brulinski.sebastian.utils.view_pager.toPage
 import cv.brulinski.sebastian.view.SlideDrawer
 import cv.brulinski.sebastian.view_model.MainViewModel
 import inflate
+import kotlinx.android.synthetic.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.fragment_welcome.*
@@ -134,6 +135,7 @@ class MainActivity : AppCompatActivity(),
                 App.FetchDataStatus.ERROR -> swipeRefreshLayout.isRefreshing = false
             }
         })
+       // clearFindViewByIdCache()
     }
 
     /*
