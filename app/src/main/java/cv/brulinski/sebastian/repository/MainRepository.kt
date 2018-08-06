@@ -6,8 +6,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import cv.brulinski.sebastian.R.string
-import cv.brulinski.sebastian.dependency_injection.app.App
 import cv.brulinski.sebastian.interfaces.BitmapLoadable
+import cv.brulinski.sebastian.interfaces.OnFetchingStatuses
 import cv.brulinski.sebastian.interfaces.OnGetCvObjects
 import cv.brulinski.sebastian.model.*
 import cv.brulinski.sebastian.utils.*
@@ -16,7 +16,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
 @SuppressLint("CheckResult")
-class MainRepository {
+class MainRepository<T : OnFetchingStatuses>(private val listener: T) {
 
     private val myCv = MutableLiveData<MyCv>()
 
@@ -34,12 +34,13 @@ class MainRepository {
                     cv?.welcome?.timestamp?.let {
                         dbNotEmpty = it != -1L
                     }
-                    if (dbNotEmpty) myCv.value = cv
-                    else {
+                    if (dbNotEmpty) {
+                        myCv.value = cv
+                    } else {
                         fetchCv()
                     }
                 }, {
-                    App.startFetchingData.value = App.FetchDataStatus.ERROR
+                    it.printStackTrace()
                 })
         return myCv
     }
@@ -78,18 +79,20 @@ class MainRepository {
     }
 
     private fun fetchCv() {
-        if (settings.firstLaunch)
-            App.startFetchingData.value = App.FetchDataStatus.START
+        listener.onFetchStart()
         fetchAllFromRemoteServer()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnComplete {
+                    settings.firstLaunch = false
+                    listener.onFetchEnd()
+                }
                 .subscribe({
                     it.insert()
                     myCv.value = it
-                    settings.firstLaunch = false
+
                 }, {
-                    ctx.getString(string.data_fetching_error).toast()
-                    it.printStackTrace()
+                    listener.onFetchError(it)
                 })
     }
 

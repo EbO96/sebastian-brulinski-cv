@@ -8,15 +8,8 @@ import cv.brulinski.sebastian.dependency_injection.module.AppModule
 
 class App : Application() {
 
-    enum class FetchDataStatus {
-        START,
-        END,
-        ERROR
-    }
-
     companion object {
         lateinit var component: AppComponent
-        var startFetchingData = MutableLiveData<FetchDataStatus>()
     }
 
     override fun onCreate() {

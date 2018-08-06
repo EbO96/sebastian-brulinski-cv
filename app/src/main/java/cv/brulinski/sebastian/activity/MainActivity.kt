@@ -6,21 +6,16 @@ import android.animation.StateListAnimator
 import android.os.Bundle
 import android.transition.Fade
 import android.view.MenuItem
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.viewpager.widget.ViewPager
-import com.facebook.shimmer.ShimmerFrameLayout
-import com.google.android.material.bottomappbar.BottomAppBar
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter
 import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Companion.Page.WELCOME_SCREEN
 import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Companion.pageMap
-import cv.brulinski.sebastian.dependency_injection.app.App
 import cv.brulinski.sebastian.dependency_injection.component.DaggerPagesComponent
 import cv.brulinski.sebastian.dependency_injection.component.PagesComponent
 import cv.brulinski.sebastian.dependency_injection.module.PagesModule
@@ -28,10 +23,9 @@ import cv.brulinski.sebastian.fragment.CareerFragment
 import cv.brulinski.sebastian.fragment.PersonalInfoFragment
 import cv.brulinski.sebastian.fragment.SettingsFragment
 import cv.brulinski.sebastian.fragment.WelcomeFragment
+import cv.brulinski.sebastian.interfaces.OnFetchingStatuses
 import cv.brulinski.sebastian.model.MyCv
-import cv.brulinski.sebastian.utils.currentFragment
-import cv.brulinski.sebastian.utils.set
-import cv.brulinski.sebastian.utils.string
+import cv.brulinski.sebastian.utils.*
 import cv.brulinski.sebastian.utils.view_pager.MyMainViewPager
 import cv.brulinski.sebastian.utils.view_pager.ViewPagerStates
 import cv.brulinski.sebastian.utils.view_pager.toLeft
@@ -39,24 +33,23 @@ import cv.brulinski.sebastian.utils.view_pager.toPage
 import cv.brulinski.sebastian.view.SlideDrawer
 import cv.brulinski.sebastian.view_model.MainViewModel
 import inflate
-import kotlinx.android.synthetic.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
-import kotlinx.android.synthetic.main.fragment_welcome.*
 
 class MainActivity : AppCompatActivity(),
         WelcomeFragment.WelcomeFragmentCallback,
         PersonalInfoFragment.PersonalInfoCallback,
         CareerFragment.CareerFragmentCallback,
         Toolbar.OnMenuItemClickListener,
-        SwipeRefreshLayout.OnRefreshListener {
+        SwipeRefreshLayout.OnRefreshListener,
+        OnFetchingStatuses {
 
     //Loading screen - displayed during first fetching
     private val loadingScreen by lazy { R.layout.data_loading_screen.inflate(this) }
     //ViewPager adapter
     private var mainActivityViewPagerAdapter: MainActivityViewPagerAdapter? = null
     //ViewModel
-    private var mainViewModel: MainViewModel? = null
+    private var mainViewModel: MainViewModel<*>? = null
     //MyCv
     private var myCv: LiveData<MyCv>? = null
     //Dagger ViewPager pages component
@@ -65,12 +58,8 @@ class MainActivity : AppCompatActivity(),
     private var refreshMenuItem: MenuItem? = null
     //Main ViewPager
     private var myMainViewPager: MyMainViewPager? = null
-    //Flags
-    private var pagesProgress = 0
     //Number of pages
     private var numberOfPages = 0
-    //Bottom app bar behavior
-    private lateinit var bottomAppBarBehavior: BottomAppBar.Behavior
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -139,16 +128,7 @@ class MainActivity : AppCompatActivity(),
 
         swipeRefreshLayout.setOnRefreshListener(this)
 
-        //Listen for fetching data completion
-        App.startFetchingData.observe(this, Observer {
-            when (it) {
-                App.FetchDataStatus.START -> {
-                }
-                App.FetchDataStatus.END -> swipeRefreshLayout.isRefreshing = false
-                App.FetchDataStatus.ERROR -> swipeRefreshLayout.isRefreshing = false
-            }
-        })
-       // clearFindViewByIdCache()
+        // clearFindViewByIdCache()
     }
 
     /*
@@ -181,12 +161,11 @@ class MainActivity : AppCompatActivity(),
                             pagesComponent = DaggerPagesComponent.builder().pagesModule(PagesModule(adapter, viewPager)).build()
                             pagesComponent.inject(this)
                             //ViewModel
-                            mainViewModel = ViewModelProvider.AndroidViewModelFactory.getInstance(application).create(MainViewModel::class.java)
+                            mainViewModel = MainViewModel(application, this)
                             myCv = mainViewModel?.myCv
                             //Observe CV
                             myCv?.observe(this, Observer {
                                 //Inform fetching observers that fetch is final
-                                App.startFetchingData.value = App.FetchDataStatus.END
                                 //Get CV parts and inform each fragment associated with this about update
                                 it?.apply {
                                     welcome?.let { welcome ->
@@ -269,6 +248,21 @@ class MainActivity : AppCompatActivity(),
     /*
     Override methods
      */
+
+    override fun onFetchStart() {
+        MAIN_ACTIVITY.log("start")
+    }
+
+    override fun onFetchEnd() {
+        swipeRefreshLayout.isRefreshing = false
+        MAIN_ACTIVITY.log("end")
+    }
+
+    override fun onFetchError(error: Throwable) {
+        swipeRefreshLayout.isRefreshing = false
+        MAIN_ACTIVITY.log("error")
+        R.string.data_fetching_error.string().toast()
+    }
 
     override fun onRefresh() {
         mainViewModel?.refreshAll()
