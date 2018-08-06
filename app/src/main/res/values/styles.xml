@@ -105,4 +105,19 @@
         <item name="android:textColor">@color/colorPrimary</item>
         <item name="android:textSize">18sp</item>
     </style>
+
+    <style name="TextPlaceholder">
+        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
+        <item name="android:layout_marginTop">4dp</item>
+        <item name="android:layout_marginBottom">4dp</item>
+    </style>
+
+    <style name="TextPlaceholderDark" parent="TextPlaceholder">
+        <item name="android:background">@color/textPlaceholder</item>
+    </style>
+
+    <style name="TextPlaceholderLight" parent="TextPlaceholder">
+        <item name="android:background">@color/textPlaceholderLight</item>
+    </style>
 </resources>

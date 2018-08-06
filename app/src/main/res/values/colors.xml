@@ -9,4 +9,6 @@
     <color name="dimSoft">#55000000</color>
     <color name="dimMedium">#77000000</color>
     <color name="dimHard">#AA000000</color>
+    <color name="textPlaceholder">#B0BEC5</color>
+    <color name="textPlaceholderLight">#CFD8DC</color>
 </resources>

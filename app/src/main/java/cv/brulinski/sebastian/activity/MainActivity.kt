@@ -6,6 +6,7 @@ import android.animation.StateListAnimator
 import android.os.Bundle
 import android.transition.Fade
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.LiveData
@@ -13,6 +14,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.viewpager.widget.ViewPager
+import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.bottomappbar.BottomAppBar
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter
@@ -37,8 +39,10 @@ import cv.brulinski.sebastian.utils.view_pager.toPage
 import cv.brulinski.sebastian.view.SlideDrawer
 import cv.brulinski.sebastian.view_model.MainViewModel
 import inflate
+import kotlinx.android.synthetic.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
+import kotlinx.android.synthetic.main.fragment_welcome.*
 
 class MainActivity : AppCompatActivity(),
         WelcomeFragment.WelcomeFragmentCallback,
@@ -144,6 +148,7 @@ class MainActivity : AppCompatActivity(),
                 App.FetchDataStatus.ERROR -> swipeRefreshLayout.isRefreshing = false
             }
         })
+       // clearFindViewByIdCache()
     }
 
     /*
