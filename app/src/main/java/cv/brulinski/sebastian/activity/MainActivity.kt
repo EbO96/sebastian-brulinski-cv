@@ -28,7 +28,6 @@ import cv.brulinski.sebastian.fragment.SettingsFragment
 import cv.brulinski.sebastian.fragment.WelcomeFragment
 import cv.brulinski.sebastian.model.MyCv
 import cv.brulinski.sebastian.utils.currentFragment
-import cv.brulinski.sebastian.utils.delay
 import cv.brulinski.sebastian.utils.set
 import cv.brulinski.sebastian.utils.string
 import cv.brulinski.sebastian.utils.view_pager.MyMainViewPager
@@ -74,15 +73,18 @@ class MainActivity : AppCompatActivity(),
         setContentView(R.layout.activity_main)
         setupViewPager()
 
+        //Slide drawer setting up
         slideDrawer({
             drawerTitle = R.string.table_of_contents.string()
         }, {
+            //Menu items
             val items = arrayListOf(SlideDrawer.DrawerMenuItem(R.string.introduction.string()),
                     SlideDrawer.DrawerMenuItem(R.string.personal_details.string()),
                     SlideDrawer.DrawerMenuItem(R.string.career.string()),
                     SlideDrawer.DrawerMenuItem(R.string.languages.string()),
                     SlideDrawer.DrawerMenuItem(R.string.skills.string()))
             setMenu(items)
+            //Menu items listener
             setMenuItemClickListener(object : SlideDrawer.MenuItemsClickListener {
                 override fun onClick(position: Int, drawerMenuItem: SlideDrawer.DrawerMenuItem) {
                     viewPager.toPage(position)
@@ -90,16 +92,20 @@ class MainActivity : AppCompatActivity(),
             })
         })
 
+        //BottomAppBar FloatingActiobButton
         fab.setOnClickListener {
             if (currentFragment !is SettingsFragment)
                 slideDrawer.apply {
-                    if (!isOpen()) open() else close()
+                    if (!isOpen()) open() else close() //Open/close drawer
                 }
             else {
-                backFromSettings()
+                backFromSettings() //If current screen is SettingsFragment
             }
         }
 
+        /*
+        BottomAppBar Fab animations
+         */
         val h = AnimatorSet()
 
         val stateListAnimator = StateListAnimator()
@@ -120,10 +126,16 @@ class MainActivity : AppCompatActivity(),
 
         fab.stateListAnimator = stateListAnimator
 
+        /*
+        BottomAppBar
+         */
+        //Setting up
         bar.replaceMenu(R.menu.bottom_app_bar_menu)
         bar.setOnMenuItemClickListener(this)
+
         swipeRefreshLayout.setOnRefreshListener(this)
 
+        //Listen for fetching data completion
         App.startFetchingData.observe(this, Observer {
             when (it) {
                 App.FetchDataStatus.START -> {
@@ -147,19 +159,30 @@ class MainActivity : AppCompatActivity(),
     private fun setupViewPager() {
         myMainViewPager = MyMainViewPager(supportFragmentManager, viewPager, viewPagerPageListener()).setup()
         mainActivityViewPagerAdapter = myMainViewPager?.mainActivityViewPagerAdapter
+
+        /*
+        MyMainViewPager is class that handle view pager and fragments settings up. The observer is called only when
+        all fragments inside viewPager are created and ready to use
+         */
         myMainViewPager?.observeForever { it ->
-            it?.let {
-                when (it) {
+            it?.let { states ->
+                when (states) {
                     ViewPagerStates.VIEW_PAGER_PAGES_CREATED -> {
+
                         numberOfPages = myMainViewPager?.getNumberOfPages() ?: 0
+
                         mainActivityViewPagerAdapter?.let { adapter ->
+                            //Inject PagesComponent. This component is used for getting viewPager fragments
                             pagesComponent = DaggerPagesComponent.builder().pagesModule(PagesModule(adapter, viewPager)).build()
                             pagesComponent.inject(this)
                             //ViewModel
                             mainViewModel = ViewModelProvider.AndroidViewModelFactory.getInstance(application).create(MainViewModel::class.java)
                             myCv = mainViewModel?.myCv
+                            //Observe CV
                             myCv?.observe(this, Observer {
+                                //Inform fetching observers that fetch is final
                                 App.startFetchingData.value = App.FetchDataStatus.END
+                                //Get CV parts and inform each fragment associated with this about update
                                 it?.apply {
                                     welcome?.let { welcome ->
                                         pagesComponent.getWelcomeScreen().update(welcome)
@@ -197,11 +220,15 @@ class MainActivity : AppCompatActivity(),
 
         override fun onPageSelected(position: Int) {
             bar.menu.apply {
+                //Hide phone and mail icon (BottomAppBar) when current screen is PersonalInfoFragment
                 setGroupVisible(R.id.callMailGroup, position != 1)
             }
         }
     }
 
+    /*
+    Return form SettingsFragment
+     */
     private fun backFromSettings(): Boolean {
         val fragment = supportFragmentManager.findFragmentById(this@MainActivity.mainContainer.id)
         return if (fragment is SettingsFragment) {
@@ -217,6 +244,9 @@ class MainActivity : AppCompatActivity(),
 
     }
 
+    /*
+    Open settings screen
+     */
     private fun goToSettings() {
         SettingsFragment().apply {
             val fade = Fade()
