@@ -1,6 +1,5 @@
 package cv.brulinski.sebastian.fragment
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,12 +9,14 @@ import androidx.fragment.app.Fragment
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.adapter.recycler.skills.SkillsRecyclerAdapter
 import cv.brulinski.sebastian.interfaces.DataProviderInterface
-import cv.brulinski.sebastian.interfaces.ViewPagerUtilsFragmentCreatedListener
-import cv.brulinski.sebastian.model.Skill
 import cv.brulinski.sebastian.utils.getBitmapsForObjects
 import kotlinx.android.synthetic.main.fragment_skills.*
 import setup
 
+/**
+ * Fragment which is used for displaying list of my skills like
+ * known programing languages, IDE, version control system
+ */
 class SkillsFragment : Fragment() {
 
     //Recycler adapter
@@ -39,12 +40,18 @@ class SkillsFragment : Fragment() {
         }
     }
 
+    /*
+    Private methods
+     */
     private fun setupSkillsRecycler() {
         skillsRecyclerAdapter = SkillsRecyclerAdapter().apply {
             recyclerView.setup(this, false)
         }
     }
 
+    /*
+    Override methods
+     */
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         dataProviderInterface = context as? DataProviderInterface

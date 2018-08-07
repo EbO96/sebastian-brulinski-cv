@@ -16,6 +16,10 @@ import cv.brulinski.sebastian.utils.getBitmapsForObjects
 import kotlinx.android.synthetic.main.fragment_languages.*
 import setup
 
+/**
+ * Fragment which is used for displaying list of languages
+ * which I know
+ */
 open class LanguagesFragment : Fragment() {
 
     private var dataProviderInterface: DataProviderInterface? = null
@@ -38,6 +42,9 @@ open class LanguagesFragment : Fragment() {
         }
     }
 
+    /*
+    Override methods
+     */
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         dataProviderInterface = context as? DataProviderInterface

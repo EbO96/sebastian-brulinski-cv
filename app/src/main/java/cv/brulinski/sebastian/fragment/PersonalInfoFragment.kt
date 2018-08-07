@@ -9,8 +9,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.interfaces.DataProviderInterface
-import cv.brulinski.sebastian.interfaces.ViewPagerUtilsFragmentCreatedListener
-import cv.brulinski.sebastian.model.PersonalInfo
 import cv.brulinski.sebastian.utils.age
 import cv.brulinski.sebastian.utils.ageSufix
 import cv.brulinski.sebastian.utils.date
@@ -18,6 +16,10 @@ import cv.brulinski.sebastian.utils.loadBitmapsIntoImageViews
 import kotlinx.android.synthetic.main.fragment_personal_info.*
 import java.lang.ClassCastException
 
+/*
+Fragment which is used for displaying my personal profile
+with information like phone number, email address, live address, born date
+ */
 open class PersonalInfoFragment : Fragment(), LifecycleOwner {
 
     private var dataProviderInterface: DataProviderInterface? = null
@@ -32,7 +34,9 @@ open class PersonalInfoFragment : Fragment(), LifecycleOwner {
 
         dataProviderInterface?.getPersonalInfo {
             it.apply {
+                //Load profile picture
                 loadBitmapsIntoImageViews(Pair(profileImageView, profilePictureBase64))?.subscribe()
+                //Set information about me
                 val nameAndSurname = "$name $surname"
                 nameAndSurnameTextView?.text = nameAndSurname
                 specialityTextView.text = speciality
@@ -57,6 +61,9 @@ open class PersonalInfoFragment : Fragment(), LifecycleOwner {
         }
     }
 
+    /*
+    Override methods
+     */
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         try {

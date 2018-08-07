@@ -14,6 +14,10 @@ import cv.brulinski.sebastian.utils.delay
 import kotlinx.android.synthetic.main.fragment_welcome.*
 import java.lang.ClassCastException
 
+/**
+ *Fragment used for displaying introduction into app.
+ * A Few words about what this application is
+ */
 open class WelcomeFragment : Fragment() {
 
     private var dataProviderInterface: DataProviderInterface? = null
@@ -26,12 +30,16 @@ open class WelcomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         welcomeNextButton.setOnClickListener {
+            //Navigate to PersonalInfoFragment
             (activity as? MainActivity)?.toPage(1)
         }
+        //Show Shimmer text loading animation
         shimmerFrame.showShimmer()
         dataProviderInterface?.getWelcome {
-            150L.delay { shimmerFrame.hideShimmer() }
-            welcomeContentTextView?.text = it.description
+            150L.delay {
+                shimmerFrame.hideShimmer()
+                welcomeContentTextView?.text = it.description
+            }
         }
     }
 

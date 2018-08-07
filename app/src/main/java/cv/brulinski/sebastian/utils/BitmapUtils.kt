@@ -17,6 +17,11 @@ import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
 
+/**
+ * Download bitmap from url
+ * @param url bitmap url to download
+ * @return Bitmap RxJava observable
+ */
 fun downloadBitmap(url: String): Observable<Bitmap> {
     return Observable.create { emitter ->
         try {
@@ -61,6 +66,18 @@ fun String.base64ToBitmap() = Observable.create<Bitmap> { emitter ->
     }
 }
 
+fun Bitmap.toBase64String() = let {
+    val byteArrayOutStream = ByteArrayOutputStream()
+    compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutStream)
+    val bitmapBytes = byteArrayOutStream.toByteArray()
+    Base64.encodeToString(bitmapBytes, Base64.DEFAULT)
+}
+
+/**
+ * Loads bitmap into ImageView
+ * @param pairs pair of ImageView into which Bitmap will be loaded
+ * @return true if success
+ */
 fun loadBitmapsIntoImageViews(vararg pairs: Pair<ImageView, String?>): Observable<Boolean>? = Observable.create<Boolean> { emitter ->
     val observables = arrayListOf<Observable<Bitmap>?>()
     pairs.forEach {
@@ -83,6 +100,13 @@ fun loadBitmapsIntoImageViews(vararg pairs: Pair<ImageView, String?>): Observabl
             })
 }
 
+/**
+ * Method operates on map from
+ * @see getBitmapsForObjects method.
+ * Decodes Base64 bitmap into Bitmap
+ * @param map map of object and his Base64 bitmap representation
+ * @return RxJava HashMap<T, Bitmap> observable
+ */
 fun <T> loadBitmapsInto(map: HashMap<T, String>): Observable<HashMap<T, Bitmap>>? = Observable.create<HashMap<T, Bitmap>> { emitter ->
     val observables = arrayListOf<Observable<Bitmap>?>()
 
@@ -109,9 +133,20 @@ fun <T> loadBitmapsInto(map: HashMap<T, String>): Observable<HashMap<T, Bitmap>>
             })
 }
 
+/**
+ * Method used for loading bitmaps into fields in passed 'T' object which must implements
+ * BitmapLoadable interface. Also it methods prepare list of items which are next used in
+ * RecyclerView adapters for languages list and skills list.
+ * @property elements list of 'T' objects into which bitmaps will loaded
+ * @property listElements lambda expression which returns prepared object to use in RecyclerAdapter
+ * @see MyRecyclerItem
+ * @see cv.brulinski.sebastian.adapter.recycler.languages.LanguagesRecyclerAdapter
+ * @see cv.brulinski.sebastian.adapter.recycler.skills.SkillsRecyclerAdapter
+ */
 @SuppressLint("CheckResult")
 fun <T : BitmapLoadable> getBitmapsForObjects(elements: List<T>, listElements: (ArrayList<MyRecyclerItem<T>>) -> Unit) {
-    val map = HashMap<T, String>()
+    val map = HashMap<T, String>() //Map of object and it string representation of bitmap (Base64 encoded)
+    //Create map
     elements.forEach {
         it.getTypeBitmapBase64()?.let { bitmapBase64 ->
             if (bitmapBase64.isNotEmpty()) map[it] = bitmapBase64
@@ -122,6 +157,7 @@ fun <T : BitmapLoadable> getBitmapsForObjects(elements: List<T>, listElements: (
     fun makeList() {
         val items = arrayListOf<MyRecyclerItem<T>>()
         if (itemsWithBitmaps.isNotEmpty() && itemsWithBitmaps[0].getTypeSkillCategory() != null) {
+            //Prepare list of object for skills list used SkillsFragment
             val sortedListMap = HashMap<T, List<T>>()
             itemsWithBitmaps.groupBy { it.getTypeSkillCategory() }.forEach {
                 val headerItem = it.value[0]
@@ -135,6 +171,7 @@ fun <T : BitmapLoadable> getBitmapsForObjects(elements: List<T>, listElements: (
                 }
             }
         } else {
+            //Prepare list of object for languages list used in LanguagesFragment
             if (itemsWithBitmaps.isNotEmpty()) {
                 itemsWithBitmaps.sortedBy { it.getSortKey() }.forEach {
                     items.add(MyRecyclerItem(it, TYPE_ITEM))
@@ -147,6 +184,7 @@ fun <T : BitmapLoadable> getBitmapsForObjects(elements: List<T>, listElements: (
     }
 
     if (map.isNotEmpty()) {
+        //Load bitmaps into prepared list
         loadBitmapsInto(map)?.apply {
             subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -168,11 +206,4 @@ fun <T : BitmapLoadable> getBitmapsForObjects(elements: List<T>, listElements: (
             makeList()
         }
     } else makeList()
-}
-
-fun Bitmap.toBase64String() = let {
-    val byteArrayOutStream = ByteArrayOutputStream()
-    compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutStream)
-    val bitmapBytes = byteArrayOutStream.toByteArray()
-    Base64.encodeToString(bitmapBytes, Base64.DEFAULT)
 }

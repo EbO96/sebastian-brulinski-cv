@@ -21,6 +21,7 @@ class SettingsFragment : androidx.fragment.app.Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         fetchGraphicsSwitch.apply {
             isChecked = settings.fetchGraphics //set the switch state
             setOnCheckedChangeListener { compoundButton, b ->

@@ -3,8 +3,15 @@ package cv.brulinski.sebastian.adapter.view_pager
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
-import cv.brulinski.sebastian.view_model.MainViewModel
 
+/**
+ * ViewPager adapter for displaying CV pages
+ * @see cv.brulinski.sebastian.fragment.WelcomeFragment
+ * @see cv.brulinski.sebastian.fragment.PersonalInfoFragment
+ * @see cv.brulinski.sebastian.fragment.CareerFragment
+ * @see cv.brulinski.sebastian.fragment.LanguagesFragment
+ * @see cv.brulinski.sebastian.fragment.SkillsFragment
+ */
 class MainActivityViewPagerAdapter(private val fragments: ArrayList<Fragment>,
                                    private val pagesTitles: ArrayList<String>,
                                    fm: FragmentManager) : FragmentStatePagerAdapter(fm) {

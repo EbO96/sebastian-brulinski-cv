@@ -38,8 +38,6 @@ class MainActivity : AppCompatActivity(),
         OnFetchingStatuses,
         DataProviderInterface {
 
-    //Loading screen - displayed during first fetching
-    private val loadingScreen by lazy { R.layout.data_loading_screen.inflate(this) }
     //ViewPager adapter
     private var mainActivityViewPagerAdapter: MainActivityViewPagerAdapter? = null
     //ViewModel

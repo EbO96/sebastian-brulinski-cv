@@ -16,6 +16,10 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 
+/**
+ * Provides all required data for application
+ * @param listener listener used for listening for events like START, END or fetch ERROR
+ */
 @SuppressLint("CheckResult")
 open class MainRepository<T : OnFetchingStatuses>(private val listener: T?) {
 

@@ -5,6 +5,10 @@ import androidx.lifecycle.AndroidViewModel
 import cv.brulinski.sebastian.interfaces.OnFetchingStatuses
 import cv.brulinski.sebastian.repository.MainRepository
 
+/**
+ * Role of this class is being bridge between repository and views
+ * @see MainRepository
+ */
 class MainViewModel<T : OnFetchingStatuses> constructor(application: Application, listener: T) : AndroidViewModel(application) {
 
     private val repository by lazy { MainRepository(listener) }
