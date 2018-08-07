@@ -8,7 +8,7 @@ import android.transition.Fade
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.viewpager.widget.ViewPager
@@ -19,15 +19,11 @@ import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Co
 import cv.brulinski.sebastian.dependency_injection.component.DaggerPagesComponent
 import cv.brulinski.sebastian.dependency_injection.component.PagesComponent
 import cv.brulinski.sebastian.dependency_injection.module.PagesModule
-import cv.brulinski.sebastian.fragment.CareerFragment
-import cv.brulinski.sebastian.fragment.PersonalInfoFragment
-import cv.brulinski.sebastian.fragment.SettingsFragment
-import cv.brulinski.sebastian.fragment.WelcomeFragment
+import cv.brulinski.sebastian.fragment.*
+import cv.brulinski.sebastian.interfaces.DataProviderInterface
 import cv.brulinski.sebastian.interfaces.OnFetchingStatuses
-import cv.brulinski.sebastian.model.MyCv
+import cv.brulinski.sebastian.model.*
 import cv.brulinski.sebastian.utils.*
-import cv.brulinski.sebastian.utils.view_pager.MyMainViewPager
-import cv.brulinski.sebastian.utils.view_pager.ViewPagerStates
 import cv.brulinski.sebastian.utils.view_pager.toLeft
 import cv.brulinski.sebastian.utils.view_pager.toPage
 import cv.brulinski.sebastian.view.SlideDrawer
@@ -37,12 +33,10 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
 
 class MainActivity : AppCompatActivity(),
-        WelcomeFragment.WelcomeFragmentCallback,
-        PersonalInfoFragment.PersonalInfoCallback,
-        CareerFragment.CareerFragmentCallback,
         Toolbar.OnMenuItemClickListener,
         SwipeRefreshLayout.OnRefreshListener,
-        OnFetchingStatuses {
+        OnFetchingStatuses,
+        DataProviderInterface {
 
     //Loading screen - displayed during first fetching
     private val loadingScreen by lazy { R.layout.data_loading_screen.inflate(this) }
@@ -50,21 +44,21 @@ class MainActivity : AppCompatActivity(),
     private var mainActivityViewPagerAdapter: MainActivityViewPagerAdapter? = null
     //ViewModel
     private var mainViewModel: MainViewModel<*>? = null
-    //MyCv
-    private var myCv: LiveData<MyCv>? = null
     //Dagger ViewPager pages component
     private lateinit var pagesComponent: PagesComponent
-    //Menu items
-    private var refreshMenuItem: MenuItem? = null
-    //Main ViewPager
-    private var myMainViewPager: MyMainViewPager? = null
-    //Number of pages
-    private var numberOfPages = 0
+    //Data for fragments
+    private val welcome: MutableLiveData<Welcome> = MutableLiveData()
+    private val personalInfo: MutableLiveData<PersonalInfo> = MutableLiveData()
+    private val career: MutableLiveData<List<Career>> = MutableLiveData()
+    private val languages: MutableLiveData<List<Language>> = MutableLiveData()
+    private val skills: MutableLiveData<List<Skill>> = MutableLiveData()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        setupViewPager()
+
+        observeCv()
+        viewPager.set()
 
         //Slide drawer setting up
         slideDrawer({
@@ -127,8 +121,6 @@ class MainActivity : AppCompatActivity(),
         bar.setOnMenuItemClickListener(this)
 
         swipeRefreshLayout.setOnRefreshListener(this)
-
-        // clearFindViewByIdCache()
     }
 
     /*
@@ -141,57 +133,52 @@ class MainActivity : AppCompatActivity(),
     Private methods
      */
 
-    private fun setupViewPager() {
-        myMainViewPager = MyMainViewPager(supportFragmentManager, viewPager, viewPagerPageListener()).setup()
-        mainActivityViewPagerAdapter = myMainViewPager?.mainActivityViewPagerAdapter
+    private fun ViewPager.set() {
+        val fragments = arrayListOf(
+                WelcomeFragment(),
+                PersonalInfoFragment(),
+                CareerFragment(),
+                LanguagesFragment(),
+                SkillsFragment()
+        )
+        val titles = arrayListOf(R.string.introduction.string(),
+                R.string.personal_details.string(),
+                R.string.career.string(),
+                R.string.languages.string(),
+                R.string.skills.string())
 
-        /*
-        MyMainViewPager is class that handle view pager and fragments settings up. The observer is called only when
-        all fragments inside viewPager are created and ready to use
-         */
-        myMainViewPager?.observeForever { it ->
-            it?.let { states ->
-                when (states) {
-                    ViewPagerStates.VIEW_PAGER_PAGES_CREATED -> {
+        mainActivityViewPagerAdapter = MainActivityViewPagerAdapter(fragments, titles, supportFragmentManager).apply {
+            pagesComponent = DaggerPagesComponent.builder().pagesModule(PagesModule(this, viewPager)).build()
+            pagesComponent.inject(this@MainActivity)
+        }
+        offscreenPageLimit = fragments.size
+        this@set.adapter = mainActivityViewPagerAdapter
+        addOnPageChangeListener(viewPagerPageListener())
+    }
 
-                        numberOfPages = myMainViewPager?.getNumberOfPages() ?: 0
-
-                        mainActivityViewPagerAdapter?.let { adapter ->
-                            //Inject PagesComponent. This component is used for getting viewPager fragments
-                            pagesComponent = DaggerPagesComponent.builder().pagesModule(PagesModule(adapter, viewPager)).build()
-                            pagesComponent.inject(this)
-                            //ViewModel
-                            mainViewModel = MainViewModel(application, this)
-                            myCv = mainViewModel?.myCv
-                            //Observe CV
-                            myCv?.observe(this, Observer {
-                                //Inform fetching observers that fetch is final
-                                //Get CV parts and inform each fragment associated with this about update
-                                it?.apply {
-                                    welcome?.let { welcome ->
-                                        pagesComponent.getWelcomeScreen().update(welcome)
-                                    }
-                                    personalInfo?.let { personalInfo ->
-                                        pagesComponent.getPersonalInfoScreen().update(personalInfo)
-                                    }
-                                    career?.let { career ->
-                                        pagesComponent.getCareerScreen().update(career)
-                                    }
-                                    languages?.let { languages ->
-                                        pagesComponent.getLanguagesScreen().update(languages)
-                                    }
-                                    skills?.let { skills ->
-                                        pagesComponent.getSkillsScreen().update(skills)
-                                    }
-                                }
-                            })
-                        }
-                    }
-                    ViewPagerStates.VIEW_PAGER_PAGES_DESTROYED -> {
-                    }
+    private fun observeCv() {
+        mainViewModel = MainViewModel(application, this)
+        mainViewModel?.myCv?.observe(this, Observer {
+            //Inform fetching observers that fetch is final
+            //Get CV parts and inform each fragment associated with this about update
+            it?.apply {
+                welcome?.let { welcome ->
+                    this@MainActivity.welcome.value = welcome
+                }
+                personalInfo?.let { personalInfo ->
+                    this@MainActivity.personalInfo.value = personalInfo
+                }
+                career?.let { career ->
+                    this@MainActivity.career.value = career
+                }
+                languages?.let { languages ->
+                    this@MainActivity.languages.value = languages
+                }
+                skills?.let { skills ->
+                    this@MainActivity.skills.value = skills
                 }
             }
-        }
+        })
     }
 
     private fun viewPagerPageListener() = object : ViewPager.OnPageChangeListener {
@@ -249,6 +236,9 @@ class MainActivity : AppCompatActivity(),
     Override methods
      */
 
+    /*
+    Fetching data statuses
+     */
     override fun onFetchStart() {
         MAIN_ACTIVITY.log("start")
     }
@@ -262,6 +252,39 @@ class MainActivity : AppCompatActivity(),
         swipeRefreshLayout.isRefreshing = false
         MAIN_ACTIVITY.log("error")
         R.string.data_fetching_error.string().toast()
+    }
+
+    /*
+    DataProviderInterface callback's
+     */
+    override fun getWelcome(block: (Welcome) -> Unit) {
+        welcome.observe(this, Observer {
+            it?.let { block(it) }
+        })
+    }
+
+    override fun getPersonalInfo(block: (PersonalInfo) -> Unit) {
+        personalInfo.observe(this, Observer {
+            it?.let { block(it) }
+        })
+    }
+
+    override fun getCareer(block: (List<Career>) -> Unit) {
+        career.observe(this, Observer {
+            it?.let { block(it) }
+        })
+    }
+
+    override fun getLanguages(block: (List<Language>) -> Unit) {
+        languages.observe(this, Observer {
+            it?.let { block(it) }
+        })
+    }
+
+    override fun getSkills(block: (List<Skill>) -> Unit) {
+        skills.observe(this, Observer {
+            it?.let { block(it) }
+        })
     }
 
     override fun onRefresh() {

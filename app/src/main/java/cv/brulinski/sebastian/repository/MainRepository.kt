@@ -13,12 +13,14 @@ import cv.brulinski.sebastian.model.*
 import cv.brulinski.sebastian.utils.*
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 
 @SuppressLint("CheckResult")
-class MainRepository<T : OnFetchingStatuses>(private val listener: T) {
+open class MainRepository<T : OnFetchingStatuses>(private val listener: T?) {
 
     private val myCv = MutableLiveData<MyCv>()
+    private val disposables = ArrayList<Disposable>()
 
     companion object {
         val errorImageUrl by lazy { string.error_image_url.string() }
@@ -26,7 +28,7 @@ class MainRepository<T : OnFetchingStatuses>(private val listener: T) {
     }
 
     fun getCv(): LiveData<MyCv> {
-        fetchAllFromDatabase()
+        val cvFetchDisposable = fetchAllFromDatabase()
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ cv ->
@@ -42,6 +44,7 @@ class MainRepository<T : OnFetchingStatuses>(private val listener: T) {
                 }, {
                     it.printStackTrace()
                 })
+        disposables.add(cvFetchDisposable)
         return myCv
     }
 
@@ -57,7 +60,7 @@ class MainRepository<T : OnFetchingStatuses>(private val listener: T) {
         var counter = 0
         return Observable.create { emitter ->
             val map = HashMap<String, String>()
-            Observable.merge(observables)
+            val bitmapFetchDisposable = Observable.merge(observables)
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnComplete {
@@ -74,31 +77,32 @@ class MainRepository<T : OnFetchingStatuses>(private val listener: T) {
                     }, {
                         emitter.onError(it)
                     })
-
+            disposables.add(bitmapFetchDisposable)
         }
     }
 
     private fun fetchCv() {
-        listener.onFetchStart()
-        fetchAllFromRemoteServer()
+        listener?.onFetchStart()
+        val cvFetchDisposable = fetchAllFromRemoteServer()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnComplete {
                     settings.firstLaunch = false
-                    listener.onFetchEnd()
+                    listener?.onFetchEnd()
                 }
                 .subscribe({
                     it.insert()
                     myCv.value = it
 
                 }, {
-                    listener.onFetchError(it)
+                    listener?.onFetchError(it)
                 })
+        disposables.add(cvFetchDisposable)
     }
 
     private fun fetchAllFromRemoteServer(): Observable<MyCv> {
         return Observable.create { emitter ->
-            retrofit
+            val fetchAllDisposable = retrofit
                     .getAll()
                     .subscribeOn(Schedulers.computation())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -119,7 +123,7 @@ class MainRepository<T : OnFetchingStatuses>(private val listener: T) {
                                     urlMap[it.id] = it.iconUrl
                                 }
 
-                                urlMap.fetchBitmaps()
+                                val bitmapFetchDisposable = urlMap.fetchBitmaps()
                                         .subscribeOn(Schedulers.computation())
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe({
@@ -138,6 +142,7 @@ class MainRepository<T : OnFetchingStatuses>(private val listener: T) {
                                         }, {
                                             emitter.onError(it)
                                         })
+                                disposables.add(bitmapFetchDisposable)
                             } else {
                                 emitter.onComplete()
                             }
@@ -149,6 +154,7 @@ class MainRepository<T : OnFetchingStatuses>(private val listener: T) {
                         emitter.onError(it)
                         it.printStackTrace()
                     })
+            disposables.add(fetchAllDisposable)
         }
     }
 
@@ -206,7 +212,7 @@ class MainRepository<T : OnFetchingStatuses>(private val listener: T) {
         }
         return Observable.create { emitter ->
             val cv = MyCv()
-            Observable.merge(observers)
+            val databaseFetchDisposable = Observable.merge(observers)
                     .subscribeOn(AndroidSchedulers.mainThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnComplete {
@@ -237,6 +243,7 @@ class MainRepository<T : OnFetchingStatuses>(private val listener: T) {
                     }, {
                         emitter.onError(it)
                     })
+            disposables.add(databaseFetchDisposable)
         }
     }
 

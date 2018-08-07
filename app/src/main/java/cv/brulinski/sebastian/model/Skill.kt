@@ -13,7 +13,7 @@ import cv.brulinski.sebastian.interfaces.BitmapLoadable
  * User skill
  */
 @Entity
-class Skill : BitmapLoadable {
+open class Skill : BitmapLoadable {
 
     @PrimaryKey
     @ColumnInfo(name = "id")

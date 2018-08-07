@@ -1,29 +1,24 @@
 package cv.brulinski.sebastian.fragment
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.adapter.recycler.languages.LanguagesRecyclerAdapter
+import cv.brulinski.sebastian.interfaces.DataProviderInterface
 import cv.brulinski.sebastian.interfaces.ViewPagerUtilsFragmentCreatedListener
 import cv.brulinski.sebastian.model.Language
-import cv.brulinski.sebastian.model.MyRecyclerItem
-import cv.brulinski.sebastian.utils.TYPE_ITEM
 import cv.brulinski.sebastian.utils.getBitmapsForObjects
 import kotlinx.android.synthetic.main.fragment_languages.*
 import setup
 
-class LanguagesFragment : Fragment() {
+open class LanguagesFragment : Fragment() {
 
-    companion object {
-        var viewPagerUtilsFragmentCreatedListener: ViewPagerUtilsFragmentCreatedListener? = null
-        fun newInstance(viewPagerUtilsFragmentCreatedListener: ViewPagerUtilsFragmentCreatedListener? = null): LanguagesFragment {
-            this.viewPagerUtilsFragmentCreatedListener = viewPagerUtilsFragmentCreatedListener
-            return LanguagesFragment()
-        }
-    }
+    private var dataProviderInterface: DataProviderInterface? = null
 
     private lateinit var languagesRecyclerAdapter: LanguagesRecyclerAdapter
 
@@ -35,19 +30,16 @@ class LanguagesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recyclerView.setup(LanguagesRecyclerAdapter().apply { languagesRecyclerAdapter = this })
-        viewPagerUtilsFragmentCreatedListener?.onFragmentCreated()
-    }
 
-    fun update(languages: List<Language>) {
-//        languagesRecyclerAdapter.items = languages.sortedBy { it.level }.reversed()
-//                .map { MyRecyclerItem(it, TYPE_ITEM) } as ArrayList<MyRecyclerItem<Language>>
-        getBitmapsForObjects(languages) {
-            languagesRecyclerAdapter.items = it
+        dataProviderInterface?.getLanguages{
+            getBitmapsForObjects(it) {
+                languagesRecyclerAdapter.items = it
+            }
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        viewPagerUtilsFragmentCreatedListener?.onFragmentDestroyed()
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        dataProviderInterface = context as? DataProviderInterface
     }
 }

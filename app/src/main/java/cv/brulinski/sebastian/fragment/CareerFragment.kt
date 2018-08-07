@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.adapter.recycler.career.CareerRecyclerAdapter
+import cv.brulinski.sebastian.interfaces.DataProviderInterface
 import cv.brulinski.sebastian.interfaces.OnItemClickListener
 import cv.brulinski.sebastian.interfaces.ViewPagerUtilsFragmentCreatedListener
 import cv.brulinski.sebastian.model.Career
@@ -19,24 +20,12 @@ import kotlinx.android.synthetic.main.fragment_career.*
 import setup
 import java.lang.ClassCastException
 
-class CareerFragment : Fragment() {
-
-    interface CareerFragmentCallback {
-    }
-
-    //Callback to parent activity
-    private lateinit var careerFragmentCallback: CareerFragmentCallback
+open class CareerFragment : Fragment() {
 
     //Career recycler adapter
     private var careerRecyclerAdapter: CareerRecyclerAdapter? = null
 
-    companion object {
-        var viewPagerUtilsFragmentCreatedListener: ViewPagerUtilsFragmentCreatedListener? = null
-        fun newInstance(viewPagerUtilsFragmentCreatedListener: ViewPagerUtilsFragmentCreatedListener? = null): CareerFragment {
-            this.viewPagerUtilsFragmentCreatedListener = viewPagerUtilsFragmentCreatedListener
-            return CareerFragment()
-        }
-    }
+    private var dataProviderInterface: DataProviderInterface? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -46,21 +35,21 @@ class CareerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupCareerRecycler()
-        viewPagerUtilsFragmentCreatedListener?.onFragmentCreated()
+
+        dataProviderInterface?.getCareer {
+            val items = arrayListOf<MyRecyclerItem<Career>>()
+            it.sortedBy { it.startTime.date() }.forEach {
+                val header = MyRecyclerItem(it, TYPE_HEADER)
+                val item = MyRecyclerItem(it, TYPE_ITEM)
+                items.add(header)
+                items.add(item)
+            }
+            if (careerRecyclerAdapter == null)
+                setupCareerRecycler()
+            careerRecyclerAdapter?.items = items
+        }
     }
 
-    fun update(career: List<Career>) {
-        val items = arrayListOf<MyRecyclerItem<Career>>()
-        career.sortedBy { it.startTime.date() }.forEach {
-            val header = MyRecyclerItem(it, TYPE_HEADER)
-            val item = MyRecyclerItem(it, TYPE_ITEM)
-            items.add(header)
-            items.add(item)
-        }
-        if (careerRecyclerAdapter == null)
-            setupCareerRecycler()
-        careerRecyclerAdapter?.items = items
-    }
 
     private fun setupCareerRecycler() {
         careerRecyclerAdapter = CareerRecyclerAdapter(object : OnItemClickListener {
@@ -72,15 +61,10 @@ class CareerFragment : Fragment() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        viewPagerUtilsFragmentCreatedListener?.onFragmentDestroyed()
-    }
-
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         try {
-            careerFragmentCallback = context as CareerFragmentCallback
+            dataProviderInterface = context as? DataProviderInterface
         } catch (e: ClassCastException) {
             throw ClassCastException("$context must implement CareerFragmentCallback")
         }
