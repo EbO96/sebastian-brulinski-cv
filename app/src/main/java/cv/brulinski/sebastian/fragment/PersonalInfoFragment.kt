@@ -7,13 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
+import com.facebook.shimmer.ShimmerFrameLayout
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.interfaces.DataProviderInterface
 import cv.brulinski.sebastian.utils.age
 import cv.brulinski.sebastian.utils.ageSufix
 import cv.brulinski.sebastian.utils.date
 import cv.brulinski.sebastian.utils.loadBitmapsIntoImageViews
-import kotlinx.android.synthetic.main.fragment_personal_info.*
+import kotlinx.android.synthetic.main.fragment_personal_info_1.*
 import java.lang.ClassCastException
 
 /*
@@ -24,18 +25,30 @@ open class PersonalInfoFragment : Fragment(), LifecycleOwner {
 
     private var dataProviderInterface: DataProviderInterface? = null
 
+    //Views
+    private val shimmers by lazy {
+        listOf(nameSurnameShimmer,
+                phoneShimmer,
+                emailShimmer,
+                addressShimmer,
+                birthShimmer)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_personal_info, container, false)
+        return inflater.inflate(R.layout.fragment_personal_info_1, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        shimmers.start()
         dataProviderInterface?.getPersonalInfo {
             it.apply {
+                shimmers.stop()
                 //Load profile picture
                 loadBitmapsIntoImageViews(Pair(profileImageView, profilePictureBase64))?.subscribe()
+
                 //Set information about me
                 val nameAndSurname = "$name $surname"
                 nameAndSurnameTextView?.text = nameAndSurname
@@ -58,6 +71,24 @@ open class PersonalInfoFragment : Fragment(), LifecycleOwner {
                         }
                 }
             }
+        }
+    }
+
+    /*
+    Private methods
+     */
+
+    private fun List<ShimmerFrameLayout>.start() {
+        this.forEach {
+            it.startShimmerAnimation()
+            it.visibility = View.VISIBLE
+        }
+    }
+
+    private fun List<ShimmerFrameLayout>.stop() {
+        this.forEach {
+            it.stopShimmerAnimation()
+            it.visibility = View.GONE
         }
     }
 

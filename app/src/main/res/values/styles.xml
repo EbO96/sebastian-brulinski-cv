@@ -120,4 +120,12 @@
     <style name="TextPlaceholderLight" parent="TextPlaceholder">
         <item name="android:background">@color/textPlaceholderLight</item>
     </style>
+
+    <style name="TextPlaceholderAltDark" parent="TextPlaceholder">
+        <item name="android:background">@color/colorPrimaryDark</item>
+    </style>
+
+    <style name="TextPlaceholderAltLight" parent="TextPlaceholder">
+        <item name="android:background">@color/colorPrimary</item>
+    </style>
 </resources>
