@@ -10,8 +10,10 @@ import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.adapter.recycler.skills.SkillsRecyclerAdapter
 import cv.brulinski.sebastian.interfaces.ParentActivityCallback
 import cv.brulinski.sebastian.utils.getBitmapsForObjects
+import gone
 import kotlinx.android.synthetic.main.fragment_skills.*
 import setup
+import visible
 
 /**
  * Fragment which is used for displaying list of my skills like
@@ -35,7 +37,10 @@ class SkillsFragment : Fragment() {
 
         parentActivityCallback?.getSkills {
             getBitmapsForObjects(it) {
-                skillsRecyclerAdapter?.items = it
+                if (it.isNotEmpty()) {
+                    noSkillsLayout.gone()
+                    skillsRecyclerAdapter?.items = it
+                } else noSkillsLayout.visible()
             }
         }
     }

@@ -10,8 +10,10 @@ import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.adapter.recycler.languages.LanguagesRecyclerAdapter
 import cv.brulinski.sebastian.interfaces.ParentActivityCallback
 import cv.brulinski.sebastian.utils.getBitmapsForObjects
+import gone
 import kotlinx.android.synthetic.main.fragment_languages.*
 import setup
+import visible
 
 /**
  * Fragment which is used for displaying list of languages
@@ -33,9 +35,12 @@ open class LanguagesFragment : Fragment() {
         recyclerView.setup(LanguagesRecyclerAdapter().apply { languagesRecyclerAdapter = this })
 
         parentActivityCallback?.getLanguages {
-                getBitmapsForObjects(it) {
+            getBitmapsForObjects(it) {
+                if (it.isNotEmpty()) {
+                    noLanguagesLayout.gone()
                     languagesRecyclerAdapter.items = it
-                }
+                } else noLanguagesLayout.visible()
+            }
         }
     }
 

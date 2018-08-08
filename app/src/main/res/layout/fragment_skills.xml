@@ -10,11 +10,22 @@
     app:layout_anchorGravity="top"
     tools:context=".fragment.SkillsFragment">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    </androidx.recyclerview.widget.RecyclerView>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <cv.brulinski.sebastian.view.EmptyListLayout
+            android:id="@+id/noSkillsLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:image="@drawable/ic_outline_star_24dp"
+            app:text="@string/skills" />
+
+    </FrameLayout>
 
 </androidx.core.widget.NestedScrollView>

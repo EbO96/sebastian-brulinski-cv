@@ -36,8 +36,10 @@ import cv.brulinski.sebastian.utils.view_pager.toPage
 import cv.brulinski.sebastian.view.LargeSnackbar
 import cv.brulinski.sebastian.view.SlideDrawer
 import cv.brulinski.sebastian.view_model.MainViewModel
+import gone
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
+import visible
 
 class MainActivity : AppCompatActivity(),
         Toolbar.OnMenuItemClickListener,
@@ -45,8 +47,10 @@ class MainActivity : AppCompatActivity(),
         OnFetchingStatuses,
         ParentActivityCallback {
 
-    //Persmissions request codes
-    private val REQUEST_CODE_MAKE_CALL = 1
+    //Permissions request codes
+    private val REQUEST_CODE_MAKE_CALL = 0
+    //Activity request codes
+    private val APP_SETTINGS_REQUEST_CODE = 1
     //ViewPager adapter
     private var mainActivityViewPagerAdapter: MainActivityViewPagerAdapter? = null
     //ViewModel
@@ -343,7 +347,8 @@ class MainActivity : AppCompatActivity(),
                 putExtra(Intent.EXTRA_EMAIL, email)
                 putExtra(Intent.EXTRA_SUBJECT, getString(R.string.email_subject))
                 resolveActivity(packageManager)?.let {
-                    startActivity(this)
+                    loadingLayout.visible()
+                    startActivityForResult(this, APP_SETTINGS_REQUEST_CODE)
                 }
             }
         }
@@ -381,6 +386,14 @@ class MainActivity : AppCompatActivity(),
                     // functionality that depends on this permission.
                 }
                 return
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        when (requestCode) {
+            APP_SETTINGS_REQUEST_CODE -> {
+                loadingLayout.gone()
             }
         }
     }

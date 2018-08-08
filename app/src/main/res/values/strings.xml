@@ -33,5 +33,6 @@
     <string name="email_subject">Kontakt w sprawie pracy</string>
     <string name="call_explanation">Aby wykonać połączenie musisz zezwolić na ich wykonywanie</string>
     <string name="explanation_line_content">Aby wykonywać połączenia musisz na nie najpierw zezwolić.</string>
-    <string name="warning">Uwaga</string>
+    <string name="warning">UWAGA</string>
+    <string name="empty">Pusto</string>
 </resources>

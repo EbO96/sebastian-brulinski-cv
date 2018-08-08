@@ -11,9 +11,21 @@
     app:layout_anchorGravity="top"
     tools:context=".fragment.LanguagesFragment">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <cv.brulinski.sebastian.view.EmptyListLayout
+            android:id="@+id/noLanguagesLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:image="@drawable/ic_outline_language_24dp"
+            app:text="@string/languages" />
+    </FrameLayout>
 
 </androidx.core.widget.NestedScrollView>

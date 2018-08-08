@@ -11,6 +11,7 @@
     <!-- Base - No action bar. -->
     <style name="AppThemeNoActionBar" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Customize your theme here. -->
+        <item name="android:fontFamily">@font/roboto</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -62,6 +63,7 @@
         <item name="android:textSize">16sp</item>
         <item name="android:textColor">@color/whiteBackgroundTextColor</item>
         <item name="android:textStyle">normal</item>
+        <item name="android:fontFamily">@font/roboto</item>
         <item name="android:textAlignment">textStart</item>
     </style>
 
@@ -149,5 +151,13 @@
         <item name="android:textColor">@color/colorAccent</item>
         <item name="android:fontFamily">@font/roboto</item>
         <item name="android:textSize">@dimen/snackbar_large_action_button_text_size</item>
+    </style>
+
+    <style name="EmptyListTextStyle" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">@color/textPlaceholder</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">@font/roboto</item>
+        <item name="android:textAlignment">gravity</item>
+        <item name="android:gravity">center_vertical|center_horizontal</item>
     </style>
 </resources>

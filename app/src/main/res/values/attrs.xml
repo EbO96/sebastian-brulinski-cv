@@ -9,13 +9,18 @@
         <attr name="dotMargin" format="dimension" />
         <attr name="levelDotColor" format="color" />
         <attr name="rangeDotColor" format="color" />
-        <attr name="level" format="integer"/>
-        <attr name="range" format="integer"/>
+        <attr name="level" format="integer" />
+        <attr name="range" format="integer" />
     </declare-styleable>
 
     <declare-styleable name="SlideDrawer">
         <attr name="mainContent" format="reference" />
         <attr name="closeButtonDrawable" format="reference" />
+    </declare-styleable>
+
+    <declare-styleable name="EmptyListLayout">
+        <attr name="image" format="reference" />
+        <attr name="text" format="string" />
     </declare-styleable>
 
 </resources>
