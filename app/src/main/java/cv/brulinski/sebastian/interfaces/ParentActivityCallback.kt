@@ -11,10 +11,12 @@ import cv.brulinski.sebastian.model.*
  * @see Language
  * @see Skill
  */
-interface DataProviderInterface {
+interface ParentActivityCallback {
     fun getWelcome(block: (Welcome) -> Unit)
     fun getPersonalInfo(block: (PersonalInfo) -> Unit)
     fun getCareer(block: (List<Career>) -> Unit)
     fun getLanguages(block: (List<Language>) -> Unit)
     fun getSkills(block: (List<Skill>) -> Unit)
+    fun tryMakeACall()
+    fun composeEmail()
 }

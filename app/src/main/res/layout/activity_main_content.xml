@@ -19,8 +19,8 @@
         android:layout_height="match_parent">
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:layout_width="match_parent"
             android:id="@+id/swipeRefreshLayout"
+            android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <androidx.viewpager.widget.ViewPager
@@ -34,7 +34,6 @@
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     </FrameLayout>
-
 
     <com.google.android.material.bottomappbar.BottomAppBar
         android:id="@+id/bar"

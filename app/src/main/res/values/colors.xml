@@ -11,4 +11,7 @@
     <color name="dimHard">#AA000000</color>
     <color name="textPlaceholder">#B0BEC5</color>
     <color name="textPlaceholderLight">#CFD8DC</color>
+    <color name="snackbarColor">#323232</color>
+    <color name="snackbarTextColor">#ffffffde</color>
+    <color name="snackbarTextColorLight">#aaffffde</color>
 </resources>

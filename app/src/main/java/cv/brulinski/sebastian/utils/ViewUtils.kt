@@ -43,3 +43,25 @@ fun TextView.setText(text: String, hideTextViewWhenTextEmpty: Boolean) {
     this.text = text
 
 }
+
+fun ViewGroup.removeViewSafe(view: View) {
+    indexOfChild(view).let { index ->
+        if (index != -1) removeViewAt(index)
+        else for (i in 0 until childCount) {
+            if (getChildAt(i).id == view.id)
+                removeViewAt(i)
+        }
+    }
+}
+
+fun View.visible() {
+    visibility = View.VISIBLE
+}
+
+fun View.invisible() {
+    visibility = View.INVISIBLE
+}
+
+fun View.gone() {
+    visibility = View.GONE
+}

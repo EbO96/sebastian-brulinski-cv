@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import com.facebook.shimmer.ShimmerFrameLayout
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.activity.MainActivity
-import cv.brulinski.sebastian.interfaces.DataProviderInterface
+import cv.brulinski.sebastian.interfaces.ParentActivityCallback
 import cv.brulinski.sebastian.utils.delay
 import kotlinx.android.synthetic.main.fragment_welcome.*
 import java.lang.ClassCastException
@@ -20,7 +20,7 @@ import java.lang.ClassCastException
  */
 open class WelcomeFragment : Fragment() {
 
-    private var dataProviderInterface: DataProviderInterface? = null
+    private var parentActivityCallback: ParentActivityCallback? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -35,7 +35,7 @@ open class WelcomeFragment : Fragment() {
         }
         //Show Shimmer text loading animation
         shimmerFrame.showShimmer()
-        dataProviderInterface?.getWelcome {
+        parentActivityCallback?.getWelcome {
             150L.delay {
                 shimmerFrame.hideShimmer()
                 welcomeContentTextView?.text = it.description
@@ -63,7 +63,7 @@ open class WelcomeFragment : Fragment() {
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         try {
-            dataProviderInterface = context as? DataProviderInterface
+            parentActivityCallback = context as? ParentActivityCallback
         } catch (e: ClassCastException) {
             throw ClassCastException("$context must implement WelcomeFragmentCallback")
         }

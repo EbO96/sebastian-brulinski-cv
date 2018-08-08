@@ -1,13 +1,20 @@
 package cv.brulinski.sebastian.activity
 
+import android.Manifest
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.StateListAnimator
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.transition.Fade
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -20,15 +27,15 @@ import cv.brulinski.sebastian.dependency_injection.component.DaggerPagesComponen
 import cv.brulinski.sebastian.dependency_injection.component.PagesComponent
 import cv.brulinski.sebastian.dependency_injection.module.PagesModule
 import cv.brulinski.sebastian.fragment.*
-import cv.brulinski.sebastian.interfaces.DataProviderInterface
 import cv.brulinski.sebastian.interfaces.OnFetchingStatuses
+import cv.brulinski.sebastian.interfaces.ParentActivityCallback
 import cv.brulinski.sebastian.model.*
 import cv.brulinski.sebastian.utils.*
 import cv.brulinski.sebastian.utils.view_pager.toLeft
 import cv.brulinski.sebastian.utils.view_pager.toPage
+import cv.brulinski.sebastian.view.LargeSnackbar
 import cv.brulinski.sebastian.view.SlideDrawer
 import cv.brulinski.sebastian.view_model.MainViewModel
-import inflate
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
 
@@ -36,8 +43,10 @@ class MainActivity : AppCompatActivity(),
         Toolbar.OnMenuItemClickListener,
         SwipeRefreshLayout.OnRefreshListener,
         OnFetchingStatuses,
-        DataProviderInterface {
+        ParentActivityCallback {
 
+    //Persmissions request codes
+    private val REQUEST_CODE_MAKE_CALL = 1
     //ViewPager adapter
     private var mainActivityViewPagerAdapter: MainActivityViewPagerAdapter? = null
     //ViewModel
@@ -195,9 +204,7 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
-    /*
-    Return form SettingsFragment
-     */
+    //Return form SettingsFragment
     private fun backFromSettings(): Boolean {
         val fragment = supportFragmentManager.findFragmentById(this@MainActivity.mainContainer.id)
         return if (fragment is SettingsFragment) {
@@ -213,9 +220,7 @@ class MainActivity : AppCompatActivity(),
 
     }
 
-    /*
-    Open settings screen
-     */
+    //Open settings screen
     private fun goToSettings() {
         SettingsFragment().apply {
             val fade = Fade()
@@ -230,6 +235,44 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
+    private fun PersonalInfo.makeACall() {
+        Intent(Intent.ACTION_CALL).apply {
+            data = Uri.parse("tel:$phoneNumber")
+            startActivity(this)
+        }
+    }
+
+    private fun requestForCallPermissions() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this@MainActivity,
+                        Manifest.permission.CALL_PHONE)) {
+            makeSnackBarCallExplanation()
+            // Show an explanation to the user *asynchronously* -- don't block
+            // this thread waiting for the user's response! After the user
+            // sees the explanation, try again to request the permission.
+        } else {
+            // No explanation needed, we can request the permission.
+            ActivityCompat.requestPermissions(this@MainActivity,
+                    arrayOf(Manifest.permission.CALL_PHONE),
+                    REQUEST_CODE_MAKE_CALL)
+        }
+    }
+
+    private fun makeSnackBarCallExplanation() {
+        LargeSnackbar.getInstance().apply {
+            show(mainContent, fab, getString(R.string.warning), getString(R.string.explanation_line_content), LargeSnackbar.Duration.LONG, R.string.settings.string()) {
+                goToAppSettings()
+            }
+        }
+    }
+
+    private fun goToAppSettings() {
+        val permissionSettingsIntent = Intent()
+        permissionSettingsIntent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+        val uri = Uri.fromParts("package", packageName, null)
+        permissionSettingsIntent.data = uri
+        startActivity(permissionSettingsIntent)
+    }
+
     /*
     Override methods
      */
@@ -238,22 +281,19 @@ class MainActivity : AppCompatActivity(),
     Fetching data statuses
      */
     override fun onFetchStart() {
-        MAIN_ACTIVITY.log("start")
     }
 
     override fun onFetchEnd() {
         swipeRefreshLayout.isRefreshing = false
-        MAIN_ACTIVITY.log("end")
     }
 
     override fun onFetchError(error: Throwable) {
         swipeRefreshLayout.isRefreshing = false
-        MAIN_ACTIVITY.log("error")
         R.string.data_fetching_error.string().toast()
     }
 
     /*
-    DataProviderInterface callback's
+    ParentActivityCallback callback's
      */
     override fun getWelcome(block: (Welcome) -> Unit) {
         welcome.observe(this, Observer {
@@ -285,6 +325,30 @@ class MainActivity : AppCompatActivity(),
         })
     }
 
+    override fun tryMakeACall() {
+        if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.CALL_PHONE)
+                != PackageManager.PERMISSION_GRANTED) {
+            //Permission is not granted
+            requestForCallPermissions()
+        } else {
+            //Permission granted
+            personalInfo.value?.makeACall()
+        }
+    }
+
+    override fun composeEmail() {
+        personalInfo.value?.apply {
+            Intent(Intent.ACTION_SENDTO).apply {
+                data = Uri.parse("mailto:$email")
+                putExtra(Intent.EXTRA_EMAIL, email)
+                putExtra(Intent.EXTRA_SUBJECT, getString(R.string.email_subject))
+                resolveActivity(packageManager)?.let {
+                    startActivity(this)
+                }
+            }
+        }
+    }
+
     override fun onRefresh() {
         mainViewModel?.refreshAll()
     }
@@ -294,7 +358,31 @@ class MainActivity : AppCompatActivity(),
             goToSettings()
             true
         }
+        R.id.call -> {
+            tryMakeACall()
+            true
+        }
+        R.id.mail -> {
+            composeEmail()
+            true
+        }
         else -> false
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        MAIN_ACTIVITY.log("on request permissions result")
+        when (requestCode) {
+            REQUEST_CODE_MAKE_CALL -> {
+                // If request is cancelled, the result arrays are empty.
+                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    personalInfo.value?.makeACall()
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return
+            }
+        }
     }
 
     override fun onBackPressed() {

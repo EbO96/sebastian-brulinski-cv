@@ -9,12 +9,12 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import com.facebook.shimmer.ShimmerFrameLayout
 import cv.brulinski.sebastian.R
-import cv.brulinski.sebastian.interfaces.DataProviderInterface
+import cv.brulinski.sebastian.interfaces.ParentActivityCallback
 import cv.brulinski.sebastian.utils.age
 import cv.brulinski.sebastian.utils.ageSufix
 import cv.brulinski.sebastian.utils.date
 import cv.brulinski.sebastian.utils.loadBitmapsIntoImageViews
-import kotlinx.android.synthetic.main.fragment_personal_info_1.*
+import kotlinx.android.synthetic.main.fragment_personal_info.*
 import java.lang.ClassCastException
 
 /*
@@ -23,7 +23,7 @@ with information like phone number, email address, live address, born date
  */
 open class PersonalInfoFragment : Fragment(), LifecycleOwner {
 
-    private var dataProviderInterface: DataProviderInterface? = null
+    private var parentActivityCallback: ParentActivityCallback? = null
 
     //Views
     private val shimmers by lazy {
@@ -36,16 +36,16 @@ open class PersonalInfoFragment : Fragment(), LifecycleOwner {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_personal_info_1, container, false)
+        return inflater.inflate(R.layout.fragment_personal_info, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         shimmers.start()
-        dataProviderInterface?.getPersonalInfo {
+        parentActivityCallback?.getPersonalInfo {
+            shimmers.stop()
             it.apply {
-                shimmers.stop()
                 //Load profile picture
                 loadBitmapsIntoImageViews(Pair(profileImageView, profilePictureBase64))?.subscribe()
 
@@ -71,6 +71,14 @@ open class PersonalInfoFragment : Fragment(), LifecycleOwner {
                         }
                 }
             }
+        }
+
+        phoneFrame.setOnClickListener {
+            parentActivityCallback?.tryMakeACall()
+        }
+
+        emailFrame.setOnClickListener {
+            parentActivityCallback?.composeEmail()
         }
     }
 
@@ -98,7 +106,7 @@ open class PersonalInfoFragment : Fragment(), LifecycleOwner {
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         try {
-            dataProviderInterface = context as? DataProviderInterface
+            parentActivityCallback = context as? ParentActivityCallback
         } catch (e: ClassCastException) {
             throw ClassCastException("$context must implement PersonalInfoCallback")
         }

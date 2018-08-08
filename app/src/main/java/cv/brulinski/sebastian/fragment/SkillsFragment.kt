@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.adapter.recycler.skills.SkillsRecyclerAdapter
-import cv.brulinski.sebastian.interfaces.DataProviderInterface
+import cv.brulinski.sebastian.interfaces.ParentActivityCallback
 import cv.brulinski.sebastian.utils.getBitmapsForObjects
 import kotlinx.android.synthetic.main.fragment_skills.*
 import setup
@@ -22,7 +22,7 @@ class SkillsFragment : Fragment() {
     //Recycler adapter
     private var skillsRecyclerAdapter: SkillsRecyclerAdapter? = null
 
-    private var dataProviderInterface: DataProviderInterface? = null
+    private var parentActivityCallback: ParentActivityCallback? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -33,7 +33,7 @@ class SkillsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupSkillsRecycler()
 
-        dataProviderInterface?.getSkills {
+        parentActivityCallback?.getSkills {
             getBitmapsForObjects(it) {
                 skillsRecyclerAdapter?.items = it
             }
@@ -54,6 +54,6 @@ class SkillsFragment : Fragment() {
      */
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        dataProviderInterface = context as? DataProviderInterface
+        parentActivityCallback = context as? ParentActivityCallback
     }
 }

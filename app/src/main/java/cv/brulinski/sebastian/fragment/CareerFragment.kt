@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.adapter.recycler.career.CareerRecyclerAdapter
-import cv.brulinski.sebastian.interfaces.DataProviderInterface
+import cv.brulinski.sebastian.interfaces.ParentActivityCallback
 import cv.brulinski.sebastian.interfaces.OnItemClickListener
 import cv.brulinski.sebastian.model.Career
 import cv.brulinski.sebastian.model.MyRecyclerItem
@@ -28,7 +28,7 @@ open class CareerFragment : Fragment() {
     //Career recycler adapter
     private var careerRecyclerAdapter: CareerRecyclerAdapter? = null
 
-    private var dataProviderInterface: DataProviderInterface? = null
+    private var parentActivityCallback: ParentActivityCallback? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -40,17 +40,17 @@ open class CareerFragment : Fragment() {
 
         setupCareerRecycler()
 
-        dataProviderInterface?.getCareer {
-            val items = arrayListOf<MyRecyclerItem<Career>>()
-            //Make list of career
-            it.sortedBy { it.startTime.date() }.forEach {
-                val header = MyRecyclerItem(it, TYPE_HEADER)
-                val item = MyRecyclerItem(it, TYPE_ITEM)
-                items.add(header)
-                items.add(item)
-            }
+        parentActivityCallback?.getCareer {
+                val items = arrayListOf<MyRecyclerItem<Career>>()
+                //Make list of career
+                it.sortedBy { it.startTime.date() }.forEach {
+                    val header = MyRecyclerItem(it, TYPE_HEADER)
+                    val item = MyRecyclerItem(it, TYPE_ITEM)
+                    items.add(header)
+                    items.add(item)
+                }
 
-            careerRecyclerAdapter?.items = items
+                careerRecyclerAdapter?.items = items
         }
     }
 
@@ -74,7 +74,7 @@ open class CareerFragment : Fragment() {
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         try {
-            dataProviderInterface = context as? DataProviderInterface
+            parentActivityCallback = context as? ParentActivityCallback
         } catch (e: ClassCastException) {
             throw ClassCastException("$context must implement CareerFragmentCallback")
         }

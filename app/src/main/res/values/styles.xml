@@ -128,4 +128,26 @@
     <style name="TextPlaceholderAltLight" parent="TextPlaceholder">
         <item name="android:background">@color/colorPrimary</item>
     </style>
+
+    <style name="SnackbarLargeStyle" parent="Base.CardView">
+        <item name="cardBackgroundColor">@color/snackbarColor</item>
+        <item name="cardElevation">@dimen/snackbar_large_elevation</item>
+        <item name="cardCornerRadius">@dimen/snackbar_large_corners</item>
+    </style>
+
+    <style name="SnackbarTextAppearance" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">@color/snackbarTextColor</item>
+        <item name="android:textSize">@dimen/snackbar_large_text_size</item>
+    </style>
+
+    <style name="SnackbarTextAppearanceLight" parent="SnackbarTextAppearance">
+        <item name="android:textColor">@color/snackbarTextColorLight</item>
+        <item name="android:textSize">@dimen/snackbar_large_text_size</item>
+    </style>
+
+    <style name="SnackbarActionButtonTextAppearance" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:fontFamily">@font/roboto</item>
+        <item name="android:textSize">@dimen/snackbar_large_action_button_text_size</item>
+    </style>
 </resources>

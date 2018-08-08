@@ -24,8 +24,8 @@ class SettingsFragment : androidx.fragment.app.Fragment() {
 
         fetchGraphicsSwitch.apply {
             isChecked = settings.fetchGraphics //set the switch state
-            setOnCheckedChangeListener { compoundButton, b ->
-                settings.fetchGraphics = b //set the preferences
+            setOnCheckedChangeListener { _, checked ->
+                settings.fetchGraphics = checked //set the preferences
             }
         }
     }
