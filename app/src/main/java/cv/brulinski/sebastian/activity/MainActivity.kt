@@ -132,6 +132,8 @@ class MainActivity : AppCompatActivity(),
         bar.setOnMenuItemClickListener(this)
 
         swipeRefreshLayout.setOnRefreshListener(this)
+
+
     }
 
     /*

@@ -17,6 +17,7 @@ class Language : BitmapLoadable {
     @SerializedName("id")
     var id = ""
 
+
     @ColumnInfo(name = "name")
     @SerializedName("name")
     var name = ""

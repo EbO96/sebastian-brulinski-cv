@@ -6,7 +6,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import cv.brulinski.sebastian.R.string
+import cv.brulinski.sebastian.annotations.Crypto
+import cv.brulinski.sebastian.crypto.CryptoOperations
 import cv.brulinski.sebastian.interfaces.BitmapLoadable
+import cv.brulinski.sebastian.interfaces.CryptoClass
 import cv.brulinski.sebastian.interfaces.OnFetchingStatuses
 import cv.brulinski.sebastian.interfaces.OnGetCvObjects
 import cv.brulinski.sebastian.model.*
@@ -15,6 +18,7 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import java.util.*
 
 /**
  * Provides all required data for application
@@ -25,6 +29,7 @@ open class MainRepository<T : OnFetchingStatuses>(private val listener: T?) {
 
     private val myCv = MutableLiveData<MyCv>()
     private val disposables = ArrayList<Disposable>()
+    private val cryptoOperations = CryptoOperations()
 
     companion object {
         val errorImageUrl by lazy { string.error_image_url.string() }
@@ -32,6 +37,7 @@ open class MainRepository<T : OnFetchingStatuses>(private val listener: T?) {
     }
 
     fun getCv(): LiveData<MyCv> {
+
         val cvFetchDisposable = fetchAllFromDatabase()
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -275,4 +281,43 @@ open class MainRepository<T : OnFetchingStatuses>(private val listener: T?) {
     private fun (String?).checkUrl(): String {
         return this.let { if (it.isNullOrBlank()) errorImageUrl else it } ?: errorImageUrl
     }
+
+    private fun String.encrypt() = cryptoOperations.encrypt(this)
+
+    private fun <T : CryptoClass> encrypt(toEncrypt: T?) {
+        if (toEncrypt is Any) {
+            toEncrypt.javaClass.declaredFields.filter { it.isAnnotationPresent(Crypto::class.java) }.forEach {
+                it.isAccessible = true
+                val field = it.get(toEncrypt)
+                if (field is Collection<*>) {
+                    field.apply {
+                        forEach {
+                            it?.let { listElement ->
+                                //encrypt(listElement as? CryptoClass)
+                            }
+                        }
+                    }
+                } else {
+                    field.javaClass.declaredFields.filter { it.isAnnotationPresent(Crypto::class.java) }.forEach {
+                        it?.apply {
+                            it.isAccessible = true
+                            val encrypted = (this.get(field) as? String)?.encrypt()
+                            this.set(field, encrypted)
+                        }
+                    }
+                }
+            }
+        }
+    }
+//
+//    private fun MyCv.encrypt() {
+//        cryptoOperations.apply {
+//            welcome?.javaClass?.declaredFields?.filter { it.isAnnotationPresent(Crypto::class.java) }
+//                    ?.forEach {
+//
+//                    }
+//        }
+//        val t = ""
+//    }
 }
+

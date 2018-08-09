@@ -1,20 +1,30 @@
 package cv.brulinski.sebastian.model
 
 import com.google.gson.annotations.SerializedName
+import cv.brulinski.sebastian.annotations.Crypto
+import cv.brulinski.sebastian.interfaces.CryptoClass
 import cv.brulinski.sebastian.interfaces.OnGetCvObjects
 
-class MyCv : OnGetCvObjects {
+class MyCv : OnGetCvObjects, CryptoClass {
 
     @SerializedName("status")
     var status = -1
+
+    @Crypto
     @SerializedName("welcome")
     var welcome: Welcome? = Welcome()
+
+    @Crypto
     @SerializedName("personal_info")
     var personalInfo: PersonalInfo? = PersonalInfo()
+
+    @Crypto
     @SerializedName("career")
     var career: List<Career>? = listOf()
+
     @SerializedName("languages")
     var languages: List<Language>? = listOf()
+
     @SerializedName("skills")
     var skills: List<Skill>? = listOf()
 

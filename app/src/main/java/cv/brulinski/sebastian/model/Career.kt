@@ -8,6 +8,7 @@ import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import cv.brulinski.sebastian.annotations.Crypto
 import cv.brulinski.sebastian.utils.TYPE_ITEM
 
 @Entity
@@ -26,30 +27,37 @@ class Career() : RecyclerItem(), Cloneable, Parcelable {
     @ColumnInfo(name = "type")
     var type = -1
 
+    @Crypto
     @SerializedName("placeName")
     @ColumnInfo(name = "placeName")
     var placeName = ""
 
+    @Crypto
     @SerializedName("function")
     @ColumnInfo(name = "function")
     var function = ""
 
+    @Crypto
     @SerializedName("description")
     @ColumnInfo(name = "description")
     var description = ""
 
+    @Crypto
     @SerializedName("startTimeDescription")
     @ColumnInfo(name = "startTimeDescription")
     var startTimeDescription = ""
 
+    @Crypto
     @SerializedName("startTime")
     @ColumnInfo(name = "startTime")
     var startTime = ""
 
+    @Crypto
     @SerializedName("endTimeDescription")
     @ColumnInfo(name = "endTimeDescription")
     var endTimeDescription = ""
 
+    @Crypto
     @SerializedName("endTime")
     @ColumnInfo(name = "endTime")
     var endTime = ""
