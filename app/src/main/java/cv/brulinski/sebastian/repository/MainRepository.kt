@@ -47,8 +47,8 @@ open class MainRepository<T : OnFetchingStatuses>(private val listener: T?) {
                         dbNotEmpty = it != -1L
                     }
                     if (dbNotEmpty) {
-                        doAsync {
-                            myCv.postValue(doCrypto(cv, false))
+                        doCrypto(cv, false)?.let {
+                            myCv.value = it
                         }
                     } else {
                         fetchCv()
@@ -103,11 +103,10 @@ open class MainRepository<T : OnFetchingStatuses>(private val listener: T?) {
                     listener?.onFetchEnd()
                 }
                 .subscribe({
+                    myCv.value = it
                     doAsync {
-                        myCv.postValue(it)
-                        doCrypto(it.clone(), true)?.insert()
+                        doCrypto(myCv.value, true)?.insert()
                     }
-
                 }, {
                     listener?.onFetchError(it)
                 })
@@ -293,7 +292,7 @@ open class MainRepository<T : OnFetchingStatuses>(private val listener: T?) {
         if (toEncrypt is Any) {
             toEncrypt.javaClass.declaredFields.filter { it.isAnnotationPresent(Crypto::class.java) }.forEach {
                 it.isAccessible = true
-                val field = it.get(toEncrypt)
+                val field = it.get(toEncrypt).javaClass.newInstance()
                 if (field is Collection<*>) {
                     field.apply {
                         forEach {
@@ -316,15 +315,5 @@ open class MainRepository<T : OnFetchingStatuses>(private val listener: T?) {
         }
         return toEncrypt
     }
-//
-//    private fun MyCv.encrypt() {
-//        cryptoOperations.apply {
-//            welcome?.javaClass?.declaredFields?.filter { it.isAnnotationPresent(Crypto::class.java) }
-//                    ?.forEach {
-//
-//                    }
-//        }
-//        val t = ""
-//    }
 }
 

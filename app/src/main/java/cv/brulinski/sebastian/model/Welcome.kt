@@ -10,7 +10,7 @@ import cv.brulinski.sebastian.annotations.Crypto
  * Welcome screen content
  */
 @Entity
-class Welcome : Any() {
+class Welcome {
 
     @PrimaryKey
     @ColumnInfo(name = "id")
