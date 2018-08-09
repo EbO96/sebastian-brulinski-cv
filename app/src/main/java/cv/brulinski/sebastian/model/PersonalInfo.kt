@@ -81,7 +81,6 @@ class PersonalInfo {
     @ColumnInfo(name = " profileBcgUrl")
     @SerializedName("profileBcgUrl")
     var profileBcgUrl = ""
-    @Crypto
     @Expose
     @ColumnInfo(name = "profilePictureBase64")
     var profilePictureBase64: String? = ""

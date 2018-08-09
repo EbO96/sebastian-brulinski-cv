@@ -32,7 +32,6 @@ class CryptoOperations {
     private val RSA_KEY_SIZE = 2048
     private var keyStore: KeyStore
     private var myPrivateKeyPreferences: MyPrivateKeyPreferences
-    private var secretKey: SecretKeySpec? = null
     private var myKey: MyKey
 
     init {
@@ -42,11 +41,66 @@ class CryptoOperations {
         myPrivateKeyPreferences = MyPrivateKeyPreferences()
 
         if (!isKeyExistsInKeyStore()) {
-            saveKey() //Jeżeli w KeyStore nie ma naszych kluczy
+            saveKey()
         }
 
         myKey = getKey()
     }
+
+    /*
+    Public methods
+     */
+
+    /**
+     * Encrypt data using AES key
+     * @property strToEncrypt is string data to encrypt
+     * @return encrypted data
+     */
+    fun encrypt(strToEncrypt: String?): String {
+        strToEncrypt?.let {
+            myKey.key?.apply {
+                try {
+                    val secretKey = SecretKeySpec(this, "AES")
+                    val cipher = Cipher.getInstance(myKey.cipherTransformation)
+                    val ivParameterSpec = IvParameterSpec(myKey.vector)
+
+                    cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec)
+                    return Base64.encodeToString(cipher.doFinal(strToEncrypt.toByteArray(charset("UTF-8"))), Base64.NO_WRAP)
+
+                } catch (e: Exception) {
+                    println("Error while encrypting: " + e.toString())
+                }
+            }
+        }
+
+        return ""
+    }
+
+    /**
+     * Decrypt data using AES key
+     * @property strToDecrypt is string data to decrypt
+     * @return decrypted data
+     */
+    fun decrypt(strToDecrypt: String?): String {
+        myKey.key?.apply {
+            try {
+                val secretKey = SecretKeySpec(this, "AES")
+                val cipher = Cipher.getInstance(myKey.cipherTransformation)
+                val ivParameterSpec = IvParameterSpec(myKey.vector)
+
+                cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec)
+                return String(cipher.doFinal(android.util.Base64.decode(strToDecrypt, android.util.Base64.NO_WRAP)))
+
+            } catch (e: Exception) {
+                println("Error while decrypting: " + e.toString())
+            }
+        }
+        return ""
+    }
+
+    /*
+    Private methods and classes
+     */
 
     private fun isKeyExistsInKeyStore(): Boolean {
         var exists = false
@@ -63,81 +117,9 @@ class CryptoOperations {
         return exists
     }
 
-    @Throws(InvalidAlgorithmParameterException::class, NoSuchAlgorithmException::class, NoSuchProviderException::class, IllegalBlockSizeException::class, InvalidKeyException::class, BadPaddingException::class, NoSuchPaddingException::class, UnrecoverableEntryException::class, KeyStoreException::class, CertificateException::class, IOException::class)
-    private fun saveKey() {
-        generateKeyStoreKey()
-        val aesKey = generateAESKey()
-        val plainAesKey = aesKey.getEncoded()
-        val plainIv = getIV(aesKey)
-        val encryptedAes = encryptAesKey(plainAesKey, getRSAPublicKey())
-        val encryptedIv = encryptAesKey(plainIv, getRSAPublicKey())
-        myPrivateKeyPreferences.saveKey(encryptedAes, encryptedIv)
-    }
-
-    @Throws(UnrecoverableEntryException::class, NoSuchAlgorithmException::class, KeyStoreException::class)
-    private fun getRSAPublicKey(): PublicKey {
-        return getKeyEntry().getCertificate().getPublicKey()
-    }
-
-
-    @Throws(UnrecoverableEntryException::class, NoSuchAlgorithmException::class, KeyStoreException::class)
-    private fun getKeyEntry(): KeyStore.PrivateKeyEntry {
-        return keyStore.getEntry(KEYSTORE_ALIAS, null) as KeyStore.PrivateKeyEntry
-    }
-
-    @Throws(NoSuchAlgorithmException::class)
-    private fun generateAESKey(): Key {
-        val keyGenerator = KeyGenerator.getInstance(PREFERENCES_KEY_ALGORITHM)
-        val secureRandom = SecureRandom()
-        keyGenerator.init(AES_KEY_SIZE, secureRandom)
-        return keyGenerator.generateKey()
-    }
-
-    @Throws(NoSuchAlgorithmException::class, NoSuchPaddingException::class, InvalidKeyException::class)
-    private fun getIV(aesKey: Key): ByteArray {
-        val cipher = Cipher.getInstance(cipherAESTransformation)
-        cipher.init(Cipher.ENCRYPT_MODE, aesKey)
-        return cipher.iv
-    }
-
-    /**
-     * Zaszyfruj klucz AES przy pomocy klucza publicznego RSA z Android KeyStore
-     *
-     * @param plainAesKey  niezaszyfrowany klucz AES
-     * @param rsaPublicKey klucz publiczy RSA z Android KeyStore
-     * @return zaszyfrowany klucz AES
-     */
-    @Throws(NoSuchAlgorithmException::class, NoSuchPaddingException::class, InvalidKeyException::class, BadPaddingException::class, IllegalBlockSizeException::class, NoSuchProviderException::class)
-    private fun encryptAesKey(plainAesKey: ByteArray, rsaPublicKey: PublicKey): String {
-        val cipher = getCipherInstance(true)
-        cipher.init(Cipher.ENCRYPT_MODE, rsaPublicKey)
-        val encryptedAes = cipher.doFinal(plainAesKey)
-        return Base64.encodeToString(encryptedAes, Base64.NO_WRAP)
-    }
-
-    /**
-     * Odszyfruj klucz AES przy pomocy klucza prywatnego RSA z Android KeyStore
-     *
-     * @param encryptedAesKey zaszyfrowany klucz AES
-     * @param rsaPrivateKey   klucz publiczprywatny RSA z Android KeyStore
-     * @return odszyforwany klucz AES
-     */
-    @Throws(NoSuchPaddingException::class, NoSuchAlgorithmException::class, InvalidKeyException::class, BadPaddingException::class, IllegalBlockSizeException::class, NoSuchProviderException::class)
-    private fun decryptAesKey(encryptedAesKey: ByteArray, rsaPrivateKey: PrivateKey): String {
-        val cipher = getCipherInstance(false)
-        cipher.init(Cipher.DECRYPT_MODE, rsaPrivateKey)
-        val decryptedAes = cipher.doFinal(encryptedAesKey)
-        return Base64.encodeToString(decryptedAes, Base64.NO_WRAP)
-    }
-
-    @Throws(NoSuchPaddingException::class, NoSuchAlgorithmException::class, NoSuchProviderException::class)
-    private fun getCipherInstance(encrypting: Boolean): Cipher {
-        return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || encrypting)
-            Cipher.getInstance(cipherRSATransformation, cipherProvider)
-        else
-            Cipher.getInstance(cipherRSATransformation)
-    }
-
+    /*
+    * Generate new RSA key and put this key into AndroidKeyStore
+    */
     @Throws(NoSuchProviderException::class, NoSuchAlgorithmException::class, InvalidAlgorithmParameterException::class)
     private fun generateKeyStoreKey() {
 
@@ -177,56 +159,113 @@ class CryptoOperations {
 
         kpGenerator.initialize(spec)
         kpGenerator.generateKeyPair()
-
     }
 
-    private fun setKey(key2: ByteArray) {
-        secretKey = SecretKeySpec(key2, "AES")
+    /**
+     * Generate new AES key to encrypt and decrypt data
+     */
+    @Throws(NoSuchAlgorithmException::class)
+    private fun generateAESKey(): Key {
+        val keyGenerator = KeyGenerator.getInstance(PREFERENCES_KEY_ALGORITHM)
+        val secureRandom = SecureRandom()
+        keyGenerator.init(AES_KEY_SIZE, secureRandom)
+        return keyGenerator.generateKey()
     }
 
-    fun encrypt(strToEncrypt: String?): String {
-        strToEncrypt?.let{
-            myKey.key?.apply {
-                try {
-
-                    setKey(this)
-
-                    val cipher = Cipher.getInstance(myKey.cipherTransformation)
-                    val ivParameterSpec = IvParameterSpec(myKey.vector)
-
-                    cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec)
-                    return Base64.encodeToString(cipher.doFinal(strToEncrypt.toByteArray(charset("UTF-8"))), Base64.NO_WRAP)
-
-                } catch (e: Exception) {
-                    println("Error while encrypting: " + e.toString())
-                }
-            }
-        }
-
-        return ""
+    /**
+     * Get IV based on previously generated AES key
+     */
+    @Throws(NoSuchAlgorithmException::class, NoSuchPaddingException::class, InvalidKeyException::class)
+    private fun getIV(aesKey: Key): ByteArray {
+        val cipher = Cipher.getInstance(cipherAESTransformation)
+        cipher.init(Cipher.ENCRYPT_MODE, aesKey)
+        return cipher.iv
     }
 
-    fun decrypt(strToDecrypt: String?): String {
-        myKey.key?.apply {
-            try {
-
-                setKey(this)
-
-                val cipher = Cipher.getInstance(myKey.cipherTransformation)
-                val ivParameterSpec = IvParameterSpec(myKey.vector)
-
-                cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec)
-                return String(cipher.doFinal(android.util.Base64.decode(strToDecrypt, android.util.Base64.NO_WRAP)))
-
-            } catch (e: Exception) {
-                println("Error while decrypting: " + e.toString())
-            }
-        }
-        return ""
+    /**
+     * Generate AES key, encrypt and save into preferences
+     */
+    @Throws(InvalidAlgorithmParameterException::class, NoSuchAlgorithmException::class, NoSuchProviderException::class, IllegalBlockSizeException::class, InvalidKeyException::class, BadPaddingException::class, NoSuchPaddingException::class, UnrecoverableEntryException::class, KeyStoreException::class, CertificateException::class, IOException::class)
+    private fun saveKey() {
+        generateKeyStoreKey()
+        val aesKey = generateAESKey()
+        val plainAesKey = aesKey.encoded
+        val plainIv = getIV(aesKey)
+        val encryptedAes = encryptAesKey(plainAesKey, getRSAPublicKey())
+        val encryptedIv = encryptAesKey(plainIv, getRSAPublicKey())
+        myPrivateKeyPreferences.saveKey(encryptedAes, encryptedIv)
     }
 
+    /**
+     * Get RSA public key from KeyStore
+     */
+    @Throws(UnrecoverableEntryException::class, NoSuchAlgorithmException::class, KeyStoreException::class)
+    private fun getRSAPublicKey(): PublicKey {
+        return getKeyEntry().certificate.publicKey
+    }
+
+    /**
+     * Get RSA private key from KeyStore
+     */
+    @Throws(UnrecoverableEntryException::class, NoSuchAlgorithmException::class, KeyStoreException::class)
+    private fun getRSAPrivateKey(): PrivateKey {
+        return getKeyEntry().privateKey
+    }
+
+    /**
+     * Get key entry from KeyStore
+     */
+    @Throws(UnrecoverableEntryException::class, NoSuchAlgorithmException::class, KeyStoreException::class)
+    private fun getKeyEntry(): KeyStore.PrivateKeyEntry {
+        return keyStore.getEntry(KEYSTORE_ALIAS, null) as KeyStore.PrivateKeyEntry
+    }
+
+    /**
+     *  Encrypt AES key by RSA key from KeyStore
+     *
+     * @param plainAesKey  plain AES key
+     * @param rsaPublicKey RSA public key from AndroidKeyStore
+     * @return encrypted AES key
+     */
+    @Throws(NoSuchAlgorithmException::class, NoSuchPaddingException::class, InvalidKeyException::class, BadPaddingException::class, IllegalBlockSizeException::class, NoSuchProviderException::class)
+    private fun encryptAesKey(plainAesKey: ByteArray, rsaPublicKey: PublicKey): String {
+        val cipher = getCipherInstance(true)
+        cipher.init(Cipher.ENCRYPT_MODE, rsaPublicKey)
+        val encryptedAes = cipher.doFinal(plainAesKey)
+        return Base64.encodeToString(encryptedAes, Base64.NO_WRAP)
+    }
+
+    /**
+     * Decrypt AES key by RSA key from AndroidKeyStore
+     *
+     * @param encryptedAesKey encrypted AES key
+     * @param rsaPrivateKey   RSA provate key from AndroidKeyStore
+     * @return decrypted AES key
+     */
+    @Throws(NoSuchPaddingException::class, NoSuchAlgorithmException::class, InvalidKeyException::class, BadPaddingException::class, IllegalBlockSizeException::class, NoSuchProviderException::class)
+    private fun decryptAesKey(encryptedAesKey: ByteArray, rsaPrivateKey: PrivateKey): String {
+        val cipher = getCipherInstance(false)
+        cipher.init(Cipher.DECRYPT_MODE, rsaPrivateKey)
+        val decryptedAes = cipher.doFinal(encryptedAesKey)
+        return Base64.encodeToString(decryptedAes, Base64.NO_WRAP)
+    }
+
+    /**
+     * Get cipher instance
+     */
+    @Throws(NoSuchPaddingException::class, NoSuchAlgorithmException::class, NoSuchProviderException::class)
+    private fun getCipherInstance(encrypting: Boolean): Cipher {
+        return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || encrypting)
+            Cipher.getInstance(cipherRSATransformation, cipherProvider)
+        else
+            Cipher.getInstance(cipherRSATransformation)
+    }
+
+    /**
+     * Get encrypted AES key from preferences and decrypt this key using RSA private key from AndroidKeyStore
+     */
     @Throws(IllegalBlockSizeException::class, InvalidKeyException::class, BadPaddingException::class, NoSuchAlgorithmException::class, NoSuchPaddingException::class, UnrecoverableEntryException::class, KeyStoreException::class, NoSuchProviderException::class, IOException::class, CertificateException::class)
-    fun getKey(): MyKey {
+    private fun getKey(): MyKey {
 
         val myKey = myPrivateKeyPreferences.getKey()
         val rsaPrivateKey = getRSAPrivateKey()
@@ -241,11 +280,9 @@ class CryptoOperations {
         return myKey
     }
 
-    @Throws(UnrecoverableEntryException::class, NoSuchAlgorithmException::class, KeyStoreException::class)
-    private fun getRSAPrivateKey(): PrivateKey {
-        return getKeyEntry().privateKey
-    }
-
+    /**
+     * Class used to save and retrieve AES key from preferences
+     */
     private inner class MyPrivateKeyPreferences {
         private val keyAES = "d_v"
         private val keyIV = "d_vv"
@@ -271,7 +308,10 @@ class CryptoOperations {
         }
     }
 
-    inner class MyKey {
+    /**
+     * Ready to use AES key
+     */
+    private inner class MyKey {
         var key: ByteArray? = null
         var vector: ByteArray? = null
         var cipherTransformation: String? = null

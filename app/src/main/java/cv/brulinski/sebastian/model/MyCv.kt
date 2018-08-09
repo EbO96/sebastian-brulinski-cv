@@ -5,7 +5,7 @@ import cv.brulinski.sebastian.annotations.Crypto
 import cv.brulinski.sebastian.interfaces.CryptoClass
 import cv.brulinski.sebastian.interfaces.OnGetCvObjects
 
-class MyCv : OnGetCvObjects, CryptoClass {
+class MyCv : OnGetCvObjects, CryptoClass, Cloneable {
 
     @SerializedName("status")
     var status = -1
@@ -33,4 +33,8 @@ class MyCv : OnGetCvObjects, CryptoClass {
     override fun getTypeCareer(): List<Career>? = career
 
     override fun getTypeLanguages(): List<Language>? = languages
+
+    public override fun clone(): MyCv {
+        return super.clone() as MyCv
+    }
 }

@@ -47,7 +47,9 @@ open class MainRepository<T : OnFetchingStatuses>(private val listener: T?) {
                         dbNotEmpty = it != -1L
                     }
                     if (dbNotEmpty) {
-                        myCv.value = cv
+                        doAsync {
+                            myCv.postValue(doCrypto(cv, false))
+                        }
                     } else {
                         fetchCv()
                     }
@@ -101,8 +103,10 @@ open class MainRepository<T : OnFetchingStatuses>(private val listener: T?) {
                     listener?.onFetchEnd()
                 }
                 .subscribe({
-                    it.insert()
-                    myCv.value = it
+                    doAsync {
+                        myCv.postValue(it)
+                        doCrypto(it.clone(), true)?.insert()
+                    }
 
                 }, {
                     listener?.onFetchError(it)
@@ -283,8 +287,9 @@ open class MainRepository<T : OnFetchingStatuses>(private val listener: T?) {
     }
 
     private fun String.encrypt() = cryptoOperations.encrypt(this)
+    private fun String.decrypt() = cryptoOperations.decrypt(this)
 
-    private fun <T : CryptoClass> encrypt(toEncrypt: T?) {
+    private fun <T : CryptoClass> doCrypto(toEncrypt: T?, encrypt: Boolean): T? {
         if (toEncrypt is Any) {
             toEncrypt.javaClass.declaredFields.filter { it.isAnnotationPresent(Crypto::class.java) }.forEach {
                 it.isAccessible = true
@@ -293,7 +298,7 @@ open class MainRepository<T : OnFetchingStatuses>(private val listener: T?) {
                     field.apply {
                         forEach {
                             it?.let { listElement ->
-                                //encrypt(listElement as? CryptoClass)
+                                doCrypto(listElement as? CryptoClass, encrypt)
                             }
                         }
                     }
@@ -301,13 +306,15 @@ open class MainRepository<T : OnFetchingStatuses>(private val listener: T?) {
                     field.javaClass.declaredFields.filter { it.isAnnotationPresent(Crypto::class.java) }.forEach {
                         it?.apply {
                             it.isAccessible = true
-                            val encrypted = (this.get(field) as? String)?.encrypt()
-                            this.set(field, encrypted)
+                            val changedField = (this.get(field) as? String)
+                                    ?.let { if (encrypt) it.encrypt() else it.decrypt() }
+                            this.set(field, changedField)
                         }
                     }
                 }
             }
         }
+        return toEncrypt
     }
 //
 //    private fun MyCv.encrypt() {
