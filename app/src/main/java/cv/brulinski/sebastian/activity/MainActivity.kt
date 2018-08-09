@@ -248,19 +248,14 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
-    private fun requestForCallPermissions() {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this@MainActivity,
-                        Manifest.permission.CALL_PHONE)) {
-            makeSnackBarCallExplanation()
-            // Show an explanation to the user *asynchronously* -- don't block
-            // this thread waiting for the user's response! After the user
-            // sees the explanation, try again to request the permission.
-        } else {
-            // No explanation needed, we can request the permission.
-            ActivityCompat.requestPermissions(this@MainActivity,
-                    arrayOf(Manifest.permission.CALL_PHONE),
-                    REQUEST_CODE_MAKE_CALL)
-        }
+    private fun shouldRequestRationale(permission: String) =
+            ActivityCompat.shouldShowRequestPermissionRationale(this@MainActivity,
+                    permission)
+
+    private fun makeRequestForCallPermission() {
+        ActivityCompat.requestPermissions(this@MainActivity,
+                arrayOf(Manifest.permission.CALL_PHONE),
+                REQUEST_CODE_MAKE_CALL)
     }
 
     private fun makeSnackBarCallExplanation() {
@@ -335,7 +330,7 @@ class MainActivity : AppCompatActivity(),
         if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.CALL_PHONE)
                 != PackageManager.PERMISSION_GRANTED) {
             //Permission is not granted
-            requestForCallPermissions()
+            makeRequestForCallPermission()
         } else {
             //Permission granted
             personalInfo.value?.makeACall()
@@ -377,13 +372,15 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        MAIN_ACTIVITY.log("on request permissions result")
         when (requestCode) {
             REQUEST_CODE_MAKE_CALL -> {
                 // If request is cancelled, the result arrays are empty.
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                     personalInfo.value?.makeACall()
                 } else {
+                    if (!shouldRequestRationale(Manifest.permission.CALL_PHONE))
+                        makeSnackBarCallExplanation()
+                    MAIN_ACTIVITY.log("on request permissions result denied")
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
                 }
