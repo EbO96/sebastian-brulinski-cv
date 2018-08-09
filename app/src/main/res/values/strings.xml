@@ -18,7 +18,7 @@
     <string name="refreshing">Odświeżanie</string>
     <string name="preambule">Wstęp</string>
     <string name="languages">Języki</string>
-    <string name="data_fetching_error">Błąd pobierania danych</string>
+    <string name="data_fetching_error">Wystąpił błąd podczas próby pobrania CV. Spróbuj ponownie za chwilę.</string>
     <string name="fetch_graphics_durng_refreshing">Pobierz grafiki przy odświeżaniu</string>
     <string name="fetching_cv">Pobieranie CV</string>
     <string name="skills">Umiejętności</string>
@@ -33,6 +33,10 @@
     <string name="email_subject">Kontakt w sprawie pracy</string>
     <string name="call_explanation">Aby wykonać połączenie musisz zezwolić na ich wykonywanie</string>
     <string name="explanation_line_content">Aby wykonywać połączenia musisz na nie najpierw zezwolić.</string>
-    <string name="warning">UWAGA</string>
+    <string name="warning">Uwaga</string>
     <string name="empty">Pusto</string>
+    <string name="error">Błąd</string>
+    <string name="ups">Ups</string>
+    <string name="offline">Offline</string>
+    <string name="no_connection_message">Brak połączenia z siecią. Spróbuj włączyć dane komórkowe lub WiFi</string>
 </resources>

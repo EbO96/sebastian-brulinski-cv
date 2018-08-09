@@ -7,9 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
+import androidx.annotation.ColorInt
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import cv.brulinski.sebastian.R
+import cv.brulinski.sebastian.utils.color
 import cv.brulinski.sebastian.utils.ctx
 import cv.brulinski.sebastian.utils.delay
 import gone
@@ -35,11 +37,22 @@ class LargeSnackbar private constructor() {
 
     private var root: ViewGroup? = null
     private var isOnScreen = false
-    private val durations = mapOf(Duration.LONG to 4500L, Duration.SHORT to 1500L)
+    private val durations = mapOf(Duration.LONG to 4500L, Duration.SHORT to 2500L)
     private val snackbar: View = R.layout.snackbar_large.inflate()
+    private val snackRoot: ViewGroup = snackbar.snackRoot
     private val lineOne = snackbar.messageLineOne
     private val lineTwo = snackbar.messageLineTwo
     private val actionButton = snackbar.actionButton
+    @ColorInt
+    private var actionButtonColor: Int? = null
+    private val actionButtonColorDef = R.color.colorAccent.color()
+    private var backgroundColor: Int? = null
+    private var backgroundColorDef = R.color.snackbarColor.color()
+    private var textTitleColor: Int? = null
+    private var textTitleColorDef = R.color.snackbarTextColor.color()
+    private var textMessageColor: Int? = null
+    private var textMessageColorDef = R.color.snackbarTextColorLight.color()
+    var upperTitle = true
     private val showAnimation = ScaleAnimation(0f,
             1f,
             0f,
@@ -75,11 +88,34 @@ class LargeSnackbar private constructor() {
         })
     }
 
+    fun setTextTitleColor(@ColorInt color: Int) {
+        textTitleColor = color
+    }
+
+    fun setTextMessageColor(@ColorInt color: Int) {
+        textMessageColor = color
+    }
+
+    fun setBackgroundColor(@ColorInt color: Int) {
+        backgroundColor = color
+    }
+
+    fun setButtonColor(@ColorInt color: Int) {
+        actionButtonColor = color
+    }
+
     fun show(rootView: ViewGroup, view: View, lineOneText: String = "", lineTwoText: String = "", duration: Duration, actionText: String, actionClick: (View) -> Unit) {
         root = rootView
+
         if (!isOnScreen) {
+
+            lineOne?.setTextColor(textTitleColor ?: textTitleColorDef)
+            lineTwo?.setTextColor(textMessageColor ?: textMessageColorDef)
+            actionButton?.setTextColor(actionButtonColor ?: actionButtonColorDef)
+            snackRoot.setBackgroundColor(backgroundColor ?: backgroundColorDef)
+
             (rootView as? CoordinatorLayout)?.apply {
-                lineOne.text = lineOneText
+                lineOne.text = lineOneText.let { if (upperTitle) it.toUpperCase() else it }
                 lineTwo.text = lineTwoText
                 this@LargeSnackbar.actionButton?.apply {
                     text = actionText.toUpperCase()
@@ -105,6 +141,11 @@ class LargeSnackbar private constructor() {
 
                 }
             }
+
+            textTitleColor = null
+            textMessageColor = null
+            backgroundColor = null
+            actionButtonColor = null
         }
     }
 

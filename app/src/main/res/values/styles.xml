@@ -133,6 +133,7 @@
 
     <style name="SnackbarLargeStyle" parent="Base.CardView">
         <item name="cardBackgroundColor">@color/snackbarColor</item>
+        <item name="android:tintMode">src_in</item>
         <item name="cardElevation">@dimen/snackbar_large_elevation</item>
         <item name="cardCornerRadius">@dimen/snackbar_large_corners</item>
     </style>

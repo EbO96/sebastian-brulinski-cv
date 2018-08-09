@@ -1,5 +1,8 @@
 package cv.brulinski.sebastian.utils
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.os.AsyncTask
 import android.os.Handler
 import android.preference.PreferenceManager
@@ -54,4 +57,10 @@ fun Int.iterate(step: (Int) -> Unit) {
     for (x in 1..this) {
         step(x)
     }
+}
+
+fun isNetworkAvailable(): Boolean {
+    val cm = ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val activeNetwork: NetworkInfo? = cm.activeNetworkInfo
+    return activeNetwork?.isConnected == true
 }

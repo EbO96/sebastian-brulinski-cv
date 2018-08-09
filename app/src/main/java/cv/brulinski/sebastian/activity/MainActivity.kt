@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.transition.Fade
 import android.view.MenuItem
+import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
@@ -47,6 +48,10 @@ class MainActivity : AppCompatActivity(),
         OnFetchingStatuses,
         ParentActivityCallback {
 
+    //Colors for snackbar
+    private val colorError by lazy { R.color.colorError.color() }
+    private val colorWarning by lazy { R.color.colorWarning.color() }
+    private val cardLight by lazy { R.color.cardview_light_background.color() }
     //Permissions request codes
     private val REQUEST_CODE_MAKE_CALL = 0
     //Activity request codes
@@ -260,11 +265,46 @@ class MainActivity : AppCompatActivity(),
 
     private fun makeSnackBarCallExplanation() {
         LargeSnackbar.getInstance().apply {
-            show(mainContent, fab, getString(R.string.warning), getString(R.string.explanation_line_content), LargeSnackbar.Duration.LONG, R.string.settings.string()) {
+            show(mainContent, fab,
+                    R.string.warning.string(),
+                    R.string.explanation_line_content.string(),
+                    LargeSnackbar.Duration.LONG,
+                    R.string.settings.string()) {
                 goToAppSettings()
             }
         }
     }
+
+    private fun makeSnackbar(@ColorInt colorFirst: Int, @ColorInt colorSecond: Int,
+                             title: String, subtitle: String, action: String) {
+        LargeSnackbar.getInstance().apply {
+            setBackgroundColor(colorFirst)
+            setTextTitleColor(colorSecond)
+            setTextMessageColor(colorSecond)
+            setButtonColor(colorSecond)
+            show(mainContent, fab, title, subtitle,
+                    LargeSnackbar.Duration.SHORT, action) {
+
+            }
+        }
+    }
+
+    private fun makeSnackbarFetchingError() {
+        makeSnackbar(colorError,
+                cardLight,
+                R.string.ups.string(),
+                R.string.data_fetching_error.string(),
+                android.R.string.ok.string())
+    }
+
+    private fun makeSnackbarNoConnectionToNetwork() {
+        makeSnackbar(colorWarning,
+                cardLight,
+                R.string.offline.string(),
+                R.string.no_connection_message.string(),
+                android.R.string.ok.string())
+    }
+
 
     private fun goToAppSettings() {
         val permissionSettingsIntent = Intent()
@@ -290,7 +330,9 @@ class MainActivity : AppCompatActivity(),
 
     override fun onFetchError(error: Throwable) {
         swipeRefreshLayout.isRefreshing = false
-        R.string.data_fetching_error.string().toast()
+        if (isNetworkAvailable())
+            makeSnackbarFetchingError()
+        else makeSnackbarNoConnectionToNetwork()
     }
 
     /*

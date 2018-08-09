@@ -15,4 +15,7 @@
     <color name="snackbarColor">#323232</color>
     <color name="snackbarTextColor">#ffffffde</color>
     <color name="snackbarTextColorLight">#aaffffde</color>
+    <color name="colorError">#B00020</color>
+    <color name="colorWarning">#FF9800</color>
+    <color name="colorWarningLight">#AAFF9800</color>
 </resources>
