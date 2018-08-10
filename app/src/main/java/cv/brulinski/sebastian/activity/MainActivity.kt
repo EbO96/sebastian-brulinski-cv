@@ -368,6 +368,9 @@ class MainActivity : AppCompatActivity(),
         })
     }
 
+    /**
+     * Try to make phone call
+     */
     override fun tryMakeACall() {
         if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.CALL_PHONE)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -379,6 +382,9 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
+    /**
+     * Compose email and open app which can handle sending emails
+     */
     override fun composeEmail() {
         personalInfo.value?.apply {
             Intent(Intent.ACTION_SENDTO).apply {
@@ -397,6 +403,9 @@ class MainActivity : AppCompatActivity(),
         mainViewModel?.refreshAll()
     }
 
+    /**
+     * BottomAppBar menu items click listener
+     */
     override fun onMenuItemClick(item: MenuItem?) = when (item?.itemId) {
         R.id.settings -> {
             goToSettings()

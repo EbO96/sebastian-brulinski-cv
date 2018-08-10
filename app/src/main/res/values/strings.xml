@@ -39,4 +39,5 @@
     <string name="ups">Ups</string>
     <string name="offline">Offline</string>
     <string name="no_connection_message">Brak połączenia z siecią. Spróbuj włączyć dane komórkowe lub WiFi</string>
+    <string name="more">WIĘCEJ</string>
 </resources>
