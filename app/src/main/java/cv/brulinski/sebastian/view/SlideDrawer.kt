@@ -163,7 +163,6 @@ class SlideDrawer(context: Context?, attrs: AttributeSet?) : FrameLayout(context
         hideMenuAnimation = ObjectAnimator.ofFloat(menuRecycler, "alpha", 1f, 0f).applyDefaultConfig()
 
         hideCloseButton()
-        hideMenuList()
         theme.drawerTitle = "Menu"
 
         closeIcon?.setOnClickListener {
@@ -252,23 +251,25 @@ class SlideDrawer(context: Context?, attrs: AttributeSet?) : FrameLayout(context
     }
 
     private fun showMenuList() {
-        showMenuAnimation?.apply {
-            View.INVISIBLE
-            endAnimationListener {
-                View.VISIBLE
+        if (theme.menuShowHideAnimation)
+            showMenuAnimation?.apply {
+                View.INVISIBLE
+                endAnimationListener {
+                    View.VISIBLE
+                }
+                start()
             }
-            start()
-        }
     }
 
     private fun hideMenuList() {
-        hideMenuAnimation?.apply {
-            View.VISIBLE
-            endAnimationListener {
-                View.INVISIBLE
+        if (theme.menuShowHideAnimation)
+            hideMenuAnimation?.apply {
+                View.VISIBLE
+                endAnimationListener {
+                    View.INVISIBLE
+                }
+                start()
             }
-            start()
-        }
     }
 
     fun getContentView() = contentView
@@ -415,54 +416,60 @@ class SlideDrawer(context: Context?, attrs: AttributeSet?) : FrameLayout(context
                 menuItem.apply {
                     drawerMenuItem.apply {
 
-                        var itemBackgroundColor = backgroundColor?.parseColor()
-                                ?: globalMenuTheme.backgroundColor.parseColor()
 
-                        if (theme.selectableMenuItems && backgroundColor == null)
-                            itemBackgroundColor = theme.drawerBackgroundColor
+                        val titleTextColors = intArrayOf(globalMenuTheme.titleColorSelected.parseColor(),
+                                globalMenuTheme.titleColor.parseColor())
 
-                        val colors = intArrayOf(itemBackgroundColor,
-                                titleColor?.parseColor()
-                                        ?: globalMenuTheme.titleColor.parseColor())
+                        val subtitleTextColors = intArrayOf(globalMenuTheme.subtitleColorSelected.parseColor(),
+                                globalMenuTheme.subtitleColor.parseColor())
 
-                        val itemSelectStateList = ColorStateList(states, colors)
-
-                        root?.isSelected = !selected
-                        root?.background?.state = if (selected) states[1] else states[0]
-                        titleTextView?.isSelected = selected
-                        subtitleTextView?.isSelected = selected
+                        val titleColorStateList = ColorStateList(states, titleTextColors)
+                        val subtitleColorStateList = ColorStateList(states, subtitleTextColors)
 
                         itemIconImageView?.apply {
                             if (iconDrawable != null) setImageDrawable(iconDrawable)
                             else {
-                                icon?.let {
-                                    setImageResource(it)
+                                iconDrawable?.let {
+                                    setImageDrawable(it)
                                 } ?: run {
                                     setImageDrawable(globalMenuTheme.menuItemIcon)
                                 }
                             }
                         }
+                        subtitleTextView?.apply {
+                            visibility = if (subtitle.isNullOrBlank())
+                                View.GONE
+                            else {
+                                text = subtitle
+                                setTextColor(subtitleColorStateList)
+                                View.VISIBLE
+                            }
+                        }
+
                         titleTextView?.apply {
                             text = title
-                            setTextColor(itemSelectStateList)
-                        }
-                        subtitleTextView?.apply {
-                            text = subtitle
-                            setTextColor(itemSelectStateList)
+                            setTextColor(titleColorStateList)
 
+                            (layoutParams as? LinearLayout.LayoutParams)?.apply {
+                                if (subtitleTextView?.visibility == View.GONE) {
+                                    setPadding(8.dp(), 8.dp(), 0, 8.dp())
+                                } else {
+                                    setPadding(8.dp(), 0, 0, 0)
+                                }
+                            }
                         }
-                        root?.background = viewCreator.createBackgroundDrawable(itemSelectStateList)
-                        // root?.backgroundTintList = itemSelectStateList
+
+                        titleTextView?.isSelected = selected
+                        subtitleTextView?.isSelected = selected
 
                         setOnClickListener {
-                            if (theme.selectableMenuItems == true)
+                            if (theme.selectableMenuItems)
                                 selectItem(position)
                             if (cfg.closeAfterItemClick)
                                 close {
                                     menuItemsClickListener?.onClick(position, drawerMenuItem)
                                 }
                             else menuItemsClickListener?.onClick(position, drawerMenuItem)
-
                         }
                     }
                 }
@@ -482,16 +489,13 @@ class SlideDrawer(context: Context?, attrs: AttributeSet?) : FrameLayout(context
     @SuppressLint("ResourceAsColor")
     data class DrawerMenuItem(var title: String? = null,
                               var subtitle: String? = null,
-                              var icon: Int? = null,
                               var iconDrawable: Drawable? = null,
-                              var titleColor: Int? = null,
-                              var subtitleColor: Int? = null,
-                              var backgroundColor: Int? = null,
                               var selected: Boolean = false)
 
     open inner class GlobalMenuTheme(var titleColor: Int = android.R.color.black,
                                      val subtitleColor: Int = android.R.color.black,
-                                     var backgroundColor: Int = android.R.color.transparent) {
+                                     var titleColorSelected: Int = android.R.color.holo_red_dark,
+                                     val subtitleColorSelected: Int = android.R.color.holo_red_dark) {
         val menuItemIcon = viewCreator.createDefaultMenuItemIcon()
     }
 
@@ -525,8 +529,8 @@ class SlideDrawer(context: Context?, attrs: AttributeSet?) : FrameLayout(context
     Theme
      */
     inner class Theme {
-
         var drawerTitle = ""
+
             set(value) {
                 field = value
                 drawerTitleTextView?.text = value
@@ -534,6 +538,7 @@ class SlideDrawer(context: Context?, attrs: AttributeSet?) : FrameLayout(context
         var itemsDividerEnabled = true
         var menuItemIconEnabled = false
         var selectableMenuItems = true
+        var menuShowHideAnimation = true
         var menuItemsDividerColor = Color.parseColor("#5578909C")
             set(value) {
                 field = value.parseColor()
@@ -605,7 +610,7 @@ class SlideDrawer(context: Context?, attrs: AttributeSet?) : FrameLayout(context
                     setImageDrawable(closeButtonDrawable) //TODO draw close button
                     layoutParams = RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
                         contentDescription = "Close menu drawer"
-                        setMargins(8.dp(), 8.dp(), 8.dp(), 8.dp())
+                        //setMargins(8.dp(), 8.dp(), 8.dp(), 8.dp())
                         setPadding(8.dp(), 8.dp(), 8.dp(), 8.dp())
                         addRule(RelativeLayout.ALIGN_PARENT_TOP)
                         addRule(RelativeLayout.ALIGN_PARENT_LEFT)
@@ -618,10 +623,10 @@ class SlideDrawer(context: Context?, attrs: AttributeSet?) : FrameLayout(context
                 val titleTextView = TextView(context).apply {
                     drawerTitleId = ID()
                     id = drawerTitleId
-                    setTextSize(TypedValue.COMPLEX_UNIT_SP, 24f)
+                    setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
                     setTextColor(theme.closeIconColor)
                     layoutParams = RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
-                        setPadding(16.dp(), 12.dp(), 16.dp(), 16.dp())
+                        setPadding(8.dp(), 8.dp(), 8.dp(), 8.dp())
                         addRule(RelativeLayout.ALIGN_PARENT_TOP)
                         addRule(RelativeLayout.CENTER_HORIZONTAL)
                     }
@@ -705,6 +710,7 @@ class SlideDrawer(context: Context?, attrs: AttributeSet?) : FrameLayout(context
                         setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
                         layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
                             weight = 1f
+                            setPadding(8.dp(), 0, 0, 0)
                         }
                     }
                     val subtitleTextView = TextView(context).apply {
@@ -712,6 +718,7 @@ class SlideDrawer(context: Context?, attrs: AttributeSet?) : FrameLayout(context
                         id = subtitleId
                         setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
                         layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+                            setPadding(8.dp(), 0, 0, 0)
                             weight = 1f
                             topMargin = 8
                         }

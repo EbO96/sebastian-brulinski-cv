@@ -86,7 +86,9 @@ class MainActivity : AppCompatActivity(),
 
         //Slide drawer setting up
         slideDrawer({
-            drawerTitle = R.string.table_of_contents.string()
+            drawerTitle = ""
+            itemsDividerEnabled = true
+            menuShowHideAnimation = false
         }, {
             //Menu items
             val items = arrayListOf(SlideDrawer.DrawerMenuItem(R.string.introduction.string()),
@@ -94,7 +96,10 @@ class MainActivity : AppCompatActivity(),
                     SlideDrawer.DrawerMenuItem(R.string.career.string()),
                     SlideDrawer.DrawerMenuItem(R.string.languages.string()),
                     SlideDrawer.DrawerMenuItem(R.string.skills.string()))
-            setMenu(items)
+            setMenu(items, GlobalMenuTheme(titleColorSelected = R.color.whiteBackgroundTextColor,
+                    subtitleColorSelected = R.color.whiteBackgroundTextColorLight,
+                    titleColor = android.R.color.darker_gray,
+                    subtitleColor = R.color.colorPrimaryDark))
             //Menu items listener
             setMenuItemClickListener(object : SlideDrawer.MenuItemsClickListener {
                 override fun onClick(position: Int, drawerMenuItem: SlideDrawer.DrawerMenuItem) {
