@@ -1,11 +1,15 @@
 package cv.brulinski.sebastian.utils
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
+import android.net.Uri
 import android.os.AsyncTask
 import android.os.Handler
 import android.preference.PreferenceManager
+import android.webkit.URLUtil
 import cv.brulinski.sebastian.dependency_injection.app.App
 
 val ctx by lazy { App.component.getContext() }
@@ -63,4 +67,24 @@ fun isNetworkAvailable(): Boolean {
     val cm = ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     val activeNetwork: NetworkInfo? = cm.activeNetworkInfo
     return activeNetwork?.isConnected == true
+}
+
+fun String.openUrl(activity: Activity? = null, requestCode: Int? = null): Boolean {
+    var success = false
+    try {
+        if (URLUtil.isValidUrl(this)) {
+            val page = Uri.parse(this)
+            Intent(Intent.ACTION_VIEW, page).let { intent ->
+                intent.resolveActivity(ctx.packageManager).apply {
+                    success = true
+                    if (activity != null && requestCode != null) {
+                        activity.startActivityForResult(intent, requestCode)
+                    } else ctx.startActivity(intent)
+                }
+            }
+        }
+    } catch (e: Exception) {
+        return false
+    }
+    return success
 }

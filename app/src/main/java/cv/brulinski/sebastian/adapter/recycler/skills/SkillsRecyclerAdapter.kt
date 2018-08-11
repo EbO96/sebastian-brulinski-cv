@@ -15,7 +15,7 @@ import cv.brulinski.sebastian.utils.TYPE_ITEM
 import cv.brulinski.sebastian.utils.list.MyRecyclerAdapter
 import inflateViewHolderView
 
-class SkillsRecyclerAdapter(var onListItemClickListener: OnItemClickListener? = null) : MyRecyclerAdapter<Skill>() {
+class SkillsRecyclerAdapter(private val onListItemClickListener: OnItemClickListener? = null) : MyRecyclerAdapter<Skill>() {
 
     override var items = arrayListOf<MyRecyclerItem<Skill>>()
         set(value) {
@@ -40,6 +40,6 @@ class SkillsRecyclerAdapter(var onListItemClickListener: OnItemClickListener? = 
     override fun getItemCount() = items.size
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        (holder as? OnBindViewInViewHolder)?.onBind(items[position], position)
+        (holder as? OnBindViewInViewHolder)?.onBind(items[position], position, onListItemClickListener)
     }
 }

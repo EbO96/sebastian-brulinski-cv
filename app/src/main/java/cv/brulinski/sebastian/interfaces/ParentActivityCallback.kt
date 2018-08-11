@@ -19,4 +19,6 @@ interface ParentActivityCallback {
     fun getSkills(block: (List<Skill>) -> Unit)
     fun tryMakeACall()
     fun composeEmail()
+    fun showLoading()
+    fun hideLoading()
 }

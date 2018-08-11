@@ -48,14 +48,22 @@ class MainActivity : AppCompatActivity(),
         OnFetchingStatuses,
         ParentActivityCallback {
 
+    companion object {
+        /*
+        Request codes
+         */
+        //Open skills url request code
+        const val OPEN_URL_REQUEST_CODE = 0
+        //Permissions request codes
+        const val REQUEST_CODE_MAKE_CALL = 1
+        //Activity request codes
+        const val APP_SETTINGS_REQUEST_CODE = 2
+    }
+
     //Colors for snackbar
     private val colorError by lazy { R.color.colorError.color() }
     private val colorWarning by lazy { R.color.colorWarning.color() }
     private val cardLight by lazy { R.color.cardview_light_background.color() }
-    //Permissions request codes
-    private val REQUEST_CODE_MAKE_CALL = 0
-    //Activity request codes
-    private val APP_SETTINGS_REQUEST_CODE = 1
     //ViewPager adapter
     private var mainActivityViewPagerAdapter: MainActivityViewPagerAdapter? = null
     //ViewModel
@@ -318,6 +326,10 @@ class MainActivity : AppCompatActivity(),
     Override methods
      */
 
+    override fun showLoading() = loadingLayout.visible()
+
+    override fun hideLoading() = loadingLayout.gone()
+
     /*
     Fetching data statuses
      */
@@ -442,7 +454,7 @@ class MainActivity : AppCompatActivity(),
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
-            APP_SETTINGS_REQUEST_CODE -> {
+            APP_SETTINGS_REQUEST_CODE, OPEN_URL_REQUEST_CODE -> {
                 loadingLayout.gone()
             }
         }

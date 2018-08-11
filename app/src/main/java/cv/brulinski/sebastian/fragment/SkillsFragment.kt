@@ -1,15 +1,20 @@
 package cv.brulinski.sebastian.fragment
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import cv.brulinski.sebastian.R
+import cv.brulinski.sebastian.activity.MainActivity
 import cv.brulinski.sebastian.adapter.recycler.skills.SkillsRecyclerAdapter
+import cv.brulinski.sebastian.interfaces.OnItemClickListener
 import cv.brulinski.sebastian.interfaces.ParentActivityCallback
+import cv.brulinski.sebastian.model.Skill
 import cv.brulinski.sebastian.utils.getBitmapsForObjects
+import cv.brulinski.sebastian.utils.openUrl
 import gone
 import kotlinx.android.synthetic.main.fragment_skills.*
 import setup
@@ -49,9 +54,22 @@ class SkillsFragment : Fragment() {
     Private methods
      */
     private fun setupSkillsRecycler() {
-        skillsRecyclerAdapter = SkillsRecyclerAdapter().apply {
+        skillsRecyclerAdapter = SkillsRecyclerAdapter(object : OnItemClickListener {
+            override fun onClick(item: Any, position: Int, v: View) {
+                if (v.id == R.id.moreFooter) {
+                    (item as? Skill)?.apply {
+                        parentActivityCallback?.showLoading()
+                        moreUrl.openUrl(activity, MainActivity.OPEN_URL_REQUEST_CODE)
+                    }
+                }
+            }
+        }).apply {
             recyclerView.setup(this, false)
         }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     /*
