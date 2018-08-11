@@ -34,6 +34,8 @@ class MyCv : OnGetCvObjects, CryptoClass, Cloneable {
 
     override fun getTypeLanguages(): List<Language>? = languages
 
+    override fun getTypePersonalInfo(): List<PersonalInfo> = listOf(personalInfo ?: PersonalInfo())
+
     public override fun clone(): MyCv {
         return super.clone() as MyCv
     }

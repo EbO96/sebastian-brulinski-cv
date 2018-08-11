@@ -101,12 +101,12 @@ open class MainRepository<T : OnFetchingStatuses>(private val listener: T?) {
                 .doOnComplete {
                     settings.firstLaunch = false
                     listener?.onFetchEnd()
-                }
-                .subscribe({
-                    myCv.value = it
                     doAsync {
                         doCrypto(myCv.value, true)?.insert()
                     }
+                }
+                .subscribe({
+                    myCv.value = it
                 }, {
                     listener?.onFetchError(it)
                 })
@@ -122,8 +122,7 @@ open class MainRepository<T : OnFetchingStatuses>(private val listener: T?) {
                     .subscribe({ cv ->
 
                         if (cv.status == 1) {
-                            copyExistingBitmaps(cv, Skill::class.java, Language::class.java)
-                            myCv.value = cv
+                            copyExistingBitmaps(cv, PersonalInfo::class.java, Skill::class.java, Language::class.java)
 
                             if (settings.fetchGraphics || settings.firstLaunch) {
                                 val urlMap = HashMap<String, String?>()
@@ -157,6 +156,7 @@ open class MainRepository<T : OnFetchingStatuses>(private val listener: T?) {
                                         })
                                 disposables.add(bitmapFetchDisposable)
                             } else {
+                                emitter.onNext(cv)
                                 emitter.onComplete()
                             }
                         } else {
@@ -182,6 +182,10 @@ open class MainRepository<T : OnFetchingStatuses>(private val listener: T?) {
                 clazz.name == Language::class.java.name -> {
                     remoteCv = t.getTypeLanguages()
                     myCv.value?.getTypeLanguages()
+                }
+                clazz.name == PersonalInfo::class.java.name -> {
+                    remoteCv = t.getTypePersonalInfo()
+                    myCv.value?.getTypePersonalInfo()
                 }
                 else -> null
             }

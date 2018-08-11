@@ -1,17 +1,19 @@
 package cv.brulinski.sebastian.model
 
+import android.graphics.Bitmap
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import cv.brulinski.sebastian.annotations.Crypto
+import cv.brulinski.sebastian.interfaces.BitmapLoadable
 
 /**
  * Class to hold personal info
  */
 @Entity
-class PersonalInfo {
+class PersonalInfo : BitmapLoadable {
 
     @PrimaryKey
     @ColumnInfo(name = "id")
@@ -113,4 +115,24 @@ class PersonalInfo {
     @ColumnInfo(name = "country")
     @SerializedName("country")
     var country = ""
+
+    override fun getTypeBitmapBase64() = profilePictureBase64
+
+    override fun getTypeBitmap(): Bitmap? = null
+
+    override fun setTypeBitmap(bitmap: Bitmap?) {
+    }
+
+    override fun setTypeBitmapBase64(bitmap: String?) {
+        profilePictureBase64 = bitmap
+    }
+
+    override fun setAvgColor(color: Int) {
+    }
+
+    override fun getSortKey() = ""
+
+    override fun getTypeId() = ""
+
+    override fun getTypeSkillCategory() = ""
 }
