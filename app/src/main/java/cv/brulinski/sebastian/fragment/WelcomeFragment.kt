@@ -44,9 +44,10 @@ open class WelcomeFragment : Fragment() {
             }
         }
 
+        parentActivityCallback?.changeFabPosition(BottomAppBar.FAB_ALIGNMENT_MODE_CENTER)
+
         textScrollView.bottomAndTopDetector({
             //Top
-            parentActivityCallback?.changeFabPosition(BottomAppBar.FAB_ALIGNMENT_MODE_END)
         }, {
             //Bottom
             parentActivityCallback?.changeFabPosition(BottomAppBar.FAB_ALIGNMENT_MODE_CENTER)
