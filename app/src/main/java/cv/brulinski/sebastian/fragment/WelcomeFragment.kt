@@ -6,7 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import bottomAndTopDetector
 import com.facebook.shimmer.ShimmerFrameLayout
+import com.google.android.material.bottomappbar.BottomAppBar
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.activity.MainActivity
 import cv.brulinski.sebastian.interfaces.ParentActivityCallback
@@ -41,6 +43,14 @@ open class WelcomeFragment : Fragment() {
                 welcomeContentTextView?.text = it.description
             }
         }
+
+        textScrollView.bottomAndTopDetector({
+            //Top
+            parentActivityCallback?.changeFabPosition(BottomAppBar.FAB_ALIGNMENT_MODE_END)
+        }, {
+            //Bottom
+            parentActivityCallback?.changeFabPosition(BottomAppBar.FAB_ALIGNMENT_MODE_CENTER)
+        })
     }
 
     /*

@@ -18,11 +18,9 @@ class Welcome {
     @SerializedName("timestamp")
     @ColumnInfo(name = "timestamp")
     var timestamp = -1L
-    @Crypto
     @SerializedName("title")
     @ColumnInfo(name = "title")
     var title = ""
-    @Crypto
     @SerializedName("description")
     @ColumnInfo(name = "description")
     var description = ""

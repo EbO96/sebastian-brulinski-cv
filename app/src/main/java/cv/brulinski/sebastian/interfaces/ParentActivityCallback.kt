@@ -21,4 +21,5 @@ interface ParentActivityCallback {
     fun composeEmail()
     fun showLoading()
     fun hideLoading()
+    fun changeFabPosition(position: Int)
 }

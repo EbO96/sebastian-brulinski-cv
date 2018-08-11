@@ -64,7 +64,7 @@ open class CareerFragment : Fragment() {
      */
     private fun setupCareerRecycler() {
         careerRecyclerAdapter = CareerRecyclerAdapter(object : OnItemClickListener {
-            override fun onClick(item: Any, position: Int) {
+            override fun onClick(item: Any, position: Int, v: View) {
 
             }
         }).apply {

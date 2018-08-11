@@ -20,9 +20,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.viewpager.widget.ViewPager
+import com.google.android.material.bottomappbar.BottomAppBar
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter
-import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Companion.Page.WELCOME_SCREEN
+import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Companion.Page.*
 import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Companion.pageMap
 import cv.brulinski.sebastian.dependency_injection.component.DaggerPagesComponent
 import cv.brulinski.sebastian.dependency_injection.component.PagesComponent
@@ -150,8 +151,6 @@ class MainActivity : AppCompatActivity(),
         bar.setOnMenuItemClickListener(this)
 
         swipeRefreshLayout.setOnRefreshListener(this)
-
-
     }
 
     /*
@@ -214,6 +213,13 @@ class MainActivity : AppCompatActivity(),
 
     private fun viewPagerPageListener() = object : ViewPager.OnPageChangeListener {
         override fun onPageScrollStateChanged(state: Int) {
+            if (state == ViewPager.SCROLL_STATE_IDLE) {
+                if (viewPager.currentItem in 1..(mainActivityViewPagerAdapter?.count ?: 1)) {
+                    val currentState = bar.fabAlignmentMode
+                    if (currentState != BottomAppBar.FAB_ALIGNMENT_MODE_END)
+                        changeFabPosition(BottomAppBar.FAB_ALIGNMENT_MODE_END)
+                } else changeFabPosition(BottomAppBar.FAB_ALIGNMENT_MODE_CENTER)
+            }
         }
 
         override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
@@ -221,6 +227,22 @@ class MainActivity : AppCompatActivity(),
         }
 
         override fun onPageSelected(position: Int) {
+            when (position) {
+                pageMap[WELCOME_SCREEN] -> {
+
+                }
+                pageMap[PERSONAL_INFO_SCREEN] -> {
+                }
+                pageMap[CAREER] -> {
+
+                }
+                pageMap[LANGUAGES] -> {
+
+                }
+                pageMap[SKILLS] -> {
+
+                }
+            }
             bar.menu.apply {
                 //Hide phone and mail icon (BottomAppBar) when current screen is PersonalInfoFragment
                 setGroupVisible(R.id.callMailGroup, position != 1)
@@ -334,6 +356,10 @@ class MainActivity : AppCompatActivity(),
     override fun showLoading() = loadingLayout.visible()
 
     override fun hideLoading() = loadingLayout.gone()
+
+    override fun changeFabPosition(position: Int) {
+        bar.fabAlignmentMode = position
+    }
 
     /*
     Fetching data statuses

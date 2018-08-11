@@ -11,7 +11,6 @@
         android:scaleType="centerCrop"
         android:src="@drawable/screen_2" />
 
-
     <androidx.cardview.widget.CardView
         android:id="@+id/textCardView"
         style="@style/MyCardViewStyle"
@@ -22,7 +21,6 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:layout_weight="1"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:textAlignment="center"
@@ -32,56 +30,63 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/textScrollView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="match_parent">
 
-            <FrameLayout
-                android:id="@+id/textWrapper"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/welcomeContentTextView"
-                    style="@style/WelcomeScreenContentTextStyle"
+                <FrameLayout
+                    android:id="@+id/textWrapper"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="8dp" />
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
 
-                <com.facebook.shimmer.ShimmerFrameLayout
-                    android:id="@+id/shimmerFrame"
-                    android:layout_width="match_parent"
+                    <TextView
+                        android:id="@+id/welcomeContentTextView"
+                        style="@style/WelcomeScreenContentTextStyle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="8dp" />
+
+                    <com.facebook.shimmer.ShimmerFrameLayout
+                        android:id="@+id/shimmerFrame"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:duration="@integer/shimmer_duration">
+
+                        <include layout="@layout/welcome_description_place_holder" />
+                    </com.facebook.shimmer.ShimmerFrameLayout>
+
+
+                </FrameLayout>
+
+                <Button
+                    android:id="@+id/welcomeNextButton"
+                    android:layout_width="88dp"
                     android:layout_height="wrap_content"
-                    app:duration="@integer/shimmer_duration">
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="@string/next"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@+id/textWrapper"
+                    app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintStart_toStartOf="@+id/textWrapper"
+                    app:layout_constraintTop_toBottomOf="@+id/textWrapper"
+                    app:layout_constraintVertical_bias="0.0" />
 
-                    <include layout="@layout/welcome_description_place_holder" />
-                </com.facebook.shimmer.ShimmerFrameLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-            </FrameLayout>
-
-            <Button
-                android:id="@+id/welcomeNextButton"
-                android:layout_width="88dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:text="@string/next"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@+id/textWrapper"
-                app:layout_constraintHorizontal_bias="1.0"
-                app:layout_constraintStart_toStartOf="@+id/textWrapper"
-                app:layout_constraintTop_toBottomOf="@+id/textWrapper"
-                app:layout_constraintVertical_bias="0.0" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.core.widget.NestedScrollView>
 
     </androidx.cardview.widget.CardView>
 
