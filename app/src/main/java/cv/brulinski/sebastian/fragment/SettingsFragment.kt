@@ -28,6 +28,13 @@ class SettingsFragment : androidx.fragment.app.Fragment() {
                 settings.fetchGraphics = checked //set the preferences
             }
         }
+
+        newCvNotificationSwitch.apply {
+            isChecked = settings.newCvNotification
+            setOnCheckedChangeListener { _, checked ->
+                settings.newCvNotification = checked
+            }
+        }
     }
 
 }

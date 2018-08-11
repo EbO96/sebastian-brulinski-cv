@@ -40,4 +40,6 @@
     <string name="offline">Offline</string>
     <string name="no_connection_message">Brak połączenia z siecią. Spróbuj włączyć dane komórkowe lub WiFi</string>
     <string name="more">WIĘCEJ</string>
+    <string name="notifications">Powiadomienia</string>
+    <string name="new_cv_notifiction">Powiadom mnie o nowej wersji CV</string>
 </resources>
