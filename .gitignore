@@ -11,3 +11,13 @@
 /captures
 /functions/node_modules
 .externalNativeBuild
+.gradle
+local.properties
+.idea
+build/
+.DS_Store
+*.iml
+*.apk
+*.aar
+*.zip
+google-services.json
