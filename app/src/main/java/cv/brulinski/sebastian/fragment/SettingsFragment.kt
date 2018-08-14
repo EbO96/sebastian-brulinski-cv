@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.utils.settings
-import kotlinx.android.synthetic.main.fragment_settings.*
+import kotlinx.android.synthetic.main.fragment_settings.view.*
 
 class SettingsFragment : androidx.fragment.app.Fragment() {
 
@@ -22,14 +22,14 @@ class SettingsFragment : androidx.fragment.app.Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        fetchGraphicsSwitch.apply {
+        view.fetchGraphicsSwitch.apply {
             isChecked = settings.fetchGraphics //set the switch state
             setOnCheckedChangeListener { _, checked ->
                 settings.fetchGraphics = checked //set the preferences
             }
         }
 
-        newCvNotificationSwitch.apply {
+        view.newCvNotificationSwitch.apply {
             isChecked = settings.newCvNotification
             setOnCheckedChangeListener { _, checked ->
                 settings.newCvNotification = checked

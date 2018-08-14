@@ -12,6 +12,7 @@ import cv.brulinski.sebastian.interfaces.ParentActivityCallback
 import cv.brulinski.sebastian.utils.getBitmapsForObjects
 import gone
 import kotlinx.android.synthetic.main.fragment_languages.*
+import kotlinx.android.synthetic.main.fragment_languages.view.*
 import setup
 import visible
 
@@ -32,14 +33,14 @@ open class LanguagesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        recyclerView.setup(LanguagesRecyclerAdapter().apply { languagesRecyclerAdapter = this })
+        view.recyclerView.setup(LanguagesRecyclerAdapter().apply { languagesRecyclerAdapter = this })
 
         parentActivityCallback?.getLanguages {
             getBitmapsForObjects(it) {
                 if (it.isNotEmpty()) {
-                    noLanguagesLayout.gone()
+                    view.noLanguagesLayout.gone()
                     languagesRecyclerAdapter.items = it
-                } else noLanguagesLayout.visible()
+                } else view.noLanguagesLayout.visible()
             }
         }
     }

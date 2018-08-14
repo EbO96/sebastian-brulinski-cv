@@ -16,13 +16,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.bottomappbar.BottomAppBar
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter
+import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Companion.Page
 import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Companion.Page.*
 import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Companion.pageMap
 import cv.brulinski.sebastian.dependency_injection.component.DaggerPagesComponent
@@ -71,18 +70,14 @@ class MainActivity : AppCompatActivity(),
     private var mainViewModel: MainViewModel<*>? = null
     //Dagger ViewPager pages component
     private lateinit var pagesComponent: PagesComponent
-    //Data for fragments
-    private val welcome: MutableLiveData<Welcome> = MutableLiveData()
-    private val personalInfo: MutableLiveData<PersonalInfo> = MutableLiveData()
-    private val career: MutableLiveData<List<Career>> = MutableLiveData()
-    private val languages: MutableLiveData<List<Language>> = MutableLiveData()
-    private val skills: MutableLiveData<List<Skill>> = MutableLiveData()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        observeCv()
+        //Init ViewModel
+        mainViewModel = MainViewModel(this, this)
+
         viewPager.set()
 
         //Slide drawer setting up
@@ -157,8 +152,6 @@ class MainActivity : AppCompatActivity(),
     Public methods
      */
 
-    fun toPage(page: Int) = viewPager.toPage(page)
-
     /*
     Private methods
      */
@@ -184,30 +177,6 @@ class MainActivity : AppCompatActivity(),
         offscreenPageLimit = fragments.size
         this@set.adapter = mainActivityViewPagerAdapter
         addOnPageChangeListener(viewPagerPageListener())
-    }
-
-    private fun observeCv() {
-        mainViewModel = MainViewModel(application, this)
-        mainViewModel?.myCv?.observe(this, Observer {
-            //Get CV parts and inform each fragment associated with this about update
-            it?.apply {
-                welcome?.let { welcome ->
-                    this@MainActivity.welcome.value = welcome
-                }
-                personalInfo?.let { personalInfo ->
-                    this@MainActivity.personalInfo.value = personalInfo
-                }
-                career?.let { career ->
-                    this@MainActivity.career.value = career
-                }
-                languages?.let { languages ->
-                    this@MainActivity.languages.value = languages
-                }
-                skills?.let { skills ->
-                    this@MainActivity.skills.value = skills
-                }
-            }
-        })
     }
 
     private fun viewPagerPageListener() = object : ViewPager.OnPageChangeListener {
@@ -278,10 +247,12 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
-    private fun PersonalInfo.makeACall() {
-        Intent(Intent.ACTION_CALL).apply {
-            data = Uri.parse("tel:$phoneNumber")
-            startActivity(this)
+    private fun makeACall() {
+        getPersonalInfo {
+            Intent(Intent.ACTION_CALL).apply {
+                data = Uri.parse("tel:${it.phoneNumber}")
+                startActivity(this)
+            }
         }
     }
 
@@ -316,7 +287,6 @@ class MainActivity : AppCompatActivity(),
             setButtonColor(colorSecond)
             show(mainContent, fab, title, subtitle,
                     LargeSnackbar.Duration.SHORT, action) {
-
             }
         }
     }
@@ -337,7 +307,6 @@ class MainActivity : AppCompatActivity(),
                 android.R.string.ok.string())
     }
 
-
     private fun goToAppSettings() {
         val permissionSettingsIntent = Intent()
         permissionSettingsIntent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
@@ -349,6 +318,10 @@ class MainActivity : AppCompatActivity(),
     /*
     Override methods
      */
+
+    override fun goToPage(page: Page) {
+        viewPager.toPage(pageMap[page])
+    }
 
     override fun showLoading() = loadingLayout.visible()
 
@@ -368,7 +341,7 @@ class MainActivity : AppCompatActivity(),
         swipeRefreshLayout.isRefreshing = false
     }
 
-    override fun onFetchError(error: Throwable) {
+    override fun onFetchError(error: Throwable?) {
         swipeRefreshLayout.isRefreshing = false
         if (isNetworkAvailable())
             makeSnackbarFetchingError()
@@ -379,33 +352,23 @@ class MainActivity : AppCompatActivity(),
     ParentActivityCallback callback's
      */
     override fun getWelcome(block: (Welcome) -> Unit) {
-        welcome.observe(this, Observer {
-            it?.let { block(it) }
-        })
+        mainViewModel?.getWelcome(block)
     }
 
     override fun getPersonalInfo(block: (PersonalInfo) -> Unit) {
-        personalInfo.observe(this, Observer {
-            it?.let { block(it) }
-        })
+        mainViewModel?.getPersonalInfo(block)
     }
 
     override fun getCareer(block: (List<Career>) -> Unit) {
-        career.observe(this, Observer {
-            it?.let { block(it) }
-        })
+        mainViewModel?.getCareer(block)
     }
 
     override fun getLanguages(block: (List<Language>) -> Unit) {
-        languages.observe(this, Observer {
-            it?.let { block(it) }
-        })
+        mainViewModel?.getLanguages(block)
     }
 
     override fun getSkills(block: (List<Skill>) -> Unit) {
-        skills.observe(this, Observer {
-            it?.let { block(it) }
-        })
+        mainViewModel?.getSkills(block)
     }
 
     /**
@@ -418,7 +381,7 @@ class MainActivity : AppCompatActivity(),
             makeRequestForCallPermission()
         } else {
             //Permission granted
-            personalInfo.value?.makeACall()
+            makeACall()
         }
     }
 
@@ -426,10 +389,10 @@ class MainActivity : AppCompatActivity(),
      * Compose email and open app which can handle sending emails
      */
     override fun composeEmail() {
-        personalInfo.value?.apply {
+        getPersonalInfo {
             Intent(Intent.ACTION_SENDTO).apply {
-                data = Uri.parse("mailto:$email")
-                putExtra(Intent.EXTRA_EMAIL, email)
+                data = Uri.parse("mailto:${it.email}")
+                putExtra(Intent.EXTRA_EMAIL, it.email)
                 putExtra(Intent.EXTRA_SUBJECT, getString(R.string.email_subject))
                 resolveActivity(packageManager)?.let {
                     loadingLayout.visible()
@@ -467,7 +430,7 @@ class MainActivity : AppCompatActivity(),
             REQUEST_CODE_MAKE_CALL -> {
                 // If request is cancelled, the result arrays are empty.
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    personalInfo.value?.makeACall()
+                    makeACall()
                 } else {
                     if (!shouldRequestRationale(Manifest.permission.CALL_PHONE))
                         makeSnackBarCallExplanation()

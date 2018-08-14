@@ -7,6 +7,8 @@ import android.security.KeyPairGeneratorSpec
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
+import cv.brulinski.sebastian.annotations.Crypto
+import cv.brulinski.sebastian.interfaces.CryptoClass
 import cv.brulinski.sebastian.utils.ctx
 import java.io.IOException
 import java.math.BigInteger
@@ -19,6 +21,16 @@ import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 import javax.security.auth.x500.X500Principal
 
+/**
+ * Class used to perform cryptography operations.
+ * Working schema:
+ * 1. Get instance of AndroidKeyStore
+ * 2. Check for already existing RSA key
+ * 2.1 - if key exist then get encrypted AES key from 'SharedPreferences'
+ *       and decrypt using RSA private key.
+ * 2.2 - if key not exist then create new one, encrypt by RSA public key and insert into SharedPreferences
+ * 4. Encrypt and Decrypt all data using AES key
+ */
 class CryptoOperations {
 
     private val cipherRSATransformation = "RSA/ECB/PKCS1Padding"
@@ -315,5 +327,32 @@ class CryptoOperations {
         var key: ByteArray? = null
         var vector: ByteArray? = null
         var cipherTransformation: String? = null
+    }
+
+    fun <T : CryptoClass> doCrypto(toEncrypt: T?, encrypt: Boolean): T? {
+        if (toEncrypt is CryptoClass) {
+            toEncrypt.javaClass.declaredFields.filter { it.isAnnotationPresent(Crypto::class.java) }.forEach {
+                it.isAccessible = true
+                val field = it.get(toEncrypt).javaClass.newInstance()
+                if (field is Collection<*>) {
+                    field.apply {
+                        forEach {
+                            it?.let { listElement ->
+                                //doCrypto(listElement as? CryptoClass, encrypt)
+                            }
+                        }
+                    }
+                } else {
+                    field.javaClass.declaredFields.filter { it.isAnnotationPresent(Crypto::class.java) }.forEach {
+                        it?.apply {
+                            it.isAccessible = true
+                            val changedField = (this.get(field) as? String)?.let { if (encrypt) encrypt(it) else decrypt(it) }
+                            this.set(field, changedField)
+                        }
+                    }
+                }
+            }
+        }
+        return toEncrypt
     }
 }

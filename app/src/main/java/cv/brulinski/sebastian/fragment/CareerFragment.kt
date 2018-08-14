@@ -15,11 +15,12 @@ import cv.brulinski.sebastian.model.MyRecyclerItem
 import cv.brulinski.sebastian.utils.TYPE_HEADER
 import cv.brulinski.sebastian.utils.TYPE_ITEM
 import cv.brulinski.sebastian.utils.date
-import gone
-import kotlinx.android.synthetic.main.fragment_career.*
-import setup
-import visible
 import java.lang.ClassCastException
+import kotlinx.android.synthetic.main.fragment_career.*
+import gone
+import kotlinx.android.synthetic.main.fragment_career.view.*
+import visible
+import setup
 
 /**
  * Fragment which is used for displaying list of witch my career,
@@ -53,9 +54,9 @@ open class CareerFragment : Fragment() {
             }
 
             if (items.isNotEmpty()) {
-                noCareerLayout.gone()
+                view.noCareerLayout.gone()
                 careerRecyclerAdapter?.items = items
-            } else noCareerLayout.visible()
+            } else view.noCareerLayout.visible()
         }
     }
 
@@ -68,7 +69,7 @@ open class CareerFragment : Fragment() {
 
             }
         }).apply {
-            recyclerView.setup(this, false)
+            view?.recyclerView?.setup(this, false)
         }
     }
 
