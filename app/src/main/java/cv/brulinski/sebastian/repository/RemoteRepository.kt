@@ -1,9 +1,9 @@
 package cv.brulinski.sebastian.repository
 
 import android.graphics.Bitmap
+import com.google.firebase.messaging.FirebaseMessaging
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.interfaces.BitmapLoadable
-import cv.brulinski.sebastian.interfaces.OnFetchingStatuses
 import cv.brulinski.sebastian.interfaces.OnGetCvObjects
 import cv.brulinski.sebastian.model.Language
 import cv.brulinski.sebastian.model.MyCv
@@ -25,6 +25,7 @@ class RemoteRepository(private val appRepository: AppRepository) {
     companion object {
         var errorBitmap: Bitmap? = null
         val errorImageUrl by lazy { R.string.error_image_url.string() ?: "" }
+        private const val FCM_NEW_CV_TOPIC = "new_cv_topic"
     }
 
     object ERROR
@@ -186,7 +187,7 @@ class RemoteRepository(private val appRepository: AppRepository) {
     }
 
     fun fetchCv(result: (MyCv) -> Unit, error: (ERROR) -> Unit) {
-        fetchAllFromRemoteServer()
+        val disposable = fetchAllFromRemoteServer()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnComplete {
@@ -202,11 +203,38 @@ class RemoteRepository(private val appRepository: AppRepository) {
                         }
                     }
                 }
+                .doOnError {
+                    error(ERROR)
+                }
                 .subscribe({
                     //Before encrypting inform observers about new CV
                     result(it)
                 }, {
                     error(ERROR)
                 })
+    }
+
+    fun registerForCvNotifications(register: Boolean, status: (Int) -> Unit) {
+        if (isNetworkAvailable())
+            FirebaseMessaging.getInstance().apply {
+                val task =
+                        if (register)
+                            subscribeToTopic(FCM_NEW_CV_TOPIC)
+                        else
+                            unsubscribeFromTopic(FCM_NEW_CV_TOPIC)
+
+                task.addOnCompleteListener {
+                    if (it.isSuccessful) {
+                        settings.newCvNotification = register
+                        status(1)
+                    } else {
+                        status(-1)
+                    }
+                }
+            }
+        else {
+            settings.newCvNotification = !register
+            status(-1)
+        }
     }
 }

@@ -24,4 +24,5 @@ interface ParentActivityCallback {
     fun hideLoading()
     fun changeFabPosition(position: Int)
     fun goToPage(page: Page)
+    fun registerForCvNotifications(register: Boolean, status: (Int) -> Unit)
 }

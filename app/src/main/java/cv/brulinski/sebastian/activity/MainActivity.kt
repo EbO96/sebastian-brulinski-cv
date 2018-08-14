@@ -28,8 +28,8 @@ import cv.brulinski.sebastian.dependency_injection.component.DaggerPagesComponen
 import cv.brulinski.sebastian.dependency_injection.component.PagesComponent
 import cv.brulinski.sebastian.dependency_injection.module.PagesModule
 import cv.brulinski.sebastian.fragment.*
-import cv.brulinski.sebastian.interfaces.OnFetchingStatuses
 import cv.brulinski.sebastian.interfaces.ParentActivityCallback
+import cv.brulinski.sebastian.interfaces.RemoteRepository
 import cv.brulinski.sebastian.model.*
 import cv.brulinski.sebastian.utils.*
 import cv.brulinski.sebastian.utils.view_pager.toLeft
@@ -45,7 +45,7 @@ import visible
 class MainActivity : AppCompatActivity(),
         Toolbar.OnMenuItemClickListener,
         SwipeRefreshLayout.OnRefreshListener,
-        OnFetchingStatuses,
+        RemoteRepository,
         ParentActivityCallback {
 
     companion object {
@@ -369,6 +369,10 @@ class MainActivity : AppCompatActivity(),
 
     override fun getSkills(block: (List<Skill>) -> Unit) {
         mainViewModel?.getSkills(block)
+    }
+
+    override fun registerForCvNotifications(register: Boolean, status: (Int) -> Unit) {
+        mainViewModel?.registerForCvNotifications(register, status)
     }
 
     /**

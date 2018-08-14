@@ -1,5 +1,6 @@
 package cv.brulinski.sebastian.repository
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import cv.brulinski.sebastian.model.*
@@ -105,6 +106,7 @@ open class LocalRepository(private val appRepository: AppRepository) {
         }
     }
 
+    @SuppressLint("CheckResult")
     fun getCv(result: (MyCv) -> Unit, empty: (EMPTY) -> Unit) {
         fetchAllFromDatabase()
                 .subscribeOn(AndroidSchedulers.mainThread())

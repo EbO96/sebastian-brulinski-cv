@@ -1,8 +1,8 @@
 package cv.brulinski.sebastian.dependency_injection.module
 
-import android.app.Application
 import android.content.Context
 import cv.brulinski.sebastian.R
+import cv.brulinski.sebastian.dependency_injection.app.App
 import cv.brulinski.sebastian.dependency_injection.scope.AppContext
 import cv.brulinski.sebastian.model.AppSettings
 import cv.brulinski.sebastian.network.RetrofitApiCallbacks
@@ -12,12 +12,16 @@ import dagger.Provides
 import javax.inject.Singleton
 
 @Module
-class AppModule(private val app: Application) {
+class AppModule(private val app: App) {
 
     @Provides
     @AppContext
     @Singleton
     fun provideContext(): Context = app.applicationContext
+
+    @Provides
+    @Singleton
+    fun provideApp(): App = app
 
     @Provides
     @Singleton

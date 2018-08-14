@@ -10,7 +10,7 @@ class AppSettings {
     private val firstLaunchKey = "firstLaunch"
     private val newCvNotificationKey = "newCvNotification"
     //Values
-    var fetchGraphics = true
+    var fetchGraphics = false
         set(value) {
             value.putPrefsValue(fetchGraphicsKey)
             field = value
@@ -20,7 +20,7 @@ class AppSettings {
             value.putPrefsValue(firstLaunchKey)
             field = value
         }
-    var newCvNotification = true
+    var newCvNotification = false
         set(value) {
             value.putPrefsValue(newCvNotificationKey)
             field = value
@@ -29,7 +29,7 @@ class AppSettings {
 
     init {
         firstLaunch = (getPrefsValue(firstLaunchKey) as? Boolean) ?: true
-        fetchGraphics = (getPrefsValue(fetchGraphicsKey) as? Boolean) ?: true
-        newCvNotification = (getPrefsValue(newCvNotificationKey) as? Boolean) ?: true
+        fetchGraphics = (getPrefsValue(fetchGraphicsKey) as? Boolean) ?: false
+        newCvNotification = (getPrefsValue(newCvNotificationKey) as? Boolean) ?: false
     }
 }

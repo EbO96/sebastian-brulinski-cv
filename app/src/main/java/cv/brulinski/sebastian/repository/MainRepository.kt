@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import cv.brulinski.sebastian.crypto.CryptoOperations
-import cv.brulinski.sebastian.interfaces.OnFetchingStatuses
+import cv.brulinski.sebastian.interfaces.RemoteRepository
 import cv.brulinski.sebastian.model.MyCv
 
 /**
@@ -12,7 +12,7 @@ import cv.brulinski.sebastian.model.MyCv
  * @param listener listener used for listening for events like START, END or fetch ERROR
  */
 @SuppressLint("CheckResult")
-class MainRepository<T : OnFetchingStatuses>(private val listener: T?) : AppRepository {
+class MainRepository<T : RemoteRepository>(private val listener: T?) : AppRepository {
 
     private val myCv = MutableLiveData<MyCv>()
     private val cryptoOperations = CryptoOperations()
@@ -37,6 +37,9 @@ class MainRepository<T : OnFetchingStatuses>(private val listener: T?) : AppRepo
     /*
     Public methods
      */
+    fun registerForCvNotifications(register: Boolean, status: (Int) -> Unit) {
+        remoteRepository.registerForCvNotifications(register, status)
+    }
 
     /**
      * Fetch CV again
