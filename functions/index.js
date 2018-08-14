@@ -9,6 +9,8 @@ admin.initializeApp({
 });
 
 const baseUrl = 'https://us-central1-sebastian-brulinski-cv-app.cloudfunctions.net/'
+//Clound Messaging topics
+const NEW_CV_NOPIC = "new_cv_topic"
 
 var db = admin.firestore();
 
@@ -148,5 +150,29 @@ exports.addSkill = functions.https.onRequest((request, response) => {
             response.status(200).send("Success")
         }).catch(error => {
             response.status(401).send("Error")
+        })
+})
+
+exports.registerForCvNotifications = functions.https.onRequest((request, response) => {
+    let token = request.params.token
+
+    return admin.messaging().subscribeToTopic([token], NEW_CV_NOPIC)
+        .then(function (response) {
+            response.status(200).send("{result: 1}")
+        })
+        .catch(function (error) {
+            response.status(400).send("{result: -1}")
+        })
+})
+
+exports.unregisterFromCvNotifications = functions.https.onRequest((request, response) => {
+    let token = request.params.token
+
+    return admin.messaging().unsubscribeFromTopic([token], NEW_CV_NOPIC)
+        .then(function (response) {
+            response.status(200).send("{result: 1}")
+        })
+        .catch(function (error) {
+            response.status(400).send("{result: -1}")
         })
 })

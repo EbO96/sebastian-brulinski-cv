@@ -1,5 +1,6 @@
 package cv.brulinski.sebastian.interfaces
 
+import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Companion.Page
 import cv.brulinski.sebastian.model.*
 
 /**
@@ -22,4 +23,5 @@ interface ParentActivityCallback {
     fun showLoading()
     fun hideLoading()
     fun changeFabPosition(position: Int)
+    fun goToPage(page: Page)
 }

@@ -17,6 +17,7 @@ import cv.brulinski.sebastian.utils.getBitmapsForObjects
 import cv.brulinski.sebastian.utils.openUrl
 import gone
 import kotlinx.android.synthetic.main.fragment_skills.*
+import kotlinx.android.synthetic.main.fragment_skills.view.*
 import setup
 import visible
 
@@ -43,9 +44,9 @@ class SkillsFragment : Fragment() {
         parentActivityCallback?.getSkills {
             getBitmapsForObjects(it) {
                 if (it.isNotEmpty()) {
-                    noSkillsLayout.gone()
+                    view.noSkillsLayout.gone()
                     skillsRecyclerAdapter?.items = it
-                } else noSkillsLayout.visible()
+                } else view.noSkillsLayout.visible()
             }
         }
     }
@@ -64,7 +65,7 @@ class SkillsFragment : Fragment() {
                 }
             }
         }).apply {
-            recyclerView.setup(this, false)
+            view?.recyclerView?.setup(this, false)
         }
     }
 

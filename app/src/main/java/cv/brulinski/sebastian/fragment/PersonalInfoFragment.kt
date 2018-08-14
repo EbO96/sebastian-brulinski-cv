@@ -14,7 +14,7 @@ import cv.brulinski.sebastian.utils.age
 import cv.brulinski.sebastian.utils.ageSufix
 import cv.brulinski.sebastian.utils.date
 import cv.brulinski.sebastian.utils.loadBitmapsIntoImageViews
-import kotlinx.android.synthetic.main.fragment_personal_info.*
+import kotlinx.android.synthetic.main.fragment_personal_info.view.*
 import java.lang.ClassCastException
 
 /*
@@ -27,11 +27,11 @@ open class PersonalInfoFragment : Fragment(), LifecycleOwner {
 
     //Views
     private val shimmers by lazy {
-        listOf(nameSurnameShimmer,
-                phoneShimmer,
-                emailShimmer,
-                addressShimmer,
-                birthShimmer)
+        listOf(view?.nameSurnameShimmer,
+                view?.phoneShimmer,
+                view?.emailShimmer,
+                view?.addressShimmer,
+                view?.birthShimmer)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -47,37 +47,40 @@ open class PersonalInfoFragment : Fragment(), LifecycleOwner {
             shimmers.stop()
             it.apply {
                 //Load profile picture
-                loadBitmapsIntoImageViews(Pair(profileImageView, profilePictureBase64))?.subscribe()
+                loadBitmapsIntoImageViews(Pair(view.profileImageView, profilePictureBase64))?.subscribe()
 
-                //Set information about me
-                val nameAndSurname = "$name $surname"
-                nameAndSurnameTextView?.text = nameAndSurname
-                specialityTextView.text = speciality
-                numberTextView?.text = phoneNumber
-                numberTypeTextView.text = numberType
-                emailTextView?.text = email
-                emailTypeTextView.text = emailType
-                val a1 = "$cityName, $postalCode"
-                val a2 = "$country, $provinceName"
-                address1TextView?.text = a1
-                address2TextView?.text = a2
-                val bornDate = "$birthDay.$birthMonth.$birthYear".trim()
-                birthDateTextView?.text = bornDate
-                ageTextView?.apply {
-                    val age = bornDate.date()?.age() ?: -1
-                    if (age != -1)
-                        "$age ${age.ageSufix()}".apply {
-                            text = this
-                        }
+                view.apply {
+                    //Set information about me
+                    val nameAndSurname = "$name $surname"
+                    nameAndSurnameTextView?.text = nameAndSurname
+                    specialityTextView.text = speciality
+                    numberTextView?.text = phoneNumber
+                    numberTypeTextView.text = numberType
+                    emailTextView?.text = email
+                    emailTypeTextView.text = emailType
+                    val a1 = "$cityName, $postalCode"
+                    val a2 = "$country, $provinceName"
+                    address1TextView?.text = a1
+                    address2TextView?.text = a2
+                    val bornDate = "$birthDay.$birthMonth.$birthYear".trim()
+                    birthDateTextView?.text = bornDate
+                    ageTextView?.apply {
+                        val age = bornDate.date()?.age() ?: -1
+                        if (age != -1)
+                            "$age ${age.ageSufix()}".apply {
+                                text = this
+                            }
+                    }
                 }
+
             }
         }
 
-        phoneFrame.setOnClickListener {
+        view.phoneFrame.setOnClickListener {
             parentActivityCallback?.tryMakeACall()
         }
 
-        emailFrame.setOnClickListener {
+        view.emailFrame.setOnClickListener {
             parentActivityCallback?.composeEmail()
         }
     }
@@ -86,17 +89,17 @@ open class PersonalInfoFragment : Fragment(), LifecycleOwner {
     Private methods
      */
 
-    private fun List<ShimmerFrameLayout>.start() {
+    private fun List<ShimmerFrameLayout?>.start() {
         this.forEach {
-            it.startShimmerAnimation()
-            it.visibility = View.VISIBLE
+            it?.startShimmerAnimation()
+            it?.visibility = View.VISIBLE
         }
     }
 
-    private fun List<ShimmerFrameLayout>.stop() {
+    private fun List<ShimmerFrameLayout?>.stop() {
         this.forEach {
-            it.stopShimmerAnimation()
-            it.visibility = View.GONE
+            it?.stopShimmerAnimation()
+            it?.visibility = View.GONE
         }
     }
 

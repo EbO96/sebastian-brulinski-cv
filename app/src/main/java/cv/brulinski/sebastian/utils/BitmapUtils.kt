@@ -8,6 +8,7 @@ import android.widget.ImageView
 import cv.brulinski.sebastian.interfaces.BitmapLoadable
 import cv.brulinski.sebastian.model.MyRecyclerItem
 import cv.brulinski.sebastian.repository.MainRepository
+import cv.brulinski.sebastian.repository.RemoteRepository
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -16,6 +17,8 @@ import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
+import cv.brulinski.sebastian.repository.RemoteRepository.Companion.errorBitmap
+import cv.brulinski.sebastian.repository.RemoteRepository.Companion.errorImageUrl
 
 /**
  * Download bitmap from url
@@ -26,8 +29,8 @@ fun downloadBitmap(url: String): Observable<Bitmap> {
     return Observable.create { emitter ->
         try {
             if (url.isNotEmpty()) {
-                if (url == MainRepository.errorImageUrl) {
-                    MainRepository.errorBitmap?.let {
+                if (url == errorImageUrl) {
+                    RemoteRepository.errorBitmap?.let {
                         emitter.onNext(it)
                         emitter.onComplete()
                         return@create
@@ -41,8 +44,8 @@ fun downloadBitmap(url: String): Observable<Bitmap> {
                 val inputStream = connection.inputStream
                 val bitmap = BitmapFactory.decodeStream(inputStream)
                 bitmap?.let {
-                    if (url == MainRepository.errorImageUrl && MainRepository.errorBitmap == null)
-                        MainRepository.errorBitmap = it
+                    if (url == errorImageUrl && errorBitmap == null)
+                        errorBitmap = it
                     emitter.onNext(it)
                 }
             } else {

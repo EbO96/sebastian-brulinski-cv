@@ -12,12 +12,19 @@ class SplashActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        auth.currentUser?.let { startMain() } ?: run {
+        //Check for already logged anonymous user
+        auth.currentUser?.let {
+            //User are already logged
+            startMain()
+        } ?: run {
+            //Login user as anonymous
             auth.signInAnonymously()
                     .addOnCompleteListener(this) { task ->
                         if (task.isSuccessful) {
                             settings.firstLaunch = true
                             startMain()
+                        } else {
+                            //TODO information about login failed
                         }
                     }
         }

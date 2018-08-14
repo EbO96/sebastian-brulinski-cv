@@ -11,9 +11,10 @@ import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.bottomappbar.BottomAppBar
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.activity.MainActivity
+import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Companion.Page.PERSONAL_INFO_SCREEN
 import cv.brulinski.sebastian.interfaces.ParentActivityCallback
 import cv.brulinski.sebastian.utils.delay
-import kotlinx.android.synthetic.main.fragment_welcome.*
+import kotlinx.android.synthetic.main.fragment_welcome.view.*
 import java.lang.ClassCastException
 
 /**
@@ -31,22 +32,22 @@ open class WelcomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        welcomeNextButton.setOnClickListener {
+        view.welcomeNextButton.setOnClickListener {
             //Navigate to PersonalInfoFragment
-            (activity as? MainActivity)?.toPage(1)
+            (activity as? MainActivity)?.goToPage(PERSONAL_INFO_SCREEN)
         }
         //Show Shimmer text loading animation
-        shimmerFrame.showShimmer()
+        view.shimmerFrame.showShimmer()
         parentActivityCallback?.getWelcome {
             150L.delay {
-                shimmerFrame.hideShimmer()
-                welcomeContentTextView?.text = it.description
+                view.shimmerFrame.hideShimmer()
+                view.welcomeContentTextView?.text = it.description
             }
         }
 
         parentActivityCallback?.changeFabPosition(BottomAppBar.FAB_ALIGNMENT_MODE_CENTER)
 
-        textScrollView.bottomAndTopDetector({
+        view.textScrollView.bottomAndTopDetector({
             //Top
         }, {
             //Bottom
