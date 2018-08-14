@@ -36,21 +36,24 @@ open class MainRepository<T : OnFetchingStatuses>(private val listener: T?) {
         var errorBitmap: Bitmap? = null
     }
 
+    /**
+     * Get CV from local database if exists
+     * or from remote server when database is empty
+     */
     fun getCv(): LiveData<MyCv> {
 
         val cvFetchDisposable = fetchAllFromDatabase()
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ cv ->
-                    var dbNotEmpty = false
-                    cv?.welcome?.timestamp?.let {
-                        dbNotEmpty = it != -1L
-                    }
+                    val dbNotEmpty = cv?.welcome?.timestamp ?: -1L != -1L
+                    //CV are in local database so we now decrypt it
                     if (dbNotEmpty) {
                         doCrypto(cv, false)?.let {
                             myCv.value = it
                         }
                     } else {
+                        //We need to fetch CV from remote server
                         fetchCv()
                     }
                 }, {
@@ -60,59 +63,21 @@ open class MainRepository<T : OnFetchingStatuses>(private val listener: T?) {
         return myCv
     }
 
+    /**
+     * Fetch CV again
+     */
     fun refreshAll() {
         fetchCv()
     }
 
-    private fun HashMap<String, String?>.fetchBitmaps(): Observable<HashMap<String, String>> {
-        val observables = arrayListOf<Observable<Bitmap>>()
-        values.forEach { url ->
-            observables.add(downloadBitmap(url.checkUrl()))
-        }
-        var counter = 0
-        return Observable.create { emitter ->
-            val map = HashMap<String, String>()
-            val bitmapFetchDisposable = Observable.merge(observables)
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .doOnComplete {
-                        emitter.onNext(map)
-                        emitter.onComplete()
-                    }
-                    .onErrorReturnItem(Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888))
-                    .subscribe({
-                        it?.apply {
-                            val key = keys.toList()[counter]
-                            map[key] = toBase64String()
-                        }
-                        counter++
-                    }, {
-                        emitter.onError(it)
-                    })
-            disposables.add(bitmapFetchDisposable)
-        }
-    }
-
-    private fun fetchCv() {
-        listener?.onFetchStart()
-        val cvFetchDisposable = fetchAllFromRemoteServer()
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnComplete {
-                    settings.firstLaunch = false
-                    listener?.onFetchEnd()
-                    doAsync {
-                        doCrypto(myCv.value, true)?.insert()
-                    }
-                }
-                .subscribe({
-                    myCv.value = it
-                }, {
-                    listener?.onFetchError(it)
-                })
-        disposables.add(cvFetchDisposable)
-    }
-
+    /**
+     * Fetch CV from remote server.
+     * This method also copying existing
+     * bitmaps from old CV object into new CV object because
+     * in app 'Settings' we can disable fetching bitmaps
+     * so in way when it is disabled all bitmaps will be 'null'
+     * @return MyCv as observable
+     */
     private fun fetchAllFromRemoteServer(): Observable<MyCv> {
         return Observable.create { emitter ->
             val fetchAllDisposable = retrofit
@@ -121,9 +86,14 @@ open class MainRepository<T : OnFetchingStatuses>(private val listener: T?) {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({ cv ->
 
+                        //Everything went well
                         if (cv.status == 1) {
+                            //Copy existing bitmaps from old CV into new CV object
                             copyExistingBitmaps(cv, PersonalInfo::class.java, Skill::class.java, Language::class.java)
 
+                            //This block of code will execute always when app is opening first time
+                            //or when in 'Settings' we will enable the option of being responsible for
+                            //fetching bitmaps
                             if (settings.fetchGraphics || settings.firstLaunch) {
                                 val urlMap = HashMap<String, String?>()
                                 urlMap["profilePicture"] = cv.personalInfo?.profilePhotoUrl
@@ -135,6 +105,7 @@ open class MainRepository<T : OnFetchingStatuses>(private val listener: T?) {
                                     urlMap[it.id] = it.iconUrl
                                 }
 
+                                //Fetch bitmaps in put into new CV object
                                 val bitmapFetchDisposable = urlMap.fetchBitmaps()
                                         .subscribeOn(Schedulers.computation())
                                         .observeOn(AndroidSchedulers.mainThread())
@@ -171,6 +142,70 @@ open class MainRepository<T : OnFetchingStatuses>(private val listener: T?) {
         }
     }
 
+    /**
+     * Fetch CV from remote server, encrypt and put into local database
+     */
+    private fun fetchCv() {
+        listener?.onFetchStart()
+        val cvFetchDisposable = fetchAllFromRemoteServer()
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnComplete {
+                    settings.firstLaunch = false
+                    listener?.onFetchEnd()
+                    //Fetching completed. Encrypt CV and insert into local database
+                    doAsync {
+                        doCrypto(myCv.value, true)?.insert()
+                    }
+                }
+                .subscribe({
+                    //Before encrypting inform observers about new CV
+                    myCv.value = it
+                }, {
+                    listener?.onFetchError(it)
+                })
+        disposables.add(cvFetchDisposable)
+    }
+
+    /**
+     * Fetch bitmaps from url address
+     * @property HashMap<String, String?> map of tag and bitmap url.
+     * Tag is used to recognize fetched bitmap
+     * @return HashMap<String, String> observable which is map of tag <-> Base64 representation of bitmap
+     */
+    private fun HashMap<String, String?>.fetchBitmaps(): Observable<HashMap<String, String>> {
+        val observables = arrayListOf<Observable<Bitmap>>()
+        values.forEach { url ->
+            observables.add(downloadBitmap(url.validBitmapUrl()))
+        }
+        var counter = 0
+        return Observable.create { emitter ->
+            val map = HashMap<String, String>()
+            val bitmapFetchDisposable = Observable.merge(observables)
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnComplete {
+                        emitter.onNext(map)
+                        emitter.onComplete()
+                    }
+                    .onErrorReturnItem(Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888))
+                    .subscribe({
+                        it?.apply {
+                            val key = keys.toList()[counter]
+                            map[key] = toBase64String() //encode bitmap to Base64 string
+                        }
+                        counter++
+                    }, {
+                        emitter.onError(it)
+                    })
+            disposables.add(bitmapFetchDisposable)
+        }
+    }
+
+    /**
+     * Used to copying bitmaps from one CV object to another.
+     * Classes which want to use this method must implement 'OnGetCvObject'
+     */
     private fun <T : OnGetCvObjects> copyExistingBitmaps(t: T, vararg c: Class<*>) {
         c.forEach { clazz ->
             var remoteCv: List<BitmapLoadable>? = null
@@ -209,7 +244,15 @@ open class MainRepository<T : OnFetchingStatuses>(private val listener: T?) {
         }
     }
 
+    /**
+     * This method is responsible for fetching CV from local SQL database.
+     * Method use RxJava to wait for all database operations.
+     * This is due to the fact that the data is in different tables in the database,
+     * so we have to wait for all operations to be completed because these operations are asynchronous
+     * @return MyCv as observable
+     */
     private fun fetchAllFromDatabase(): Observable<MyCv> {
+        //Create observables from every database operation
         val observers = arrayListOf<Observable<Any?>>().apply {
             add(fetchFromDatabase {
                 database.getWelcome()
@@ -227,6 +270,8 @@ open class MainRepository<T : OnFetchingStatuses>(private val listener: T?) {
                 database.getSkills()
             })
         }
+
+        //Merge previously created database operations
         return Observable.create { emitter ->
             val cv = MyCv()
             val databaseFetchDisposable = Observable.merge(observers)
@@ -264,6 +309,9 @@ open class MainRepository<T : OnFetchingStatuses>(private val listener: T?) {
         }
     }
 
+    /**
+     * Creating observable instance from database operation
+     */
     private fun fetchFromDatabase(fetch: () -> LiveData<*>): Observable<Any?> {
         return Observable.create { emitter ->
             try {
@@ -285,7 +333,12 @@ open class MainRepository<T : OnFetchingStatuses>(private val listener: T?) {
         }
     }
 
-    private fun (String?).checkUrl(): String {
+    /**
+     * Validation of bitmap URL. In case when
+     * url is wrong then returns url to 'error' bitmap
+     * @return valid URL
+     */
+    private fun (String?).validBitmapUrl(): String {
         return this.let { if (it.isNullOrBlank()) errorImageUrl else it } ?: errorImageUrl
     }
 

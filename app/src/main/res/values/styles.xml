@@ -35,6 +35,7 @@
 
     <style name="MyCardViewStyle" parent="Base.CardView">
         <item name="cardCornerRadius">@dimen/card_corners_radius</item>
+        <item name="cardViewStyle">@style/CardView</item>
         <item name="cardElevation">@dimen/card_elevation</item>
     </style>
 

@@ -189,7 +189,6 @@ class MainActivity : AppCompatActivity(),
     private fun observeCv() {
         mainViewModel = MainViewModel(application, this)
         mainViewModel?.myCv?.observe(this, Observer {
-            //Inform fetching observers that fetch is final
             //Get CV parts and inform each fragment associated with this about update
             it?.apply {
                 welcome?.let { welcome ->
@@ -243,10 +242,8 @@ class MainActivity : AppCompatActivity(),
 
                 }
             }
-            bar.menu.apply {
-                //Hide phone and mail icon (BottomAppBar) when current screen is PersonalInfoFragment
-                setGroupVisible(R.id.callMailGroup, position != 1)
-            }
+            //Hide phone and mail icon (BottomAppBar) when current screen is PersonalInfoFragment
+            bar.menu?.setGroupVisible(R.id.callMailGroup, position != 1)
         }
     }
 
