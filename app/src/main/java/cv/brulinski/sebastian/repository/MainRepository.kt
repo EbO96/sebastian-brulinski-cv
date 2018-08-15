@@ -23,7 +23,7 @@ class MainRepository<T : RemoteRepository>(private val listener: T?) : AppReposi
      * Get CV from local database if exists
      * or from remote server when database is empty
      */
-    fun getCv(): LiveData<MyCv> {
+    fun getCv(): MutableLiveData<MyCv> {
 
         localRepository.getCv({
             myCv.value = it

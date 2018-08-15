@@ -1,11 +1,13 @@
 package cv.brulinski.sebastian.model
 
+import android.os.Parcel
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import cv.brulinski.sebastian.annotations.Crypto
 import cv.brulinski.sebastian.interfaces.CryptoClass
 import cv.brulinski.sebastian.interfaces.OnGetCvObjects
 
-class MyCv : OnGetCvObjects, CryptoClass, Cloneable {
+class MyCv() : OnGetCvObjects, CryptoClass, Cloneable {
 
     @SerializedName("status")
     var status = -1

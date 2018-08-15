@@ -455,6 +455,16 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        mainViewModel?.registerMyBroadcastReceiver()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mainViewModel?.unregisterMyBroadcastReceiver()
+    }
+
     override fun onBackPressed() {
         viewPager.apply {
             when {

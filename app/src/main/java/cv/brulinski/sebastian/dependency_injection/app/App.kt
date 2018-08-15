@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import cv.brulinski.sebastian.dependency_injection.component.AppComponent
 import cv.brulinski.sebastian.dependency_injection.component.DaggerAppComponent
 import cv.brulinski.sebastian.dependency_injection.module.AppModule
+import cv.brulinski.sebastian.model.MyCv
 
 class App : Application() {
 
@@ -17,6 +18,5 @@ class App : Application() {
         component = DaggerAppComponent.builder().appModule(AppModule(this)).build()
         component.inject(this)
     }
-
 
 }

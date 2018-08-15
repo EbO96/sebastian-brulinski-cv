@@ -12,7 +12,7 @@ import cv.brulinski.sebastian.annotations.Crypto
 import cv.brulinski.sebastian.utils.TYPE_ITEM
 
 @Entity
-class Career() : RecyclerItem(), Cloneable, Parcelable {
+class Career() : RecyclerItem(), Cloneable {
 
     @Ignore
     @Expose
@@ -93,35 +93,5 @@ class Career() : RecyclerItem(), Cloneable, Parcelable {
     @Ignore
     public override fun clone(): Career {
         return super.clone() as Career
-    }
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeInt(itemType)
-        parcel.writeString(id)
-        parcel.writeInt(type)
-        parcel.writeString(placeName)
-        parcel.writeString(function)
-        parcel.writeString(description)
-        parcel.writeString(startTimeDescription)
-        parcel.writeString(startTime)
-        parcel.writeString(endTimeDescription)
-        parcel.writeString(endTime)
-        parcel.writeDouble(latitude)
-        parcel.writeDouble(longitude)
-        parcel.writeLong(timestamp)
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    companion object CREATOR : Parcelable.Creator<Career> {
-        override fun createFromParcel(parcel: Parcel): Career {
-            return Career(parcel)
-        }
-
-        override fun newArray(size: Int): Array<Career?> {
-            return arrayOfNulls(size)
-        }
     }
 }

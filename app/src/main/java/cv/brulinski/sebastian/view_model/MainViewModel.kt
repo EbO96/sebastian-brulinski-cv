@@ -1,5 +1,9 @@
 package cv.brulinski.sebastian.view_model
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -8,6 +12,8 @@ import cv.brulinski.sebastian.dependency_injection.app.App
 import cv.brulinski.sebastian.interfaces.RemoteRepository
 import cv.brulinski.sebastian.model.*
 import cv.brulinski.sebastian.repository.MainRepository
+import cv.brulinski.sebastian.utils.MAIN_ACTIVITY
+import cv.brulinski.sebastian.utils.log
 
 /**
  * Role of this class is being bridge between repository and views
@@ -25,9 +31,18 @@ class MainViewModel<T : RemoteRepository> constructor(private val activity: AppC
     private val repository by lazy { MainRepository(listener) }
     //Repository CV
     val myCv by lazy { repository.getCv() }
+    //Broadcast
+    private var myBroadcastReceiver: MyBroadcastReceiver? = null
+    private var broadcastIntentFilter: IntentFilter? = null
+
+    companion object {
+        //MyBroadcastReceiver actions
+        const val UPDATED_CV_IN_BACKGROUND = "updated cv in background"
+    }
 
     init {
-        activity?.let {
+        activity?.apply {
+            //Observer CV
             myCv.observe(activity, Observer {
                 //Get CV parts and inform each fragment associated with this about update
                 it?.apply {
@@ -48,6 +63,7 @@ class MainViewModel<T : RemoteRepository> constructor(private val activity: AppC
                     }
                 }
             })
+
         }
     }
 
@@ -95,5 +111,34 @@ class MainViewModel<T : RemoteRepository> constructor(private val activity: AppC
 
     fun registerForCvNotifications(register: Boolean, status: (Int) -> Unit) {
         repository.registerForCvNotifications(register, status)
+    }
+
+    fun registerMyBroadcastReceiver() {
+        activity?.apply {
+            //Initialize broadcast receiver only when activity isn't null
+            myBroadcastReceiver = MyBroadcastReceiver()
+            broadcastIntentFilter = IntentFilter().apply {
+                addAction(UPDATED_CV_IN_BACKGROUND)
+            }
+            registerReceiver(myBroadcastReceiver, broadcastIntentFilter)
+        }
+    }
+
+    fun unregisterMyBroadcastReceiver() {
+        myBroadcastReceiver?.let {
+            activity?.unregisterReceiver(it)
+        }
+    }
+
+    private class MyBroadcastReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            when (intent?.action) {
+                UPDATED_CV_IN_BACKGROUND -> {
+                    intent.getStringExtra("cv")?.apply {
+                        MAIN_ACTIVITY.log(this)
+                    }
+                }
+            }
+        }
     }
 }

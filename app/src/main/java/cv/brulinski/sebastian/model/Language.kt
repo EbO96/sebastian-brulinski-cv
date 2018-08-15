@@ -1,6 +1,8 @@
 package cv.brulinski.sebastian.model
 
 import android.graphics.Bitmap
+import android.os.Parcel
+import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
@@ -10,7 +12,7 @@ import com.google.gson.annotations.SerializedName
 import cv.brulinski.sebastian.interfaces.BitmapLoadable
 
 @Entity
-class Language : BitmapLoadable {
+class Language() : BitmapLoadable{
 
     @PrimaryKey
     @ColumnInfo(name = "id")
@@ -74,4 +76,5 @@ class Language : BitmapLoadable {
     }
 
     override fun getTypeSkillCategory(): String? = null
+
 }

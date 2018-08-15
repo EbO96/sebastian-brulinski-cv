@@ -1,7 +1,9 @@
 package cv.brulinski.sebastian.service
 
+import android.content.Intent
 import androidx.lifecycle.Observer
 import com.firebase.jobdispatcher.JobService
+import com.google.gson.Gson
 import cv.brulinski.sebastian.interfaces.RemoteRepository
 import cv.brulinski.sebastian.model.MyCv
 import cv.brulinski.sebastian.utils.MAIN_ACTIVITY
@@ -40,6 +42,16 @@ class FetchNewCvJob : JobService(), RemoteRepository {
     }
 
     override fun onFetchEnd() {
+        viewModel.myCv.value?.let { cv ->
+            Intent().apply {
+                action = MainViewModel.UPDATED_CV_IN_BACKGROUND
+                val jsonCv = Gson().toJson(cv)
+                //TODO all bitmaps to base64
+//                putExtra("cv", jsonCv)//TODO error - to long string?
+                application.sendBroadcast(this)
+            }
+        }
+
         createNotification()
         MAIN_ACTIVITY.log("fetch end")
     }
