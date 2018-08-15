@@ -3,12 +3,12 @@ package cv.brulinski.sebastian.service
 import com.firebase.jobdispatcher.*
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import cv.brulinski.sebastian.interfaces.RemoteRepository
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage?) {
-        fetchNewCv()
+        if ((remoteMessage?.data?.get("newCv")?.toBoolean() == true))
+            fetchNewCv()
     }
 
     private fun fetchNewCv() {
