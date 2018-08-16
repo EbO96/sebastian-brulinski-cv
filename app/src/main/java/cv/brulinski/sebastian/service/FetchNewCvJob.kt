@@ -1,17 +1,20 @@
 package cv.brulinski.sebastian.service
 
+import android.app.PendingIntent
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.Observer
 import com.firebase.jobdispatcher.JobService
 import cv.brulinski.sebastian.R
+import cv.brulinski.sebastian.activity.MainActivity
 import cv.brulinski.sebastian.dependency_injection.app.App
 import cv.brulinski.sebastian.interfaces.RemoteRepository
 import cv.brulinski.sebastian.model.MyCv
 import cv.brulinski.sebastian.utils.MAIN_ACTIVITY
 import cv.brulinski.sebastian.utils.log
 import cv.brulinski.sebastian.view_model.MainViewModel
+
 
 /**
  * This service is used to fetching new CV is foreground or background.
@@ -59,12 +62,17 @@ class FetchNewCvJob : JobService(), RemoteRepository {
     }
 
     private fun createNotification() {
+        val intent = Intent(this, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        val pendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
+
         val notificationBuilder = NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_receipt)
                 .setContentTitle(contentTitle)
                 .setContentText(contentText)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setStyle(NotificationCompat.BigTextStyle())
+                .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
         notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
     }

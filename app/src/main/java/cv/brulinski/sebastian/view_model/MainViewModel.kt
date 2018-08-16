@@ -67,6 +67,9 @@ class MainViewModel<T : RemoteRepository> constructor(private val activity: AppC
         }
     }
 
+    /*
+    Public methods
+     */
     fun refreshAll(cv: ((MyCv) -> Unit)? = null) = repository.refreshAll(cv)
 
     fun getWelcome(block: (Welcome) -> Unit) {
@@ -133,6 +136,10 @@ class MainViewModel<T : RemoteRepository> constructor(private val activity: AppC
             MAIN_ACTIVITY.log("${e.message}")
         }
     }
+
+    /*
+    Private methods
+     */
 
     private inner class MyBroadcastReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
