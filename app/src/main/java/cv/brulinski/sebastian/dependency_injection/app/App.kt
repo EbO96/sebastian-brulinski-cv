@@ -1,7 +1,6 @@
 package cv.brulinski.sebastian.dependency_injection.app
 
 import android.app.Application
-import androidx.lifecycle.MutableLiveData
 import cv.brulinski.sebastian.dependency_injection.component.AppComponent
 import cv.brulinski.sebastian.dependency_injection.component.DaggerAppComponent
 import cv.brulinski.sebastian.dependency_injection.module.AppModule
@@ -19,4 +18,8 @@ class App : Application() {
         component.inject(this)
     }
 
+    enum class DataHolder {
+        INSTANCE;
+        var cv: MyCv? = null
+    }
 }

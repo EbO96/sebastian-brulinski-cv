@@ -13,9 +13,9 @@ import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.activity.MainActivity
 import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Companion.Page.PERSONAL_INFO_SCREEN
 import cv.brulinski.sebastian.interfaces.ParentActivityCallback
-import cv.brulinski.sebastian.utils.delay
 import kotlinx.android.synthetic.main.fragment_welcome.view.*
 import java.lang.ClassCastException
+import java.util.*
 
 /**
  *Fragment used for displaying introduction into app.
@@ -39,10 +39,8 @@ open class WelcomeFragment : Fragment() {
         //Show Shimmer text loading animation
         view.shimmerFrame.showShimmer()
         parentActivityCallback?.getWelcome {
-            150L.delay {
-                view.shimmerFrame.hideShimmer()
-                view.welcomeContentTextView?.text = it.description
-            }
+            view.shimmerFrame.hideShimmer()
+            view.welcomeContentTextView?.text = it.description
         }
 
         parentActivityCallback?.changeFabPosition(BottomAppBar.FAB_ALIGNMENT_MODE_CENTER)

@@ -1,18 +1,16 @@
 package cv.brulinski.sebastian.model
 
 import android.graphics.Bitmap
-import android.os.Parcel
-import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import cv.brulinski.sebastian.interfaces.BitmapLoadable
+import cv.brulinski.sebastian.utils.getBitmapFromBase64
 
 @Entity
-class Language() : BitmapLoadable{
+class Language() : BitmapLoadable {
 
     @PrimaryKey
     @ColumnInfo(name = "id")
@@ -44,12 +42,8 @@ class Language() : BitmapLoadable{
     var imageUrl = ""
 
     @Expose
-    @ColumnInfo(name = "flagBase64")
-    var flagBase64: String? = ""
-
-    @Expose
-    @Ignore
-    var flagBitmap: Bitmap? = null
+    @ColumnInfo(name = "flagBitmap")
+    var flagBitmap: String? = null
 
     @ColumnInfo(name = "avgBitmapColor")
     @Expose
@@ -59,20 +53,23 @@ class Language() : BitmapLoadable{
         avgBitmapColor = color
     }
 
+    fun getLanguageIcon(bitmap: (Bitmap) -> Unit) {
+        flagBitmap?.getBitmapFromBase64(bitmap)
+    }
+
     override fun getSortKey() = "$level"
 
     override fun getTypeId() = id
 
-    override fun getTypeBitmap() = flagBitmap
+    override fun getTypeBitmap(): Bitmap? = null
 
-    override fun getTypeBitmapBase64() = flagBase64
+    override fun getTypeBitmapBase64() = flagBitmap
 
     override fun setTypeBitmapBase64(bitmap: String?) {
-        flagBase64 = bitmap
+        flagBitmap = bitmap
     }
 
     override fun setTypeBitmap(bitmap: Bitmap?) {
-        flagBitmap = bitmap
     }
 
     override fun getTypeSkillCategory(): String? = null

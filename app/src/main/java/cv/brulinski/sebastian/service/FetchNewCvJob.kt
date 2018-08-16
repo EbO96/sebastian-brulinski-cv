@@ -1,30 +1,54 @@
 package cv.brulinski.sebastian.service
 
 import android.content.Intent
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.Observer
 import com.firebase.jobdispatcher.JobService
-import com.google.gson.Gson
+import cv.brulinski.sebastian.R
+import cv.brulinski.sebastian.dependency_injection.app.App
 import cv.brulinski.sebastian.interfaces.RemoteRepository
 import cv.brulinski.sebastian.model.MyCv
 import cv.brulinski.sebastian.utils.MAIN_ACTIVITY
 import cv.brulinski.sebastian.utils.log
 import cv.brulinski.sebastian.view_model.MainViewModel
 
+/**
+ * This service is used to fetching new CV is foreground or background.
+ * This Job is trigger by FCM notification
+ */
 class FetchNewCvJob : JobService(), RemoteRepository {
 
     private val viewModel = MainViewModel<RemoteRepository>(null, this)
+    private var cv: MyCv? = null //This is updated version of cv
+    //Notification
+    private val CHANNEL_ID = "NEW CV CHANNEL"
+    private val NOTIFICATION_ID = 1
+    private var contentTitle = ""
+    private var contentText = ""
+    private val notificationManager by lazy { NotificationManagerCompat.from(this) }
+
+    companion object {
+        const val TITLE_ARG = "title"
+        const val MESSAGE_ARG = "message"
+    }
 
     override fun onStopJob(job: com.firebase.jobdispatcher.JobParameters?): Boolean {
         return false // Answers the question: "Should this job be retried?"
     }
 
     override fun onStartJob(job: com.firebase.jobdispatcher.JobParameters?): Boolean {
+        job?.extras?.apply {
+            contentTitle = getString(TITLE_ARG)
+            contentText = getString(MESSAGE_ARG)
+        }
         viewModel.apply {
-
             var observer: Observer<MyCv>? = null
             observer = Observer {
                 observer?.let {
-                    refreshAll()
+                    refreshAll {
+                        cv = it
+                    }
                     myCv.removeObserver(it)
                 }
             }
@@ -34,7 +58,13 @@ class FetchNewCvJob : JobService(), RemoteRepository {
     }
 
     private fun createNotification() {
-
+        val notificationBuilder = NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_receipt)
+                .setContentTitle(contentTitle)
+                .setContentText(contentText)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true)
+        notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
     }
 
     override fun onFetchStart() {
@@ -42,18 +72,16 @@ class FetchNewCvJob : JobService(), RemoteRepository {
     }
 
     override fun onFetchEnd() {
-        viewModel.myCv.value?.let { cv ->
+        //Send broadcast to inform observers about new CV version
+        cv?.let { cv ->
             Intent().apply {
                 action = MainViewModel.UPDATED_CV_IN_BACKGROUND
-                val jsonCv = Gson().toJson(cv)
-                //TODO all bitmaps to base64
-//                putExtra("cv", jsonCv)//TODO error - to long string?
+                App.DataHolder.INSTANCE.cv = cv
                 application.sendBroadcast(this)
             }
         }
-
-        createNotification()
         MAIN_ACTIVITY.log("fetch end")
+        createNotification()
     }
 
     override fun onFetchError(error: Throwable?) {

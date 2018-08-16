@@ -7,8 +7,9 @@ import android.util.Base64
 import android.widget.ImageView
 import cv.brulinski.sebastian.interfaces.BitmapLoadable
 import cv.brulinski.sebastian.model.MyRecyclerItem
-import cv.brulinski.sebastian.repository.MainRepository
 import cv.brulinski.sebastian.repository.RemoteRepository
+import cv.brulinski.sebastian.repository.RemoteRepository.Companion.errorBitmap
+import cv.brulinski.sebastian.repository.RemoteRepository.Companion.errorImageUrl
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -17,8 +18,6 @@ import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
-import cv.brulinski.sebastian.repository.RemoteRepository.Companion.errorBitmap
-import cv.brulinski.sebastian.repository.RemoteRepository.Companion.errorImageUrl
 
 /**
  * Download bitmap from url
@@ -74,6 +73,20 @@ fun Bitmap.toBase64String() = let {
     compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutStream)
     val bitmapBytes = byteArrayOutStream.toByteArray()
     Base64.encodeToString(bitmapBytes, Base64.DEFAULT)
+}
+
+@SuppressLint("CheckResult")
+fun String.getBitmapFromBase64(bitmap: (Bitmap) -> Unit) {
+    base64ToBitmap()
+            .subscribeOn(Schedulers.computation())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                it?.let {
+                    bitmap(it)
+                }
+            }, {
+                it.printStackTrace()
+            })
 }
 
 /**

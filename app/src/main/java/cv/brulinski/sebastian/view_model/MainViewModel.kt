@@ -12,8 +12,6 @@ import cv.brulinski.sebastian.dependency_injection.app.App
 import cv.brulinski.sebastian.interfaces.RemoteRepository
 import cv.brulinski.sebastian.model.*
 import cv.brulinski.sebastian.repository.MainRepository
-import cv.brulinski.sebastian.utils.MAIN_ACTIVITY
-import cv.brulinski.sebastian.utils.log
 
 /**
  * Role of this class is being bridge between repository and views
@@ -47,7 +45,7 @@ class MainViewModel<T : RemoteRepository> constructor(private val activity: AppC
                 //Get CV parts and inform each fragment associated with this about update
                 it?.apply {
                     welcome?.let { welcome ->
-                        this@MainViewModel.welcome.value = welcome
+                        this@MainViewModel.welcome.postValue(welcome)
                     }
                     personalInfo?.let { personalInfo ->
                         this@MainViewModel.personalInfo.value = personalInfo
@@ -67,7 +65,7 @@ class MainViewModel<T : RemoteRepository> constructor(private val activity: AppC
         }
     }
 
-    fun refreshAll() = repository.refreshAll()
+    fun refreshAll(cv: ((MyCv) -> Unit)? = null) = repository.refreshAll(cv)
 
     fun getWelcome(block: (Welcome) -> Unit) {
         activity?.let {
@@ -130,12 +128,12 @@ class MainViewModel<T : RemoteRepository> constructor(private val activity: AppC
         }
     }
 
-    private class MyBroadcastReceiver : BroadcastReceiver() {
+    private inner class MyBroadcastReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
                 UPDATED_CV_IN_BACKGROUND -> {
-                    intent.getStringExtra("cv")?.apply {
-                        MAIN_ACTIVITY.log(this)
+                    App.DataHolder.INSTANCE.cv?.let { cv ->
+                        myCv.postValue(cv)
                     }
                 }
             }

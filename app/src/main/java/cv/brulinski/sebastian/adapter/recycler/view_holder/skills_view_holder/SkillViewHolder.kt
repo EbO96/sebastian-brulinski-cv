@@ -11,14 +11,14 @@ import kotlinx.android.synthetic.main.skill_item.view.*
 
 open class SkillViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), OnBindViewInViewHolder {
     override fun onBind(item: MyRecyclerItem<*>, position: Int, onItemClickListener: OnItemClickListener?) {
-        (item.item as? Skill)?.let {skill ->
+        (item.item as? Skill)?.let { skill ->
             itemView.apply {
                 moreFooter.gone(!skill.moreButton)
                 if (skill.moreButton)
                     moreFooter.setOnClickListener { view ->
                         onItemClickListener?.onClick(skill, position, view)
                     }
-                skill.iconBitmap?.let {
+                skill.getSkillIcon {
                     iconImageView.setImageBitmap(it)
                 }
                 skillNameTextView.text = skill.skillName

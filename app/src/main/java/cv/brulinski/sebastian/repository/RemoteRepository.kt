@@ -161,7 +161,7 @@ class RemoteRepository(private val appRepository: AppRepository) {
                                                 cv.personalInfo?.profilePictureBcgBase64 = it["profileBcg"]
                                             }
                                             cv.languages?.forEach { language ->
-                                                language.flagBase64 = it[language.id]
+                                                language.flagBitmap = it[language.id]
                                             }
                                             cv.skills?.forEach { skill ->
                                                 skill.iconBase64 = it[skill.id]

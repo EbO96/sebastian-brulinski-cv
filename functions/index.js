@@ -156,7 +156,9 @@ exports.addSkill = functions.https.onRequest((request, response) => {
 exports.notifyAboutNewCv = functions.https.onRequest((request, response) => {
     let message = {
         data: {
-            newCv: 'true'
+            newCv: 'true',
+            title: 'Aktualizacja CV',
+            message: 'Android Developer, Sebastian Bruliński właśnie zaktualizował swoje CV'
         },
         topic: FCM_NEW_CV_TOPIC
     };

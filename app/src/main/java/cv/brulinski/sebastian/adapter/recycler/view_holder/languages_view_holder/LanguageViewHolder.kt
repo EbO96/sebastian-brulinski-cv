@@ -12,7 +12,7 @@ open class LanguageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView
     override fun onBind(item: MyRecyclerItem<*>, position: Int, onItemClickListener: OnItemClickListener?) {
         (item.item as? Language)?.apply {
             itemView.apply {
-                flagBitmap?.let {
+                getLanguageIcon {
                     iconImageView.setImageBitmap(it)
                 }
                 nameTextView.text = name

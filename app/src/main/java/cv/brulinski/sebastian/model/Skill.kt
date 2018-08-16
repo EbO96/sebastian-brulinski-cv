@@ -3,12 +3,12 @@ package cv.brulinski.sebastian.model
 import android.graphics.Bitmap
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import cv.brulinski.sebastian.annotations.Crypto
 import cv.brulinski.sebastian.interfaces.BitmapLoadable
+import cv.brulinski.sebastian.utils.getBitmapFromBase64
 
 /**
  * User skill
@@ -54,19 +54,19 @@ open class Skill : BitmapLoadable {
     @Expose
     var iconBase64: String? = ""
 
-    @Ignore
-    @Expose
-    var iconBitmap: Bitmap? = null
-
     @ColumnInfo(name = "avgBitmapColor")
     @Expose
     var avgBitmapColor: Int = -1
+
+    fun getSkillIcon(bitmap: (Bitmap) -> Unit) {
+        iconBase64?.getBitmapFromBase64(bitmap)
+    }
 
     override fun getSortKey() = skillName
 
     override fun getTypeId() = id
 
-    override fun getTypeBitmap() = iconBitmap
+    override fun getTypeBitmap(): Bitmap? = null
 
     override fun getTypeBitmapBase64() = iconBase64
 
@@ -75,7 +75,6 @@ open class Skill : BitmapLoadable {
     }
 
     override fun setTypeBitmap(bitmap: Bitmap?) {
-        iconBitmap = bitmap
     }
 
     override fun setAvgColor(color: Int) {

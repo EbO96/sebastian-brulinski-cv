@@ -1,7 +1,6 @@
 package cv.brulinski.sebastian.repository
 
 import android.annotation.SuppressLint
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import cv.brulinski.sebastian.crypto.CryptoOperations
 import cv.brulinski.sebastian.interfaces.RemoteRepository
@@ -44,18 +43,19 @@ class MainRepository<T : RemoteRepository>(private val listener: T?) : AppReposi
     /**
      * Fetch CV again
      */
-    fun refreshAll() {
-        fetchCvFromRemote()
+    fun refreshAll(cv: ((MyCv) -> Unit)? = null) {
+        fetchCvFromRemote(cv)
     }
 
     /*
     Private methods
      */
-    private fun fetchCvFromRemote() {
+    private fun fetchCvFromRemote(cv: ((MyCv) -> Unit)? = null) {
         listener?.onFetchStart()
         remoteRepository.fetchCv({
-            listener?.onFetchEnd()
             myCv.value = it
+            cv?.apply { invoke(it) }
+            listener?.onFetchEnd()
         }, {
             listener?.onFetchError(null)
         })
