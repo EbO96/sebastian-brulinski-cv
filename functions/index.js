@@ -154,21 +154,29 @@ exports.addSkill = functions.https.onRequest((request, response) => {
 })
 
 exports.notifyAboutNewCv = functions.https.onRequest((request, response) => {
-    let message = {
-        data: {
-            newCv: 'true',
-            title: 'Aktualizacja CV',
-            message: 'Android Developer, Sebastian Bruliński właśnie zaktualizował swoje CV'
-        },
-        topic: FCM_NEW_CV_TOPIC
-    };
 
-    // Send a message to devices subscribed to the provided topic.
-    return admin.messaging().send(message)
-        .then((res) => {
-            response.status(200).send('Successfully sent message')
+    return db.collection('new_cv_notification').get().then((snapshot) => {
+
+        let message = {
+            data: {
+                newCv: 'true',
+                title: '',
+                message: ''
+            },
+            topic: FCM_NEW_CV_TOPIC
+        };
+
+        snapshot.forEach((doc) => {
+            message.data.title = doc.data().contentTitle
+            message.data.message = doc.data().contentText
         })
-        .catch((err) => {
-            response.status(400).send('Error sending message')
-        });
+
+        // Send a message to devices subscribed to the provided topic.
+        return admin.messaging().send(message)
+
+    }).then((res) => {
+        response.status(200).send('Successfully sent message')
+    }).catch((err) => {
+        response.status(400).send('Error sending message')
+    })
 })

@@ -22,13 +22,14 @@ class FetchNewCvJob : JobService(), RemoteRepository {
     private val viewModel = MainViewModel<RemoteRepository>(null, this)
     private var cv: MyCv? = null //This is updated version of cv
     //Notification
-    private val CHANNEL_ID = "NEW CV CHANNEL"
     private val NOTIFICATION_ID = 1
     private var contentTitle = ""
     private var contentText = ""
     private val notificationManager by lazy { NotificationManagerCompat.from(this) }
 
     companion object {
+        //Channel
+        const val CHANNEL_ID = "NEW CV CHANNEL"
         const val TITLE_ARG = "title"
         const val MESSAGE_ARG = "message"
     }
@@ -63,6 +64,7 @@ class FetchNewCvJob : JobService(), RemoteRepository {
                 .setContentTitle(contentTitle)
                 .setContentText(contentText)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setStyle(NotificationCompat.BigTextStyle())
                 .setAutoCancel(true)
         notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
     }

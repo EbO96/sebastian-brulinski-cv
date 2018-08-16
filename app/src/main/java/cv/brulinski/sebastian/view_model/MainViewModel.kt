@@ -12,6 +12,8 @@ import cv.brulinski.sebastian.dependency_injection.app.App
 import cv.brulinski.sebastian.interfaces.RemoteRepository
 import cv.brulinski.sebastian.model.*
 import cv.brulinski.sebastian.repository.MainRepository
+import cv.brulinski.sebastian.utils.MAIN_ACTIVITY
+import cv.brulinski.sebastian.utils.log
 
 /**
  * Role of this class is being bridge between repository and views
@@ -123,8 +125,12 @@ class MainViewModel<T : RemoteRepository> constructor(private val activity: AppC
     }
 
     fun unregisterMyBroadcastReceiver() {
-        myBroadcastReceiver?.let {
-            activity?.unregisterReceiver(it)
+        try {
+            myBroadcastReceiver?.let {
+                activity?.unregisterReceiver(it)
+            }
+        } catch (e: IllegalArgumentException) {
+            MAIN_ACTIVITY.log("${e.message}")
         }
     }
 
