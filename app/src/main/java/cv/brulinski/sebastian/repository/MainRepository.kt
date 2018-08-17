@@ -4,7 +4,10 @@ import android.annotation.SuppressLint
 import androidx.lifecycle.MutableLiveData
 import cv.brulinski.sebastian.crypto.CryptoOperations
 import cv.brulinski.sebastian.interfaces.RemoteRepository
+import cv.brulinski.sebastian.model.Credit
 import cv.brulinski.sebastian.model.MyCv
+import cv.brulinski.sebastian.utils.database
+import cv.brulinski.sebastian.utils.doAsync
 
 /**
  * Provides all required data for application
@@ -14,6 +17,7 @@ import cv.brulinski.sebastian.model.MyCv
 class MainRepository<T : RemoteRepository>(private val listener: T?) : AppRepository {
 
     private val myCv = MutableLiveData<MyCv>()
+    private val credits = MutableLiveData<List<Credit>>()
     private val cryptoOperations = CryptoOperations()
     private val localRepository = LocalRepository(this@MainRepository) //Provides CV from local SQL database
     private val remoteRepository = RemoteRepository(this@MainRepository) //Provides Cv from remote server
@@ -33,9 +37,19 @@ class MainRepository<T : RemoteRepository>(private val listener: T?) : AppReposi
         return myCv
     }
 
+    fun getCredits(): MutableLiveData<List<Credit>> {
+        localRepository.getCredits({
+            credits.value = it
+        }, {
+            fetchCreditsFromRemote()
+        })
+        return credits
+    }
+
     /*
     Public methods
      */
+
     fun registerForCvNotifications(register: Boolean, status: (Int) -> Unit) {
         remoteRepository.registerForCvNotifications(register, status)
     }
@@ -59,6 +73,15 @@ class MainRepository<T : RemoteRepository>(private val listener: T?) : AppReposi
         }, {
             listener?.onFetchError(null)
         })
+    }
+
+    private fun fetchCreditsFromRemote() {
+        remoteRepository.getCredits {
+            doAsync {
+                it?.also { database.insertCredits(it) }
+            }
+            credits.value = it
+        }
     }
 
     /*

@@ -22,6 +22,9 @@ interface MainDatabaseDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertSkills(skill: List<Skill>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertCredits(credits: List<Credit>)
+
     @Query("DELETE FROM Career")
     fun deleteCareer()
 
@@ -34,13 +37,11 @@ interface MainDatabaseDao {
     @Query("DELETE FROM PersonalInfo")
     fun deletePersonalInfo()
 
-
     @Query("SELECT * FROM Welcome")
     fun getWelcome(): LiveData<Welcome>
 
     @Query("SELECT * FROM PersonalInfo")
     fun getPersonalInfo(): LiveData<PersonalInfo>
-
 
     @Query("SELECT * FROM Language")
     fun getLanguages(): LiveData<List<Language>>
@@ -50,5 +51,8 @@ interface MainDatabaseDao {
 
     @Query("SELECT * FROM Skill")
     fun getSkills(): LiveData<List<Skill>>
+
+    @Query("SELECT * FROM Credit")
+    fun getCredits(): LiveData<List<Credit>>
 
 }

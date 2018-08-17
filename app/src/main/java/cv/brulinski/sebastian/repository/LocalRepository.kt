@@ -126,4 +126,26 @@ open class LocalRepository(private val appRepository: AppRepository) {
                     it.printStackTrace()
                 })
     }
+
+    @SuppressLint("CheckResult")
+    fun getCredits(credits: (List<Credit>?) -> Unit, empty: (EMPTY) -> Unit) {
+        val observable = fetchFromDatabase {
+            database.getCredits()
+        }
+
+        observable
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    (it as? List<*>)?.also {
+                        if (it.isNotEmpty() && it[0] is Credit) {
+                            credits(it as List<Credit>)
+                        } else empty(EMPTY)
+                    } ?: run {
+                        empty(EMPTY)
+                    }
+                }, {
+                    empty(EMPTY)
+                })
+    }
 }

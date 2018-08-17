@@ -180,3 +180,39 @@ exports.notifyAboutNewCv = functions.https.onRequest((request, response) => {
         response.status(400).send('Error sending message')
     })
 })
+
+exports.addCredits = functions.https.onRequest((request, response) => {
+
+    let authorParam = request.query.author
+    let authorUrlParam = request.query.authorUrl
+
+    let data = {
+    }
+
+    data['author'] = authorParam
+    data['authorUrl'] = authorUrlParam
+
+    return db.collection('credits').add(data)
+        .then((res) => {
+            response.status(200).send("Success")
+        }).catch((err) => {
+            response.status(400).send("Error")
+        })
+})
+
+exports.getCredits = functions.https.onRequest((request, response) => {
+
+    let credits = []
+
+    return db.collection('credits').get()
+        .then((snapshot) => {
+            snapshot.forEach((doc) => {
+                let credit = doc.data()
+                credit['id'] = doc.id
+                credits.push(credit)
+            })
+            response.status(200).send(credits)
+        }).catch((error) => {
+            response.status(400).send(credits)
+        })
+})

@@ -46,19 +46,19 @@ class MainViewModel<T : RemoteRepository> constructor(private val activity: AppC
             myCv.observe(activity, Observer {
                 //Get CV parts and inform each fragment associated with this about update
                 it?.apply {
-                    welcome?.let { welcome ->
+                    welcome?.also { welcome ->
                         this@MainViewModel.welcome.postValue(welcome)
                     }
-                    personalInfo?.let { personalInfo ->
+                    personalInfo?.also { personalInfo ->
                         this@MainViewModel.personalInfo.value = personalInfo
                     }
-                    career?.let { career ->
+                    career?.also { career ->
                         this@MainViewModel.career.value = career
                     }
-                    languages?.let { languages ->
+                    languages?.also { languages ->
                         this@MainViewModel.languages.value = languages
                     }
-                    skills?.let { skills ->
+                    skills?.also { skills ->
                         this@MainViewModel.skills.value = skills
                     }
                 }
@@ -72,42 +72,51 @@ class MainViewModel<T : RemoteRepository> constructor(private val activity: AppC
      */
     fun refreshAll(cv: ((MyCv) -> Unit)? = null) = repository.refreshAll(cv)
 
+    fun getCredits(credits: (List<Credit>) -> Unit) {
+        activity?.also {
+            if (!repository.getCredits().hasActiveObservers())
+                repository.getCredits().observe(it, Observer {
+                    it?.apply { credits(it) }
+                })
+        }
+    }
+
     fun getWelcome(block: (Welcome) -> Unit) {
-        activity?.let {
+        activity?.also {
             welcome.observe(it, Observer {
-                it?.let { block(it) }
+                it?.also { block(it) }
             })
         }
     }
 
     fun getPersonalInfo(block: (PersonalInfo) -> Unit) {
-        activity?.let {
+        activity?.also {
             personalInfo.observe(it, Observer {
-                it?.let { block(it) }
+                it?.also { block(it) }
             })
         }
     }
 
     fun getCareer(block: (List<Career>) -> Unit) {
-        activity?.let {
+        activity?.also {
             career.observe(it, Observer {
-                it?.let { block(it) }
+                it?.also { block(it) }
             })
         }
     }
 
     fun getLanguages(block: (List<Language>) -> Unit) {
-        activity?.let {
+        activity?.also {
             languages.observe(it, Observer {
-                it?.let { block(it) }
+                it?.also { block(it) }
             })
         }
     }
 
     fun getSkills(block: (List<Skill>) -> Unit) {
-        activity?.let {
+        activity?.also {
             skills.observe(it, Observer {
-                it?.let { block(it) }
+                it?.also { block(it) }
             })
         }
     }
@@ -129,7 +138,7 @@ class MainViewModel<T : RemoteRepository> constructor(private val activity: AppC
 
     fun unregisterMyBroadcastReceiver() {
         try {
-            myBroadcastReceiver?.let {
+            myBroadcastReceiver?.also {
                 activity?.unregisterReceiver(it)
             }
         } catch (e: IllegalArgumentException) {
@@ -145,7 +154,7 @@ class MainViewModel<T : RemoteRepository> constructor(private val activity: AppC
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
                 UPDATED_CV_IN_BACKGROUND -> {
-                    App.DataHolder.INSTANCE.cv?.let { cv ->
+                    App.DataHolder.INSTANCE.cv?.also { cv ->
                         myCv.postValue(cv)
                     }
                 }

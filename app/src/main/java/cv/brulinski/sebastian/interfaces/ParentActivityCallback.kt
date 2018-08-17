@@ -1,5 +1,6 @@
 package cv.brulinski.sebastian.interfaces
 
+import androidx.fragment.app.Fragment
 import cv.brulinski.sebastian.adapter.view_pager.MainActivityViewPagerAdapter.Companion.Page
 import cv.brulinski.sebastian.model.*
 
@@ -18,6 +19,7 @@ interface ParentActivityCallback {
     fun getCareer(block: (List<Career>) -> Unit)
     fun getLanguages(block: (List<Language>) -> Unit)
     fun getSkills(block: (List<Skill>) -> Unit)
+    fun getCredits(block: (List<Credit>) -> Unit)
     fun tryMakeACall()
     fun composeEmail()
     fun showLoading()
@@ -25,4 +27,6 @@ interface ParentActivityCallback {
     fun changeFabPosition(position: Int)
     fun goToPage(page: Page)
     fun registerForCvNotifications(register: Boolean, status: (Int) -> Unit)
+    fun goToCredits()
+    fun onFragmentDestroyed(fragment: Fragment)
 }

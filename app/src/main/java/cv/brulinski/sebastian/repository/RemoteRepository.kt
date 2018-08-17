@@ -1,14 +1,12 @@
 package cv.brulinski.sebastian.repository
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import com.google.firebase.messaging.FirebaseMessaging
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.interfaces.BitmapLoadable
 import cv.brulinski.sebastian.interfaces.OnGetCvObjects
-import cv.brulinski.sebastian.model.Language
-import cv.brulinski.sebastian.model.MyCv
-import cv.brulinski.sebastian.model.PersonalInfo
-import cv.brulinski.sebastian.model.Skill
+import cv.brulinski.sebastian.model.*
 import cv.brulinski.sebastian.utils.*
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -236,5 +234,17 @@ class RemoteRepository(private val appRepository: AppRepository) {
             settings.newCvNotification = !register
             status(-1)
         }
+    }
+
+    @SuppressLint("CheckResult")
+    fun getCredits(credits: (List<Credit>?) -> Unit) {
+        retrofit.getCredits()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    credits(it)
+                }, {
+                    credits(null)
+                })
     }
 }

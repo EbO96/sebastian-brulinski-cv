@@ -9,13 +9,13 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.transition.Fade
 import android.view.MenuItem
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.bottomappbar.BottomAppBar
@@ -106,13 +106,11 @@ class MainActivity : AppCompatActivity(),
 
         //BottomAppBar FloatingActiobButton
         fab.setOnClickListener {
-            if (currentFragment !is SettingsFragment)
+            if (supportFragmentManager.backStackEntryCount == 0)
                 slideDrawer.apply {
                     if (!isOpen()) open() else close() //Open/close drawer
                 }
-            else {
-                backFromSettings() //If current screen is SettingsFragment
-            }
+            else supportFragmentManager.popBackStack()
         }
 
         /*
@@ -216,28 +214,9 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
-    //Return form SettingsFragment
-    private fun backFromSettings(): Boolean {
-        val fragment = supportFragmentManager.findFragmentById(this@MainActivity.mainContainer.id)
-        return if (fragment is SettingsFragment) {
-            supportFragmentManager.beginTransaction().remove(fragment).commit()
-            this@MainActivity.fab.setImageState(intArrayOf(-android.R.attr.state_selected), false)
-            currentFragment = null
-            this@MainActivity.bar.menu.apply {
-                setGroupVisible(R.id.callMailGroup, viewPager.currentItem != 1)
-                setGroupVisible(R.id.settingsGroup, true)
-            }
-            true
-        } else false
-
-    }
-
     //Open settings screen
     private fun goToSettings() {
         SettingsFragment().apply {
-            val fade = Fade()
-            enterTransition = fade
-            exitTransition = fade
             this@apply.set(supportFragmentManager, this@MainActivity.mainContainer.id)
             this@MainActivity.fab.setImageState(intArrayOf(android.R.attr.state_selected), false)
             this@MainActivity.bar.menu.apply {
@@ -371,8 +350,29 @@ class MainActivity : AppCompatActivity(),
         mainViewModel?.getSkills(block)
     }
 
+    override fun getCredits(block: (List<Credit>) -> Unit) {
+        mainViewModel?.getCredits(block)
+    }
+
     override fun registerForCvNotifications(register: Boolean, status: (Int) -> Unit) {
         mainViewModel?.registerForCvNotifications(register, status)
+    }
+
+    override fun goToCredits() {
+        CreditsFragment().set(supportFragmentManager, this@MainActivity.mainContainer.id)
+    }
+
+    override fun onFragmentDestroyed(fragment: Fragment) {
+        when (fragment) {
+            is SettingsFragment -> {
+                //Setup menu and fab
+                this@MainActivity.fab.setImageState(intArrayOf(-android.R.attr.state_selected), false)
+                this@MainActivity.bar.menu.apply {
+                    setGroupVisible(R.id.callMailGroup, viewPager.currentItem != 1)
+                    setGroupVisible(R.id.settingsGroup, true)
+                }
+            }
+        }
     }
 
     /**
@@ -468,7 +468,8 @@ class MainActivity : AppCompatActivity(),
     override fun onBackPressed() {
         viewPager.apply {
             when {
-                backFromSettings() -> {
+                supportFragmentManager.backStackEntryCount > 0 -> {
+                    supportFragmentManager.popBackStack()
                 }
                 this@MainActivity.slideDrawer?.isOpen() != false -> slideDrawer.close()
                 currentItem == pageMap[WELCOME_SCREEN] ?: 0 -> super.onBackPressed()

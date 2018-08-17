@@ -45,6 +45,15 @@ class SettingsFragment : androidx.fragment.app.Fragment() {
                 }
             }
         }
+
+        view.creditsSection.setOnClickListener {
+            parentActivityCallback?.goToCredits()
+        }
+    }
+
+    override fun onDetach() {
+        parentActivityCallback?.onFragmentDestroyed(this)
+        super.onDetach()
     }
 
     override fun onAttach(context: Context?) {
