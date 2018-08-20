@@ -375,6 +375,7 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onFragmentDestroyed(fragment: Fragment) {
+        val f = supportFragmentManager.fragments
         when (fragment) {
             is SettingsFragment -> {
                 //Setup menu and fab
@@ -383,6 +384,9 @@ class MainActivity : AppCompatActivity(),
                     setGroupVisible(R.id.callMailGroup, viewPager.currentItem != 1)
                     setGroupVisible(R.id.settingsGroup, true)
                 }
+            }
+            is CreditsFragment -> {
+                mainViewModel?.removeCreditsObservers()
             }
         }
     }

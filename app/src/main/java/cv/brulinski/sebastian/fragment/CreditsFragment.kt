@@ -7,12 +7,23 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import cv.brulinski.sebastian.R
+import cv.brulinski.sebastian.adapter.recycler.credits.CreditsRecyclerAdapter
+import cv.brulinski.sebastian.interfaces.OnItemClickListener
 import cv.brulinski.sebastian.interfaces.ParentActivityCallback
+import cv.brulinski.sebastian.model.MyRecyclerItem
+import cv.brulinski.sebastian.utils.TYPE_ITEM
+import kotlinx.android.synthetic.main.fragment_credits.view.*
+import setup
 
-class CreditsFragment : Fragment() {
+/**
+ * Fragment to display credits
+ */
+class CreditsFragment : Fragment(), OnItemClickListener {
 
     //Communication with parent activity
     private var parentActivityCallback: ParentActivityCallback? = null
+    //Credits recycler adapter
+    private var creditsRecyclerAdapter: CreditsRecyclerAdapter? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -22,9 +33,23 @@ class CreditsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        parentActivityCallback?.getCredits {
-
+        //Setup recycler
+        creditsRecyclerAdapter = CreditsRecyclerAdapter(this).apply {
+            view.creditsRecyclerView.setup(this, true)
         }
+
+        parentActivityCallback?.getCredits {
+            creditsRecyclerAdapter?.items = it.map { MyRecyclerItem(it, TYPE_ITEM) }
+        }
+    }
+
+    override fun onClick(item: Any, position: Int, v: View) {
+
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        parentActivityCallback?.onFragmentDestroyed(this)
     }
 
     override fun onAttach(context: Context?) {

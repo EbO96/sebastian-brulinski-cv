@@ -81,6 +81,12 @@ class MainViewModel<T : RemoteRepository> constructor(private val activity: AppC
         }
     }
 
+    fun removeCreditsObservers() {
+        activity?.also {
+            repository.getCredits().removeObservers(it)
+        }
+    }
+
     fun getWelcome(block: (Welcome) -> Unit) {
         activity?.also {
             welcome.observe(it, Observer {
