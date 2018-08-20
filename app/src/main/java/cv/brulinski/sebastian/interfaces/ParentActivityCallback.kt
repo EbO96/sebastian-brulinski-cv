@@ -29,4 +29,5 @@ interface ParentActivityCallback {
     fun registerForCvNotifications(register: Boolean, status: (Int) -> Unit)
     fun goToCredits()
     fun onFragmentDestroyed(fragment: Fragment)
+    fun openMapsActivity(lat: Double?, lng: Double?)
 }

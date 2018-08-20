@@ -43,4 +43,5 @@
     <string name="notifications">Powiadomienia</string>
     <string name="new_cv_notifiction">Powiadom mnie o nowej wersji CV</string>
     <string name="credits">Credits</string>
+    <string name="home">Miejsce zamieszkania</string>
 </resources>

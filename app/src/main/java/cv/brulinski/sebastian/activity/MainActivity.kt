@@ -58,6 +58,8 @@ class MainActivity : AppCompatActivity(),
         const val REQUEST_CODE_MAKE_CALL = 1
         //Activity request codes
         const val APP_SETTINGS_REQUEST_CODE = 2
+        //Open MyLocationActivity request code
+        const val OPEN_MY_LOCATION_ACTIVITY_REQUEST_CODE = 3
     }
 
     //Colors for snackbar
@@ -362,6 +364,16 @@ class MainActivity : AppCompatActivity(),
         CreditsFragment().set(supportFragmentManager, this@MainActivity.mainContainer.id)
     }
 
+    override fun openMapsActivity(lat: Double?, lng: Double?) {
+        if (lat != null && lng != null)
+            Intent(this, MyLocationActivity::class.java).apply {
+                putExtra(MyLocationActivity.LAT, lat)
+                putExtra(MyLocationActivity.LNG, lng)
+                startActivityForResult(this, OPEN_MY_LOCATION_ACTIVITY_REQUEST_CODE)
+                loadingLayout.visible()
+            }
+    }
+
     override fun onFragmentDestroyed(fragment: Fragment) {
         when (fragment) {
             is SettingsFragment -> {
@@ -449,7 +461,7 @@ class MainActivity : AppCompatActivity(),
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
-            APP_SETTINGS_REQUEST_CODE, OPEN_URL_REQUEST_CODE -> {
+            APP_SETTINGS_REQUEST_CODE, OPEN_URL_REQUEST_CODE, OPEN_MY_LOCATION_ACTIVITY_REQUEST_CODE -> {
                 loadingLayout.gone()
             }
         }

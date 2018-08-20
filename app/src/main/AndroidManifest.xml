@@ -17,8 +17,19 @@
         android:supportsRtl="true"
         android:theme="@style/AppThemeNoActionBar"
         tools:ignore="GoogleAppIndexingWarning">
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <!-- Maps API key -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
+
         <activity
             android:name=".activity.MainActivity"
+            android:label="@string/home"
+            android:launchMode="singleTop"
             android:resizeableActivity="false"
             android:screenOrientation="portrait"
             android:theme="@style/AppThemeNoActionBar"
@@ -32,6 +43,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".activity.MyLocationActivity"
+            android:parentActivityName=".activity.MainActivity"
+            android:resizeableActivity="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeNoActionBar"
+            tools:targetApi="n" />
 
         <meta-data
             android:name="preloaded_fonts"
@@ -51,6 +69,7 @@
                 <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE" />
             </intent-filter>
         </service>
+
     </application>
 
 </manifest>

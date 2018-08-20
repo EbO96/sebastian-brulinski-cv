@@ -10,6 +10,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.facebook.shimmer.ShimmerFrameLayout
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.interfaces.ParentActivityCallback
+import cv.brulinski.sebastian.model.PersonalInfo
 import cv.brulinski.sebastian.utils.age
 import cv.brulinski.sebastian.utils.ageSufix
 import cv.brulinski.sebastian.utils.date
@@ -24,6 +25,7 @@ with information like phone number, email address, live address, born date
 open class PersonalInfoFragment : Fragment(), LifecycleOwner {
 
     private var parentActivityCallback: ParentActivityCallback? = null
+    private var personalInfo: PersonalInfo? = null
 
     //Views
     private val shimmers by lazy {
@@ -44,6 +46,7 @@ open class PersonalInfoFragment : Fragment(), LifecycleOwner {
 
         shimmers.start()
         parentActivityCallback?.getPersonalInfo {
+            personalInfo = it
             shimmers.stop()
             it.apply {
                 //Load profile picture
@@ -82,6 +85,10 @@ open class PersonalInfoFragment : Fragment(), LifecycleOwner {
 
         view.emailFrame.setOnClickListener {
             parentActivityCallback?.composeEmail()
+        }
+
+        view.addressFrame.setOnClickListener {
+            parentActivityCallback?.openMapsActivity(personalInfo?.latitude, personalInfo?.longitude)
         }
     }
 
