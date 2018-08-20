@@ -3,8 +3,10 @@ package cv.brulinski.sebastian.fragment
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.adapter.recycler.credits.CreditsRecyclerAdapter
@@ -12,7 +14,9 @@ import cv.brulinski.sebastian.interfaces.OnItemClickListener
 import cv.brulinski.sebastian.interfaces.ParentActivityCallback
 import cv.brulinski.sebastian.model.MyRecyclerItem
 import cv.brulinski.sebastian.utils.TYPE_ITEM
+import cv.brulinski.sebastian.utils.string
 import kotlinx.android.synthetic.main.fragment_credits.view.*
+import kotlinx.android.synthetic.main.my_toolbar.view.*
 import setup
 
 /**
@@ -33,6 +37,16 @@ class CreditsFragment : Fragment(), OnItemClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        //Setup Toolbar
+        setHasOptionsMenu(true)
+        (activity as? AppCompatActivity)?.apply {
+            setSupportActionBar(view.myToolbar)
+            supportActionBar?.apply {
+                title = R.string.credits.string()
+                setDisplayHomeAsUpEnabled(true)
+            }
+        }
+
         //Setup recycler
         creditsRecyclerAdapter = CreditsRecyclerAdapter(this).apply {
             view.creditsRecyclerView.setup(this, true)
@@ -45,6 +59,16 @@ class CreditsFragment : Fragment(), OnItemClickListener {
 
     override fun onClick(item: Any, position: Int, v: View) {
 
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        return when (item?.itemId) {
+            android.R.id.home -> {
+                activity?.supportFragmentManager?.popBackStack()
+                true
+            }
+            else -> false
+        }
     }
 
     override fun onDetach() {

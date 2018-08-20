@@ -22,7 +22,7 @@ class FirstLetterTextView(context: Context?, attrs: AttributeSet?) : TextView(co
     }
 
     override fun setBackground(background: Drawable?) {
-        super.setBackground(R.drawable.circle_shape.drawable())
+        super.setBackground(R.drawable.circle_shape.drawable(context))
     }
 
     override fun setText(text: CharSequence?, type: BufferType?) {

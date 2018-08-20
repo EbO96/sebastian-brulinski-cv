@@ -1,11 +1,13 @@
 package cv.brulinski.sebastian.utils
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
 import androidx.core.content.ContextCompat
 import cv.brulinski.sebastian.dependency_injection.app.App
 
-fun Int.color() = ContextCompat.getColor(App.component.getContext(), this)
+fun Int.color(ctx: Context? = null) = ContextCompat.getColor(ctx
+        ?: App.component.getContext(), this)
 
 fun Int.setAlpha(alpha: Int): Int? {
     return try {
