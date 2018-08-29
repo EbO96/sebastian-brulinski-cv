@@ -216,3 +216,34 @@ exports.getCredits = functions.https.onRequest((request, response) => {
             response.status(400).send(credits)
         })
 })
+
+function validateToken(token) {
+
+    return new Promise((resolve, reject) => {
+        admin.auth().verifyIdToken(token)
+            .then(decodedIdToken => {
+                 console.log(decodedIdToken);
+                resolve(true)
+            })
+            .catch(error => {
+                console.log(error);
+                reject(false)
+            });
+    });
+}
+
+exports.authTest = functions.https.onRequest((request, response) => {
+    let token = request.headers.authorization;
+    console.log("token = " + token);
+    if (token) {
+        return validateToken(token)
+            .then(result => {
+                response.status(200).send("Auth ok")
+            })
+            .catch(error => {
+                response.status(400).send("Bad auth token")
+            });
+    } else {
+        response.status(400).send("No auth token")
+    }
+});

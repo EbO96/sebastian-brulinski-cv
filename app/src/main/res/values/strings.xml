@@ -44,4 +44,10 @@
     <string name="new_cv_notifiction">Powiadom mnie o nowej wersji CV</string>
     <string name="credits">Credits</string>
     <string name="home">Miejsce zamieszkania</string>
+    <string name="email">Email</string>
+    <string name="password">Hasło</string>
+    <string name="sign_in">Zaloguj</string>
+    <string name="login_screen_message">Proszę o wpisanie danych logowania\nz wiadomości email</string>
+    <string name="access_denied">Odmowa dostępu</string>
+    <string name="login_successful">Zapraszam</string>
 </resources>

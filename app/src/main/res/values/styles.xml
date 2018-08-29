@@ -162,4 +162,32 @@
         <item name="android:textAlignment">gravity</item>
         <item name="android:gravity">center_vertical|center_horizontal</item>
     </style>
+
+    <style name="LoginScreenEditTextStyle" parent="Base.V7.Widget.AppCompat.EditText">
+        <item name="android:maxLines">1</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:theme">@style/Theme.AppCompat.Light</item>
+        <item name="android:colorAccent">@color/colorPrimary</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:textColorHint">@color/colorPrimaryAlpha</item>
+        <item name="android:backgroundTint">@color/colorPrimary</item>
+    </style>
+
+    <style name="LoginScreenInputLayout" parent="Base.Widget.MaterialComponents.TextInputLayout">
+        <item name="hintTextAppearance">@style/LoginScreenHintText</item>
+    </style>
+
+    <style name="LoginScreenHintText" parent="TextAppearance.AppCompat.Small">
+        <item name="android:textColor">@color/colorPrimaryAlpha</item>
+    </style>
+
+    <style name="LoginButtonStyle" parent="Base.Widget.AppCompat.Button">
+        <item name="android:background">@drawable/white_rounded</item>
+        <item name="android:textColor">@color/colorAccent</item>
+    </style>
+
+    <style name="LoginScreenTextViewStyle" parent="TextAppearance.AppCompat">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+    </style>
 </resources>
