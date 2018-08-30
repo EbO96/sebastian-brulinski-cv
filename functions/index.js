@@ -6,6 +6,8 @@ const express = require('express');
 const cookieParser = require('cookie-parser')();
 const cors = require('cors')({ origin: true });
 const app = express();
+const app1 = express();
+const app2 = express();
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
@@ -285,9 +287,20 @@ app.use(cors);
 app.use(cookieParser);
 app.use(validateFirebaseIdToken);
 app.use(getAll);
-app.user(getCredits);
+
+app1.use(cors);
+app1.use(cookieParser);
+app1.use(validateFirebaseIdToken);
+app1.use(getCredits);
+
+app2.use(cors);
+app2.use(cookieParser);
+app2.use(validateFirebaseIdToken);
+app2.use(notifyAboutNewCv);
 
 // This HTTPS endpoint can only be accessed by your Firebase Users.
 // Requests need to be authorized by providing an `Authorization` HTTP header
 // with value `Bearer <Firebase ID Token>`.
 exports.app = functions.https.onRequest(app);
+exports.app1 = functions.https.onRequest(app1);
+exports.app2 = functions.https.onRequest(app2);

@@ -7,9 +7,9 @@ import retrofit2.http.GET
 
 interface RetrofitApiCallbacks {
 
-    @GET("getAll")
+    @GET("app/getAll")
     fun getAll(): Observable<MyCv>
 
-    @GET("getCredits")
+    @GET("app1/getCredits")
     fun getCredits(): Observable<List<Credit>>
 }
