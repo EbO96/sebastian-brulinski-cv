@@ -285,6 +285,7 @@ app.use(cors);
 app.use(cookieParser);
 app.use(validateFirebaseIdToken);
 app.use(getAll);
+app.user(getCredits);
 
 // This HTTPS endpoint can only be accessed by your Firebase Users.
 // Requests need to be authorized by providing an `Authorization` HTTP header
