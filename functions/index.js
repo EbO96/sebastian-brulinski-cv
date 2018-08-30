@@ -2,6 +2,10 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const requestify = require('requestify');
 var serviceAccount = require("./sebastian-brulinski-cv-app-firebase-adminsdk-b1ddn-608e079791");
+const express = require('express');
+const cookieParser = require('cookie-parser')();
+const cors = require('cors')({origin: true});
+const app = express();
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
