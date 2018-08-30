@@ -12,33 +12,35 @@ const baseUrl = 'https://us-central1-sebastian-brulinski-cv-app.cloudfunctions.n
 //Clound Messaging topics
 const FCM_NEW_CV_TOPIC = "new_cv_topic"
 
-var db = admin.firestore();
+var firestore = admin.firestore();
+const settings = { timestampsInSnapshots: true };
+firestore.settings(settings);
 
 function getCareerProomise() {
-    return db
+    return firestore
         .collection('career')
         .get()
 }
 function getWelcomePromise() {
-    return db
+    return firestore
         .collection('welcome')
         .get()
 }
 
 function getPersonalInfoPromise() {
-    return db
+    return firestore
         .collection('personal_data')
         .get()
 }
 
 function getLanguagesPromise() {
-    return db
+    return firestore
         .collection('languages')
         .get()
 }
 
 function getSkillsPromise() {
-    return db.
+    return firestore.
         collection('skills')
         .get()
 }
@@ -113,7 +115,7 @@ exports.addCareer = functions.https.onRequest((request, response) => {
         type: 1,
         startTimeDescription: ""
     }
-    return db.collection('career').add(career)
+    return firestore.collection('career').add(career)
         .then(result => {
             response.status(200).send("Success")
         }).catch(error => {
@@ -129,7 +131,7 @@ exports.addLanguage = functions.https.onRequest((request, response) => {
         levelScale: 5,
         imageUrl: ""
     }
-    return db.collection('languages').add(language)
+    return firestore.collection('languages').add(language)
         .then(result => {
             response.status(200).send("Success")
         }).catch(error => {
@@ -145,7 +147,7 @@ exports.addSkill = functions.https.onRequest((request, response) => {
         iconUrl: ""
     }
 
-    return db.collection('skills').add(skill)
+    return firestore.collection('skills').add(skill)
         .then(result => {
             response.status(200).send("Success")
         }).catch(error => {
@@ -155,7 +157,7 @@ exports.addSkill = functions.https.onRequest((request, response) => {
 
 exports.notifyAboutNewCv = functions.https.onRequest((request, response) => {
 
-    return db.collection('new_cv_notification').get().then((snapshot) => {
+    return firestore.collection('new_cv_notification').get().then((snapshot) => {
 
         let message = {
             data: {
@@ -192,7 +194,7 @@ exports.addCredits = functions.https.onRequest((request, response) => {
     data['author'] = authorParam
     data['authorUrl'] = authorUrlParam
 
-    return db.collection('credits').add(data)
+    return firestore.collection('credits').add(data)
         .then((res) => {
             response.status(200).send("Success")
         }).catch((err) => {
@@ -204,7 +206,7 @@ exports.getCredits = functions.https.onRequest((request, response) => {
 
     let credits = []
 
-    return db.collection('credits').get()
+    return firestore.collection('credits').get()
         .then((snapshot) => {
             snapshot.forEach((doc) => {
                 let credit = doc.data()
@@ -222,7 +224,7 @@ function validateToken(token) {
     return new Promise((resolve, reject) => {
         admin.auth().verifyIdToken(token)
             .then(decodedIdToken => {
-                 console.log(decodedIdToken);
+                console.log(decodedIdToken);
                 resolve(true)
             })
             .catch(error => {
