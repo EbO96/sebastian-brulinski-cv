@@ -12,6 +12,7 @@ class App : Application() {
 
     companion object {
         lateinit var component: AppComponent
+        var token: String? = null
     }
 
     override fun onCreate() {

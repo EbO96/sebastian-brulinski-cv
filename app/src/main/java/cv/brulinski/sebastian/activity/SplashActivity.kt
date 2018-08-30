@@ -3,6 +3,7 @@ package cv.brulinski.sebastian.activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
+import cv.brulinski.sebastian.dependency_injection.app.App
 import cv.brulinski.sebastian.fragment.LoginFragment
 import cv.brulinski.sebastian.interfaces.SplashScreenCallback
 import cv.brulinski.sebastian.utils.set
@@ -25,8 +26,13 @@ class SplashActivity : AppCompatActivity(), SplashScreenCallback {
     }
 
     private fun startMain() {
-        startActivity(Intent(this, MainActivity::class.java))
-        finish()
+        FirebaseAuth.getInstance().currentUser?.getIdToken(true)?.addOnCompleteListener {
+            if (it.isSuccessful) {
+                App.token = it.result.token
+                startActivity(Intent(this, MainActivity::class.java))
+                finish()
+            } else finish()
+        }
     }
 
     private fun startLogin() {
