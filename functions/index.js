@@ -16,9 +16,10 @@ const baseUrl = 'https://us-central1-sebastian-brulinski-cv-app.cloudfunctions.n
 //Clound Messaging topics
 const FCM_NEW_CV_TOPIC = "new_cv_topic"
 
-var firestore = admin.firestore();
-const settings = { timestampsInSnapshots: true };
-firestore.settings(settings);
+const firestore = admin.firestore();
+
+// const settings = { timestampsInSnapshots: true };
+// firestore.settings(settings);
 
 function getCareerProomise() {
     return firestore
@@ -49,7 +50,7 @@ function getSkillsPromise() {
         .get()
 }
 
-exports.getAll = functions.https.onRequest((request, response) => {
+const getAll = functions.https.onRequest((request, response) => {
     var requests = []
     var jsonResult = { status: -1, welcome: { timestamp: -1 }, personal_info: { timestamp: -1 }, career: [], languages: [], skills: [] }
     requests.push(getWelcomePromise())
@@ -106,7 +107,7 @@ exports.getAll = functions.https.onRequest((request, response) => {
         })
 })
 
-exports.addCareer = functions.https.onRequest((request, response) => {
+const addCareer = functions.https.onRequest((request, response) => {
     var career = {
         endTime: "",
         function: "",
@@ -127,7 +128,7 @@ exports.addCareer = functions.https.onRequest((request, response) => {
         })
 })
 
-exports.addLanguage = functions.https.onRequest((request, response) => {
+const addLanguage = functions.https.onRequest((request, response) => {
     var language = {
         name: "",
         description: "",
@@ -143,7 +144,7 @@ exports.addLanguage = functions.https.onRequest((request, response) => {
         })
 })
 
-exports.addSkill = functions.https.onRequest((request, response) => {
+const addSkill = functions.https.onRequest((request, response) => {
     var skill = {
         skillName: "",
         skillDescription: "",
@@ -159,7 +160,7 @@ exports.addSkill = functions.https.onRequest((request, response) => {
         })
 })
 
-exports.notifyAboutNewCv = functions.https.onRequest((request, response) => {
+const notifyAboutNewCv = functions.https.onRequest((request, response) => {
 
     return firestore.collection('new_cv_notification').get().then((snapshot) => {
 
@@ -187,7 +188,7 @@ exports.notifyAboutNewCv = functions.https.onRequest((request, response) => {
     })
 })
 
-exports.addCredits = functions.https.onRequest((request, response) => {
+const addCredits = functions.https.onRequest((request, response) => {
 
     let authorParam = request.query.author
     let authorUrlParam = request.query.authorUrl
@@ -206,7 +207,7 @@ exports.addCredits = functions.https.onRequest((request, response) => {
         })
 })
 
-exports.getCredits = functions.https.onRequest((request, response) => {
+const getCredits = functions.https.onRequest((request, response) => {
 
     let credits = []
 
@@ -238,21 +239,6 @@ function validateToken(token) {
     });
 }
 
-exports.authTest = functions.https.onRequest((request, response) => {
-    let token = request.headers.authorization;
-    console.log("token = " + token);
-    if (token) {
-        return validateToken(token)
-            .then(result => {
-                response.status(200).send("Auth ok")
-            })
-            .catch(error => {
-                response.status(400).send("Bad auth token")
-            });
-    } else {
-        response.status(400).send("No auth token")
-    }
-});
 
 // Express middleware that validates Firebase ID Tokens passed in the Authorization HTTP header.
 // The Firebase ID token needs to be passed as a Bearer token in the Authorization HTTP header like this:
@@ -276,7 +262,7 @@ const validateFirebaseIdToken = (req, res, next) => {
         console.log('Found "Authorization" header');
         // Read the ID Token from the Authorization header.
         idToken = req.headers.authorization.split('Bearer ')[1];
-    } else if (req.cookies) {
+    } else if (req.cookies) { 
         console.log('Found "__session" cookie');
         // Read the ID Token from cookie.
         idToken = req.cookies.__session;
@@ -298,6 +284,7 @@ const validateFirebaseIdToken = (req, res, next) => {
 app.use(cors);
 app.use(cookieParser);
 app.use(validateFirebaseIdToken);
+app.use(getAll);
 
 // This HTTPS endpoint can only be accessed by your Firebase Users.
 // Requests need to be authorized by providing an `Authorization` HTTP header
