@@ -30,7 +30,7 @@
     <string name="surname">Nazwisko</string>
     <string name="settings">Ustawienia</string>
     <string name="data">Dane</string>
-    <string name="email_subject">Kontakt w sprawie pracy</string>
+    <string name="email_subject">Oferta pracy</string>
     <string name="call_explanation">Aby wykonać połączenie musisz zezwolić na ich wykonywanie</string>
     <string name="explanation_line_content">Aby wykonywać połączenia musisz na nie najpierw zezwolić.</string>
     <string name="warning">Uwaga</string>
@@ -50,4 +50,10 @@
     <string name="login_screen_message">Proszę o wpisanie danych logowania\nz wiadomości email</string>
     <string name="access_denied">Odmowa dostępu</string>
     <string name="login_successful">Zapraszam</string>
+    <string name="sign_out">Wyloguj</string>
+    <string name="logout_message">Jesteś pewien, że chcesz się wylogować? Będzie musiał ponownie podać dane logowania</string>
+    <string name="no">NIE</string>
+    <string name="yes">TAK</string>
+    <string name="authorization">Autoryzacja</string>
+    <string name="cant_authorize">Nie można zautoryzować</string>
 </resources>

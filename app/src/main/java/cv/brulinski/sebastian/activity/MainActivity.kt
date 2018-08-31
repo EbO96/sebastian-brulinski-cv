@@ -37,6 +37,7 @@ import cv.brulinski.sebastian.utils.view_pager.toPage
 import cv.brulinski.sebastian.view.LargeSnackbar
 import cv.brulinski.sebastian.view.SlideDrawer
 import cv.brulinski.sebastian.view_model.MainViewModel
+import dialog
 import gone
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
@@ -72,6 +73,17 @@ class MainActivity : AppCompatActivity(),
     private var mainViewModel: MainViewModel<*>? = null
     //Dagger ViewPager pages component
     private lateinit var pagesComponent: PagesComponent
+    //Logout dialog
+    private val logoutDialog by lazy {
+        val dialogConfig = DialogConfig(R.string.sign_out.string(),
+                R.string.logout_message.string(),
+                R.string.yes.string(),
+                R.string.no.string())
+        dialog(dialogConfig) { isPositiveClicked ->
+            if (isPositiveClicked)
+                mainViewModel?.logout()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -146,6 +158,7 @@ class MainActivity : AppCompatActivity(),
         bar.setOnMenuItemClickListener(this)
 
         swipeRefreshLayout.setOnRefreshListener(this)
+
     }
 
     /*
@@ -229,12 +242,14 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun makeACall() {
-        getPersonalInfo {
-            Intent(Intent.ACTION_CALL).apply {
-                data = Uri.parse("tel:${it.phoneNumber}")
-                startActivity(this)
+        val phone = pagesComponent.getPersonalInfoScreen().getPersonalInfo()?.phoneNumber
+        if (phone != null)
+            getPersonalInfo {
+                Intent(Intent.ACTION_CALL).apply {
+                    data = Uri.parse("tel:$phone")
+                    startActivity(this)
+                }
             }
-        }
     }
 
     private fun shouldRequestRationale(permission: String) =
@@ -310,6 +325,10 @@ class MainActivity : AppCompatActivity(),
 
     override fun changeFabPosition(position: Int) {
         bar.fabAlignmentMode = position
+    }
+
+    override fun logout() {
+        logoutDialog.show()
     }
 
     /*
@@ -409,17 +428,18 @@ class MainActivity : AppCompatActivity(),
      * Compose email and open app which can handle sending emails
      */
     override fun composeEmail() {
-        getPersonalInfo {
+        val email = pagesComponent.getPersonalInfoScreen().getPersonalInfo()?.email
+        "email: $email".toast()
+        if (email != null)
             Intent(Intent.ACTION_SENDTO).apply {
-                data = Uri.parse("mailto:${it.email}")
-                putExtra(Intent.EXTRA_EMAIL, it.email)
+                data = Uri.parse("mailto:$email")
+                putExtra(Intent.EXTRA_EMAIL, email)
                 putExtra(Intent.EXTRA_SUBJECT, getString(R.string.email_subject))
                 resolveActivity(packageManager)?.let {
                     loadingLayout.visible()
                     startActivityForResult(this, APP_SETTINGS_REQUEST_CODE)
                 }
             }
-        }
     }
 
     override fun onRefresh() {

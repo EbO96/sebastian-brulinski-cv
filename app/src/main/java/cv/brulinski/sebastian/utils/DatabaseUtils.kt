@@ -18,5 +18,19 @@ fun MyCv.insert() {
     }
 }
 
+fun deleteCvLocal(result: () -> Unit) {
+    doAsync {
+        with(database) {
+            deleteWelcome()
+            deletePersonalInfo()
+            deleteCareer()
+            deleteLanguage()
+            deleteSkill()
+            deleteCredit()
+            result()
+        }
+    }
+}
+
 
 

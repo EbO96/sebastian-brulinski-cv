@@ -30,4 +30,5 @@ interface ParentActivityCallback {
     fun goToCredits()
     fun onFragmentDestroyed(fragment: Fragment)
     fun openMapsActivity(lat: Double?, lng: Double?)
+    fun logout()
 }

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import com.google.firebase.messaging.FirebaseMessaging
 import cv.brulinski.sebastian.R
+import cv.brulinski.sebastian.dependency_injection.app.App
 import cv.brulinski.sebastian.interfaces.BitmapLoadable
 import cv.brulinski.sebastian.interfaces.OnGetCvObjects
 import cv.brulinski.sebastian.model.*
@@ -194,9 +195,8 @@ class RemoteRepository(private val appRepository: AppRepository) {
                     doAsync {
                         appRepository.apply {
                             getMyCv()?.let { cv ->
-                                getCrypto()
-                                        .doCrypto(cv, true)
-                                        ?.insert()
+                                val encryptedCv = App.component.getApp().cryptoOperations?.doCrypto(cv, true)
+                                encryptedCv?.insert()
                             }
                         }
                     }

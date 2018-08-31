@@ -3,8 +3,10 @@ package cv.brulinski.sebastian.repository
 import android.annotation.SuppressLint
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import cv.brulinski.sebastian.dependency_injection.app.App
 import cv.brulinski.sebastian.model.*
 import cv.brulinski.sebastian.utils.database
+import cv.brulinski.sebastian.utils.doAsync
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 
@@ -115,8 +117,11 @@ open class LocalRepository(private val appRepository: AppRepository) {
                     val dbNotEmpty = cv?.welcome?.timestamp ?: -1L != -1L
                     //CV are in local database so we now decrypt it
                     if (dbNotEmpty) {
-                        appRepository.getCrypto().doCrypto(cv, false)?.let {
-                            result(it)
+                        doAsync {
+                            val decryptedCv = App.component.getApp().cryptoOperations?.doCrypto(cv, false)
+                            decryptedCv?.also {
+                                result(decryptedCv)
+                            }
                         }
                     } else {
                         //We need to fetch CV from remote server

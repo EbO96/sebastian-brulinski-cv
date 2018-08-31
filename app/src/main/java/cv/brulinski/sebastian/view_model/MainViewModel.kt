@@ -8,6 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import com.google.firebase.auth.FirebaseAuth
+import cv.brulinski.sebastian.activity.SplashActivity
 import cv.brulinski.sebastian.dependency_injection.app.App
 import cv.brulinski.sebastian.interfaces.RemoteRepository
 import cv.brulinski.sebastian.model.*
@@ -88,17 +90,17 @@ class MainViewModel<T : RemoteRepository> constructor(private val activity: AppC
     }
 
     fun getWelcome(block: (Welcome) -> Unit) {
-        activity?.also {
-            welcome.observe(it, Observer {
-                it?.also { block(it) }
+        activity?.also { appCompatActivity ->
+            welcome.observe(appCompatActivity, Observer { welcome ->
+                welcome?.also { block(welcome) }
             })
         }
     }
 
     fun getPersonalInfo(block: (PersonalInfo) -> Unit) {
         activity?.also {
-            personalInfo.observe(it, Observer {
-                it?.also { block(it) }
+            personalInfo.observe(it, Observer { personalInfo ->
+                personalInfo?.apply { block(this) }
             })
         }
     }
@@ -150,6 +152,18 @@ class MainViewModel<T : RemoteRepository> constructor(private val activity: AppC
         } catch (e: IllegalArgumentException) {
             MAIN_ACTIVITY.log("${e.message}")
         }
+    }
+
+    /**
+     * Logout from account. All data will be lose
+     */
+    fun logout() {
+
+        FirebaseAuth.getInstance().signOut()
+        //Override token to null
+        App.token = null
+        activity?.startActivity(Intent(activity, SplashActivity::class.java))
+        activity?.finish()
     }
 
     /*

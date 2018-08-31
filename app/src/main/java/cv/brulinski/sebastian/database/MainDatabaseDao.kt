@@ -10,6 +10,8 @@ import cv.brulinski.sebastian.model.*
 @Dao
 interface MainDatabaseDao {
 
+    //Insert
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertWelcome(welcome: Welcome)
 
@@ -25,17 +27,29 @@ interface MainDatabaseDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertCredits(credits: List<Credit>)
 
-    @Query("DELETE FROM Career")
-    fun deleteCareer()
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertCareer(career: List<Career>)
 
+    //Delete
     @Query("DELETE FROM Welcome")
     fun deleteWelcome()
 
     @Query("DELETE FROM PersonalInfo")
     fun deletePersonalInfo()
+
+    @Query("DELETE FROM Career")
+    fun deleteCareer()
+
+    @Query("DELETE FROM Language")
+    fun deleteLanguage()
+
+    @Query("DELETE FROM Skill")
+    fun deleteSkill()
+
+    @Query("DELETE FROM Credit")
+    fun deleteCredit()
+
+    //Get
 
     @Query("SELECT * FROM Welcome")
     fun getWelcome(): LiveData<Welcome>

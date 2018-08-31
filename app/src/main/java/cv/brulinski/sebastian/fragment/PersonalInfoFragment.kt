@@ -93,6 +93,11 @@ open class PersonalInfoFragment : Fragment(), LifecycleOwner {
     }
 
     /*
+    Public methods
+     */
+    fun getPersonalInfo() = personalInfo
+
+    /*
     Private methods
      */
 

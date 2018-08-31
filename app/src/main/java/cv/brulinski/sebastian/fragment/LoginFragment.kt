@@ -10,6 +10,7 @@ import com.google.firebase.auth.FirebaseAuth
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.interfaces.SplashScreenCallback
 import cv.brulinski.sebastian.utils.snack
+import cv.brulinski.sebastian.utils.string
 import kotlinx.android.synthetic.main.fragment_login.*
 
 /**
@@ -38,8 +39,11 @@ class LoginFragment : Fragment() {
         FirebaseAuth.getInstance().signInWithEmailAndPassword("${emailEditText.text}", "${passwordEditText.text}")
                 .addOnCompleteListener {
                     if (it.isSuccessful) {
-                        getString(R.string.login_successful).snack(activity!!) {
-                            splashScreenCallback?.loginSuccessful()
+                        activity?.also { activity ->
+                            R.string.login_successful.string().snack(activity) {
+                                activity.supportFragmentManager.popBackStack()
+                                splashScreenCallback?.loginSuccessful()
+                            }
                         }
                     } else {
                         getString(R.string.access_denied).snack(activity!!)

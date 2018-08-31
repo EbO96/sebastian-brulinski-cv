@@ -41,7 +41,7 @@ class CryptoOperations {
     private val KEYSTORE_KEY_ALGORITHM = "RSA"
     private val PREFERENCES_KEY_ALGORITHM = "AES"
     private val AES_KEY_SIZE = 256
-    private val RSA_KEY_SIZE = 2048
+    private val RSA_KEY_SIZE = 4096
     private var keyStore: KeyStore
     private var myPrivateKeyPreferences: MyPrivateKeyPreferences
     private var myKey: MyKey
@@ -329,30 +329,33 @@ class CryptoOperations {
         var cipherTransformation: String? = null
     }
 
-    fun <T : CryptoClass> doCrypto(toEncrypt: T?, encrypt: Boolean): T? {
-        if (toEncrypt is CryptoClass) {
-            toEncrypt.javaClass.declaredFields.filter { it.isAnnotationPresent(Crypto::class.java) }.forEach {
-                it.isAccessible = true
-                val field = it.get(toEncrypt).javaClass.newInstance()
-                if (field is Collection<*>) {
-                    field.apply {
-                        forEach {
-                            it?.let { listElement ->
-                                //doCrypto(listElement as? CryptoClass, encrypt)
+    fun <T : CryptoClass> doCrypto(toEncrypt: T?, encrypt: Boolean, disable: Boolean = false): T? {
+        if (!disable) {
+            if (toEncrypt is CryptoClass) {
+                toEncrypt.javaClass.declaredFields.filter { it.isAnnotationPresent(Crypto::class.java) }.forEach { field ->
+                    field.isAccessible = true
+                    val subjectField = field.get(toEncrypt)
+                    if (subjectField is Collection<*>) {
+                        subjectField.apply {
+                            forEach {
+                                it?.let { listElement ->
+                                    doCrypto(listElement as? CryptoClass, encrypt, disable)
+                                }
                             }
                         }
-                    }
-                } else {
-                    field.javaClass.declaredFields.filter { it.isAnnotationPresent(Crypto::class.java) }.forEach {
-                        it?.apply {
-                            it.isAccessible = true
-                            val changedField = (this.get(field) as? String)?.let { if (encrypt) encrypt(it) else decrypt(it) }
-                            this.set(field, changedField)
+                    } else {
+                        subjectField.javaClass.declaredFields.filter { it.isAnnotationPresent(Crypto::class.java) }.forEach { fieldToEncryptDecrypt ->
+                            fieldToEncryptDecrypt?.apply {
+                                fieldToEncryptDecrypt.isAccessible = true
+                                val changedField = (this.get(subjectField) as? String)?.let { if (encrypt) encrypt(it) else decrypt(it) }
+                                this.set(subjectField, changedField)
+                            }
                         }
                     }
                 }
             }
-        }
-        return toEncrypt
+            return toEncrypt
+        } else
+            return toEncrypt
     }
 }

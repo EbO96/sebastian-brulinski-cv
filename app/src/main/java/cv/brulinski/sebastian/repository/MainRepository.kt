@@ -2,7 +2,6 @@ package cv.brulinski.sebastian.repository
 
 import android.annotation.SuppressLint
 import androidx.lifecycle.MutableLiveData
-import cv.brulinski.sebastian.crypto.CryptoOperations
 import cv.brulinski.sebastian.interfaces.RemoteRepository
 import cv.brulinski.sebastian.model.Credit
 import cv.brulinski.sebastian.model.MyCv
@@ -18,7 +17,6 @@ class MainRepository<T : RemoteRepository>(private val listener: T?) : AppReposi
 
     private val myCv = MutableLiveData<MyCv>()
     private val credits = MutableLiveData<List<Credit>>()
-    private val cryptoOperations = CryptoOperations()
     private val localRepository = LocalRepository(this@MainRepository) //Provides CV from local SQL database
     private val remoteRepository = RemoteRepository(this@MainRepository) //Provides Cv from remote server
 
@@ -27,9 +25,8 @@ class MainRepository<T : RemoteRepository>(private val listener: T?) : AppReposi
      * or from remote server when database is empty
      */
     fun getCv(): MutableLiveData<MyCv> {
-
         localRepository.getCv({
-            myCv.value = it
+            myCv.postValue(it.clone())
         }, {
             fetchCvFromRemote()
         })
@@ -67,7 +64,7 @@ class MainRepository<T : RemoteRepository>(private val listener: T?) : AppReposi
     private fun fetchCvFromRemote(cv: ((MyCv) -> Unit)? = null) {
         listener?.onFetchStart()
         remoteRepository.fetchCv({
-            myCv.value = it
+            myCv.value = it.clone()
             cv?.apply { invoke(it) }
             listener?.onFetchEnd()
         }, {
@@ -92,6 +89,5 @@ class MainRepository<T : RemoteRepository>(private val listener: T?) : AppReposi
 
     override fun getMyCv(): MyCv? = myCv.value
 
-    override fun getCrypto() = cryptoOperations
 }
 

@@ -3,6 +3,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.widget.NestedScrollView
@@ -10,11 +11,9 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.bottomappbar.BottomAppBar
 import cv.brulinski.sebastian.R
-import cv.brulinski.sebastian.utils.MAIN_ACTIVITY
+import cv.brulinski.sebastian.model.DialogConfig
 import cv.brulinski.sebastian.utils.ctx
-import cv.brulinski.sebastian.utils.log
 
 fun AppCompatActivity.setBaseToolbar(enableHomeButton: Boolean = false, title: String = "") {
     setSupportActionBar(findViewById(R.id.myToolbar))
@@ -27,8 +26,23 @@ fun AppCompatActivity.setBaseToolbar(enableHomeButton: Boolean = false, title: S
 infix fun ViewGroup.inflateViewHolderView(resLayout: Int) =
         LayoutInflater.from(this.context).inflate(resLayout, this, false)
 
+/**
+ * Inflating layouts
+ */
 fun Int.inflate(context: Context? = null) =
         LayoutInflater.from(context ?: ctx).inflate(this, null, false)
+
+fun AppCompatActivity.addToAndroidContainer(view: View?) {
+    view?.also {
+        findViewById<ViewGroup>(android.R.id.content).addView(view)
+    }
+}
+
+fun AppCompatActivity.removeFromAndroidContainer(view: View?) {
+    view?.also {
+        findViewById<ViewGroup>(android.R.id.content).removeView(view)
+    }
+}
 
 fun RecyclerView.setup(adapter: RecyclerView.Adapter<RecyclerView.ViewHolder>, divider: Boolean = false) {
     ViewCompat.setNestedScrollingEnabled(this, false)
@@ -58,20 +72,32 @@ fun ViewGroup.removeViewSafe(view: View) {
     }
 }
 
+/**
+ * Show view
+ */
 fun View.visible() {
     visibility = View.VISIBLE
 }
 
+/**
+ * Hide view
+ */
 fun View.invisible() {
     visibility = View.INVISIBLE
 }
 
+/**
+ * Hide view
+ */
 fun View.gone(gone: Boolean = true) {
     if (gone)
         visibility = View.GONE
     else visible()
 }
 
+/**
+ * Detecting bottom and top positions for lists
+ */
 fun NestedScrollView.bottomAndTopDetector(top: () -> Unit, bottom: () -> Unit) {
     this.setOnScrollChangeListener { _: NestedScrollView?, _: Int, _: Int, _: Int, _: Int ->
         if (!this.canScrollVertically(1)) {
@@ -82,6 +108,21 @@ fun NestedScrollView.bottomAndTopDetector(top: () -> Unit, bottom: () -> Unit) {
         }
     }
 }
+
+fun AppCompatActivity.dialog(dialogConfig: DialogConfig, action: (Boolean) -> Unit) =
+        with(dialogConfig) {
+            AlertDialog.Builder(this@dialog)
+                    .setTitle(title)
+                    .setMessage(message)
+                    .setPositiveButton(positive) { _, _ ->
+                        action(true)
+                    }
+                    .setNegativeButton(negative) { _, _ ->
+                        action(false)
+                    }
+                    .create()
+        }
+
 
 enum class SlideDirection {
     UP,

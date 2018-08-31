@@ -52,8 +52,8 @@ class CreditsFragment : Fragment(), OnItemClickListener {
             view.creditsRecyclerView.setup(this, true)
         }
 
-        parentActivityCallback?.getCredits {
-            creditsRecyclerAdapter?.items = it.map { MyRecyclerItem(it, TYPE_ITEM) }
+        parentActivityCallback?.getCredits { listOfCredit ->
+            creditsRecyclerAdapter?.items = listOfCredit.map { MyRecyclerItem(it, TYPE_ITEM) }
         }
     }
 

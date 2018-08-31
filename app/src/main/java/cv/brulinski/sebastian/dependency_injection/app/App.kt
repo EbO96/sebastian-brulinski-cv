@@ -1,6 +1,7 @@
 package cv.brulinski.sebastian.dependency_injection.app
 
 import android.app.Application
+import cv.brulinski.sebastian.crypto.CryptoOperations
 import cv.brulinski.sebastian.dependency_injection.component.AppComponent
 import cv.brulinski.sebastian.dependency_injection.component.DaggerAppComponent
 import cv.brulinski.sebastian.dependency_injection.module.AppModule
@@ -15,6 +16,8 @@ class App : Application() {
         var token: String? = null
     }
 
+    var cryptoOperations: CryptoOperations? = null
+
     override fun onCreate() {
         super.onCreate()
         component = DaggerAppComponent.builder().appModule(AppModule(this)).build()
@@ -22,6 +25,9 @@ class App : Application() {
 
         val myNotificationChannel = MyNotificationChannel(this)
         myNotificationChannel.newCvChannel(FetchNewCvJob.CHANNEL_ID)
+
+        if (cryptoOperations == null)
+            cryptoOperations = CryptoOperations()
     }
 
     enum class DataHolder {
