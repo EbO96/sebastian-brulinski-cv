@@ -429,7 +429,6 @@ class MainActivity : AppCompatActivity(),
      */
     override fun composeEmail() {
         val email = pagesComponent.getPersonalInfoScreen().getPersonalInfo()?.email
-        "email: $email".toast()
         if (email != null)
             Intent(Intent.ACTION_SENDTO).apply {
                 data = Uri.parse("mailto:$email")
