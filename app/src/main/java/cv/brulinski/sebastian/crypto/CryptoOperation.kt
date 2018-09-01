@@ -7,6 +7,7 @@ import android.security.KeyPairGeneratorSpec
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
+import com.google.gson.Gson
 import cv.brulinski.sebastian.annotations.Crypto
 import cv.brulinski.sebastian.interfaces.CryptoClass
 import cv.brulinski.sebastian.utils.ctx
@@ -329,33 +330,55 @@ class CryptoOperations {
         var cipherTransformation: String? = null
     }
 
-    fun <T : CryptoClass> doCrypto(toEncrypt: T?, encrypt: Boolean, disable: Boolean = false): T? {
-        if (!disable) {
-            if (toEncrypt is CryptoClass) {
-                toEncrypt.javaClass.declaredFields.filter { it.isAnnotationPresent(Crypto::class.java) }.forEach { field ->
-                    field.isAccessible = true
-                    val subjectField = field.get(toEncrypt)
-                    if (subjectField is Collection<*>) {
-                        subjectField.apply {
-                            forEach {
-                                it?.let { listElement ->
-                                    doCrypto(listElement as? CryptoClass, encrypt, disable)
+    inner class CryptoOperation<T : CryptoClass>(private val sourceObject: T?, objectClass: Class<T>) {
+
+        private val gson = Gson()
+        //Clone current instance of CV to avoid displaying encrypted data
+        private val copyOfSourceObject =
+                gson.fromJson<T>(gson.toJson(sourceObject), objectClass)
+
+        fun start(encrypt: Boolean, disable: Boolean = false) =
+                doCrypto(copyOfSourceObject, encrypt, disable) as? T
+
+
+        /**
+         * Do encrypt and decrypt operations
+         * @property toEncrypt source object to encrypt. Field to encrypt must have @Crypto annotation
+         * @property encrypt used to identify mode
+         * @property disable pass true to disable encryption operations and return oryginal object
+         * @see Crypto
+         * @return encrypted/decrypted deep copy of source object. But if you pass true as 'disable' parameter
+         * then function return original object
+         */
+        private fun doCrypto(toEncrypt: CryptoClass?, encrypt: Boolean, disable: Boolean = false): CryptoClass? {
+
+            if (!disable) {
+                if (toEncrypt is CryptoClass) {
+                    toEncrypt.javaClass.declaredFields.filter { it.isAnnotationPresent(Crypto::class.java) }.forEach { field ->
+                        field.isAccessible = true
+                        val subjectField = field.get(toEncrypt)
+                        if (subjectField is Collection<*>) {
+                            subjectField.apply {
+                                forEach {
+                                    it?.let { listElement ->
+                                        doCrypto(listElement as? CryptoClass, encrypt, disable)
+                                    }
                                 }
                             }
-                        }
-                    } else {
-                        subjectField.javaClass.declaredFields.filter { it.isAnnotationPresent(Crypto::class.java) }.forEach { fieldToEncryptDecrypt ->
-                            fieldToEncryptDecrypt?.apply {
-                                fieldToEncryptDecrypt.isAccessible = true
-                                val changedField = (this.get(subjectField) as? String)?.let { if (encrypt) encrypt(it) else decrypt(it) }
-                                this.set(subjectField, changedField)
+                        } else {
+                            subjectField.javaClass.declaredFields.filter { it.isAnnotationPresent(Crypto::class.java) }.forEach { fieldToEncryptDecrypt ->
+                                fieldToEncryptDecrypt?.apply {
+                                    fieldToEncryptDecrypt.isAccessible = true
+                                    val changedField = (this.get(subjectField) as? String)?.let { if (encrypt) encrypt(it) else decrypt(it) }
+                                    this.set(subjectField, changedField)
+                                }
                             }
                         }
                     }
                 }
-            }
-            return toEncrypt
-        } else
-            return toEncrypt
+                return toEncrypt
+            } else
+                return sourceObject
+        }
     }
 }

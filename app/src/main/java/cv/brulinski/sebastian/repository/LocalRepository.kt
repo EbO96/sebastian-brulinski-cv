@@ -118,10 +118,11 @@ open class LocalRepository(private val appRepository: AppRepository) {
                     //CV are in local database so we now decrypt it
                     if (dbNotEmpty) {
                         doAsync {
-                            val decryptedCv = App.component.getApp().cryptoOperations?.doCrypto(cv, false)
-                            decryptedCv?.also {
-                                result(decryptedCv)
-                            }
+                            val decryptedCv = App.component.getApp()
+                                    .cryptoOperations
+                                    ?.CryptoOperation(cv, MyCv::class.java)
+                                    ?.start(false)
+                            decryptedCv?.also { result(decryptedCv) }
                         }
                     } else {
                         //We need to fetch CV from remote server

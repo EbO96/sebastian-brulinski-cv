@@ -89,9 +89,6 @@ class MainActivity : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //Init ViewModel
-        mainViewModel = MainViewModel(this, this)
-
         viewPager.set()
 
         //Slide drawer setting up
@@ -158,6 +155,9 @@ class MainActivity : AppCompatActivity(),
         bar.setOnMenuItemClickListener(this)
 
         swipeRefreshLayout.setOnRefreshListener(this)
+
+        //Init ViewModel
+        mainViewModel = MainViewModel(this, this)
 
     }
 

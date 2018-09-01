@@ -186,6 +186,8 @@ class RemoteRepository(private val appRepository: AppRepository) {
     }
 
     fun fetchCv(result: (MyCv) -> Unit, error: (ERROR) -> Unit) {
+        var cv: MyCv? = null
+
         val disposable = fetchAllFromRemoteServer()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -193,20 +195,21 @@ class RemoteRepository(private val appRepository: AppRepository) {
                     settings.firstLaunch = false
                     //Fetching completed. Encrypt CV and insert into local database
                     doAsync {
-                        appRepository.apply {
-                            getMyCv()?.let { cv ->
-                                val encryptedCv = App.component.getApp().cryptoOperations?.doCrypto(cv, true)
-                                encryptedCv?.insert()
-                            }
+                        cv?.also {
+                            val encryptedCv = App.component.getApp().cryptoOperations
+                                    ?.CryptoOperation(cv, MyCv::class.java)
+                                    ?.start(true)
+                            encryptedCv?.insert()
                         }
                     }
                 }
                 .doOnError {
                     error(ERROR)
                 }
-                .subscribe({
+                .subscribe({ fetchedCv ->
+                    cv = fetchedCv
                     //Before encrypting inform observers about new CV
-                    result(it)
+                    result(fetchedCv)
                 }, {
                     error(ERROR)
                 })
