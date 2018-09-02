@@ -10,11 +10,18 @@
         layout="@layout/my_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/creditsRecyclerView"
-        style="@style/RootRecyclerStyle"
+    
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/creditsRecyclerView"
+            style="@style/RootRecyclerStyle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </LinearLayout>

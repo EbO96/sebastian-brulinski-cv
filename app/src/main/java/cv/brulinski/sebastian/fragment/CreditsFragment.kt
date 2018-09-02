@@ -8,10 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.adapter.recycler.credits.CreditsRecyclerAdapter
 import cv.brulinski.sebastian.interfaces.OnItemClickListener
 import cv.brulinski.sebastian.interfaces.ParentActivityCallback
+import cv.brulinski.sebastian.model.Credit
 import cv.brulinski.sebastian.model.MyRecyclerItem
 import cv.brulinski.sebastian.utils.TYPE_ITEM
 import cv.brulinski.sebastian.utils.string
@@ -22,7 +24,7 @@ import setup
 /**
  * Fragment to display credits
  */
-class CreditsFragment : Fragment(), OnItemClickListener {
+class CreditsFragment : Fragment(), OnItemClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     //Communication with parent activity
     private var parentActivityCallback: ParentActivityCallback? = null
@@ -53,9 +55,26 @@ class CreditsFragment : Fragment(), OnItemClickListener {
         }
 
         parentActivityCallback?.getCredits { listOfCredit ->
-            creditsRecyclerAdapter?.items = listOfCredit.map { MyRecyclerItem(it, TYPE_ITEM) }
+            updateUi(listOfCredit)
+        }
+
+        view.swipeRefreshLayout.setOnRefreshListener(this)
+
+    }
+
+    /*
+    Private methods
+     */
+    private fun updateUi(list: List<Credit>?) {
+        view?.swipeRefreshLayout?.isRefreshing = false
+        list?.also { _ ->
+            creditsRecyclerAdapter?.items = list.map { MyRecyclerItem(it, TYPE_ITEM) }
         }
     }
+
+    /*
+    Override methods
+    */
 
     override fun onClick(item: Any, position: Int, v: View) {
 
@@ -68,6 +87,13 @@ class CreditsFragment : Fragment(), OnItemClickListener {
                 true
             }
             else -> false
+        }
+    }
+
+
+    override fun onRefresh() {
+        parentActivityCallback?.refreshCredits { credits ->
+            updateUi(credits)
         }
     }
 

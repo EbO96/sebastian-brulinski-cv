@@ -20,6 +20,7 @@ interface ParentActivityCallback {
     fun getLanguages(block: (List<Language>) -> Unit)
     fun getSkills(block: (List<Skill>) -> Unit)
     fun getCredits(block: (List<Credit>) -> Unit)
+    fun refreshCredits(block: (List<Credit>?) -> Unit)
     fun tryMakeACall()
     fun composeEmail()
     fun showLoading()

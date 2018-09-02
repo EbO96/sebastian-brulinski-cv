@@ -56,4 +56,5 @@
     <string name="yes">TAK</string>
     <string name="authorization">Autoryzacja</string>
     <string name="cant_authorize">Nie można zautoryzować</string>
+    <string name="explanation_no_email_app">Brak klienta poczty e-mail.</string>
 </resources>

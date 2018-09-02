@@ -77,10 +77,14 @@ class MainViewModel<T : RemoteRepository> constructor(private val activity: AppC
     fun getCredits(credits: (List<Credit>) -> Unit) {
         activity?.also {
             if (!repository.getCredits().hasActiveObservers())
-                repository.getCredits().observe(it, Observer {
-                    it?.apply { credits(it) }
+                repository.getCredits().observe(activity, Observer { listOfCredits ->
+                    it.apply { credits(listOfCredits) }
                 })
         }
+    }
+
+    fun refreshCredits(credits: (List<Credit>?) -> Unit){
+        repository.refreshCredits(credits)
     }
 
     fun removeCreditsObservers() {

@@ -30,8 +30,7 @@ class LargeSnackbar private constructor() {
         fun getInstance() = Instance.instance
     }
 
-    enum class Duration {
-        LONG,
+    enum class Duration {LONG,
         SHORT
     }
 

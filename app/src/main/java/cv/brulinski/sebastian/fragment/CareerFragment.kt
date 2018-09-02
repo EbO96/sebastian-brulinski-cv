@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.adapter.recycler.career.CareerRecyclerAdapter
 import cv.brulinski.sebastian.interfaces.OnItemClickListener
@@ -15,12 +16,12 @@ import cv.brulinski.sebastian.model.MyRecyclerItem
 import cv.brulinski.sebastian.utils.TYPE_HEADER
 import cv.brulinski.sebastian.utils.TYPE_ITEM
 import cv.brulinski.sebastian.utils.date
-import java.lang.ClassCastException
-import kotlinx.android.synthetic.main.fragment_career.*
 import gone
 import kotlinx.android.synthetic.main.fragment_career.view.*
-import visible
+import kotlinx.android.synthetic.main.fragment_credits.view.*
 import setup
+import visible
+import java.lang.ClassCastException
 
 /**
  * Fragment which is used for displaying list of witch my career,
@@ -43,12 +44,14 @@ open class CareerFragment : Fragment() {
 
         setupCareerRecycler()
 
-        parentActivityCallback?.getCareer {
+        //Update UI
+        parentActivityCallback?.getCareer { listOfCareer ->
+
             val items = arrayListOf<MyRecyclerItem<Career>>()
             //Make list of career
-            it.sortedBy { it.startTime.date() }.forEach {
-                val header = MyRecyclerItem(it, TYPE_HEADER)
-                val item = MyRecyclerItem(it, TYPE_ITEM)
+            listOfCareer.sortedBy { it.startTime.date() }.forEach { career ->
+                val header = MyRecyclerItem(career, TYPE_HEADER)
+                val item = MyRecyclerItem(career, TYPE_ITEM)
                 items.add(header)
                 items.add(item)
             }

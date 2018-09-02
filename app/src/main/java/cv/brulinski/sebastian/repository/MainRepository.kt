@@ -43,6 +43,12 @@ class MainRepository<T : RemoteRepository>(private val listener: T?) : AppReposi
         return credits
     }
 
+    fun refreshCredits(credits: (List<Credit>?) -> Unit) {
+        remoteRepository.getCredits { remoteCredits ->
+            credits(remoteCredits)
+        }
+    }
+
     /*
     Public methods
      */

@@ -274,6 +274,18 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
+    private fun makeNoEmailAppSnack() {
+        LargeSnackbar.getInstance().apply {
+            show(mainContent, fab,
+                    R.string.warning.string(),
+                    R.string.explanation_no_email_app.string(),
+                    LargeSnackbar.Duration.SHORT,
+                    android.R.string.ok.string()) {
+
+            }
+        }
+    }
+
     private fun makeSnackbar(@ColorInt colorFirst: Int, @ColorInt colorSecond: Int,
                              title: String, subtitle: String, action: String) {
         LargeSnackbar.getInstance().apply {
@@ -375,6 +387,10 @@ class MainActivity : AppCompatActivity(),
         mainViewModel?.getCredits(block)
     }
 
+    override fun refreshCredits(block: (List<Credit>?) -> Unit) {
+        mainViewModel?.refreshCredits(block)
+    }
+
     override fun registerForCvNotifications(register: Boolean, status: (Int) -> Unit) {
         mainViewModel?.registerForCvNotifications(register, status)
     }
@@ -437,6 +453,9 @@ class MainActivity : AppCompatActivity(),
                 resolveActivity(packageManager)?.let {
                     loadingLayout.visible()
                     startActivityForResult(this, APP_SETTINGS_REQUEST_CODE)
+                } ?: kotlin.run {
+                    //No email app found
+                    makeNoEmailAppSnack()
                 }
             }
     }
