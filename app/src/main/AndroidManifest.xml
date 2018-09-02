@@ -26,6 +26,11 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
+        <!-- ML Kit - download the ML model to the device after your app is installed from the Play Store.-->
+        <meta-data
+            android:name="com.google.firebase.ml.vision.DEPENDENCIES"
+            android:value="barcode" />
+
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/home"

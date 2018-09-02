@@ -66,10 +66,11 @@ dependencies {
     implementation 'com.facebook.shimmer:shimmer:0.1.0@aar'
     //Firebase
     implementation 'com.google.firebase:firebase-auth:16.0.3'
-    implementation 'com.google.firebase:firebase-core:16.0.1'
+    implementation 'com.google.firebase:firebase-core:16.0.3'
     implementation 'com.google.firebase:firebase-firestore:17.1.0'
     implementation 'com.google.firebase:firebase-messaging:17.3.0'
     implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
+    implementation 'com.google.firebase:firebase-ml-vision:17.0.0'
     //Firebase storage
     implementation 'com.google.firebase:firebase-storage:16.0.1'
     //Dagger 2
