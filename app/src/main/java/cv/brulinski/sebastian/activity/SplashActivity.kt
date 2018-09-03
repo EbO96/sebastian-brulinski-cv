@@ -16,7 +16,6 @@ import cv.brulinski.sebastian.dependency_injection.app.App
 import cv.brulinski.sebastian.fragment.EmailPasswordLogin
 import cv.brulinski.sebastian.fragment.LoginFragment
 import cv.brulinski.sebastian.fragment.QrCodeLogin
-import cv.brulinski.sebastian.fragment.QrCodeLoginFragment
 import cv.brulinski.sebastian.utils.*
 import cv.brulinski.sebastian.view.LargeSnackbar
 import inflate
@@ -35,8 +34,6 @@ class SplashActivity : AppCompatActivity(),
     private var getTokenScreen: View? = null
     //Login screen
     private var loginFragment: LoginFragment? = null
-    //Qr code login screen
-    private var qrCodeLoginFragment: QrCodeLoginFragment? = null
     //Camera permission request code
     private val CAMERA_REQUEST_CODE = 0
 
@@ -89,8 +86,7 @@ class SplashActivity : AppCompatActivity(),
     }
 
     private fun startQrCodeLogin() {
-        if (qrCodeLoginFragment == null) qrCodeLoginFragment = QrCodeLoginFragment()
-        qrCodeLoginFragment?.set(supportFragmentManager, android.R.id.content, true)
+        startActivity(Intent(this, QrCodeLoginActivity::class.java))
     }
 
     private fun makeCameraExplanation() {
