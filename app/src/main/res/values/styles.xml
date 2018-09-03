@@ -186,6 +186,10 @@
         <item name="android:textColor">@color/colorAccent</item>
     </style>
 
+    <style name="QrCodeLoginButtonStyle" parent="Base.Widget.AppCompat.Button">
+        <item name="android:background">@drawable/outline_background</item>
+    </style>
+
     <style name="LoginScreenTextViewStyle" parent="TextAppearance.AppCompat">
         <item name="android:textSize">18sp</item>
         <item name="android:textColor">@color/colorPrimary</item>

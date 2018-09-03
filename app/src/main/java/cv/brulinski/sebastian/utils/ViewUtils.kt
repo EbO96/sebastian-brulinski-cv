@@ -32,15 +32,17 @@ infix fun ViewGroup.inflateViewHolderView(resLayout: Int) =
 fun Int.inflate(context: Context? = null) =
         LayoutInflater.from(context ?: ctx).inflate(this, null, false)
 
+fun AppCompatActivity.androidContainer() = findViewById<ViewGroup>(android.R.id.content)
+
 fun AppCompatActivity.addToAndroidContainer(view: View?) {
     view?.also {
-        findViewById<ViewGroup>(android.R.id.content).addView(view)
+        androidContainer().addView(view)
     }
 }
 
 fun AppCompatActivity.removeFromAndroidContainer(view: View?) {
     view?.also {
-        findViewById<ViewGroup>(android.R.id.content).removeView(view)
+        androidContainer().removeView(view)
     }
 }
 

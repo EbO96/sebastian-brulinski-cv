@@ -8,7 +8,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.provider.Settings
 import android.view.MenuItem
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
@@ -252,10 +251,6 @@ class MainActivity : AppCompatActivity(),
             }
     }
 
-    private fun shouldRequestRationale(permission: String) =
-            ActivityCompat.shouldShowRequestPermissionRationale(this@MainActivity,
-                    permission)
-
     private fun makeRequestForCallPermission() {
         ActivityCompat.requestPermissions(this@MainActivity,
                 arrayOf(Manifest.permission.CALL_PHONE),
@@ -313,14 +308,6 @@ class MainActivity : AppCompatActivity(),
                 R.string.offline.string(),
                 R.string.no_connection_message.string(),
                 android.R.string.ok.string())
-    }
-
-    private fun goToAppSettings() {
-        val permissionSettingsIntent = Intent()
-        permissionSettingsIntent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-        val uri = Uri.fromParts("package", packageName, null)
-        permissionSettingsIntent.data = uri
-        startActivity(permissionSettingsIntent)
     }
 
     /*
@@ -492,7 +479,6 @@ class MainActivity : AppCompatActivity(),
                 } else {
                     if (!shouldRequestRationale(Manifest.permission.CALL_PHONE))
                         makeSnackBarCallExplanation()
-                    MAIN_ACTIVITY.log("on request permissions result denied")
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
                 }

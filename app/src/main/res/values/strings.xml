@@ -57,4 +57,6 @@
     <string name="authorization">Autoryzacja</string>
     <string name="cant_authorize">Nie można zautoryzować</string>
     <string name="explanation_no_email_app">Brak klienta poczty e-mail.</string>
+    <string name="explanation_camera">Aby zeskanować kod QR wymagany do logowania musisz pozwolić na dostęp do kamery</string>
+    <string name="qr">QR</string>
 </resources>

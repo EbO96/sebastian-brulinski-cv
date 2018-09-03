@@ -9,7 +9,6 @@ import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
 import androidx.annotation.ColorInt
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.utils.color
 import cv.brulinski.sebastian.utils.ctx
@@ -30,7 +29,7 @@ class LargeSnackbar private constructor() {
         fun getInstance() = Instance.instance
     }
 
-    enum class Duration {LONG,
+    enum class Duration { LONG,
         SHORT
     }
 
@@ -103,7 +102,7 @@ class LargeSnackbar private constructor() {
         actionButtonColor = color
     }
 
-    fun show(rootView: ViewGroup, view: View, lineOneText: String = "", lineTwoText: String = "", duration: Duration, actionText: String, actionClick: (View) -> Unit) {
+    fun show(rootView: ViewGroup, view: View, lineOneText: String = "", lineTwoText: String = "", duration: Duration, actionText: String, bottomMargin: Int = 196, actionClick: (View) -> Unit) {
         root = rootView
 
         if (!isOnScreen) {
@@ -123,13 +122,12 @@ class LargeSnackbar private constructor() {
                         actionClick(it)
                     }
                 }
-                if (view is FloatingActionButton) {
-                    snackbar.layoutParams = CoordinatorLayout.LayoutParams(CoordinatorLayout.LayoutParams.MATCH_PARENT, CoordinatorLayout.LayoutParams.WRAP_CONTENT).apply {
-                        anchorGravity = Gravity.TOP
-                        setMargins(16, 16, 16, 196)
-                        anchorId = view.id
-                    }
+                snackbar.layoutParams = CoordinatorLayout.LayoutParams(CoordinatorLayout.LayoutParams.MATCH_PARENT, CoordinatorLayout.LayoutParams.WRAP_CONTENT).apply {
+                    anchorGravity = Gravity.TOP
+                    setMargins(16, 16, 16, bottomMargin)
+                    anchorId = view.id
                 }
+
                 try {
                     addView(snackbar)
                     showSnackbar()

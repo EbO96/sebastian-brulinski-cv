@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.AsyncTask
 import android.os.Handler
 import android.preference.PreferenceManager
+import android.provider.Settings
 import android.webkit.URLUtil
 import cv.brulinski.sebastian.dependency_injection.app.App
 
@@ -87,4 +88,15 @@ fun String.openUrl(activity: Activity? = null, requestCode: Int? = null): Boolea
         return false
     }
     return success
+}
+
+/**
+ * Open this app system settings screen
+ */
+fun Activity.goToAppSettings() {
+    val permissionSettingsIntent = Intent()
+    permissionSettingsIntent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+    val uri = Uri.fromParts("package", packageName, null)
+    permissionSettingsIntent.data = uri
+    startActivity(permissionSettingsIntent)
 }

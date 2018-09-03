@@ -8,10 +8,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.google.firebase.auth.FirebaseAuth
 import cv.brulinski.sebastian.R
-import cv.brulinski.sebastian.interfaces.SplashScreenCallback
 import cv.brulinski.sebastian.utils.snack
 import cv.brulinski.sebastian.utils.string
 import kotlinx.android.synthetic.main.fragment_login.*
+import kotlinx.android.synthetic.main.fragment_login.view.*
 
 /**
  * Class to handle login user to firebase
@@ -19,7 +19,7 @@ import kotlinx.android.synthetic.main.fragment_login.*
 class LoginFragment : Fragment() {
 
     //Parent callback interface
-    private var splashScreenCallback: SplashScreenCallback? = null
+    private var emailPasswordLogin: EmailPasswordLogin? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -29,11 +29,27 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        loginButton.setOnClickListener {
+        view.loginButton.setOnClickListener {
             if (!emailEditText.text.isNullOrEmpty() && !passwordEditText.text.isNullOrEmpty())
                 login()
         }
+
+        view.qrLoginButton.setOnClickListener {
+            emailPasswordLogin?.tryQrLogin()
+        }
     }
+
+    /*
+    Public methods
+     */
+
+    fun snackbarAnchorView() = view?.snackAnchorView
+
+    fun getRootView() = view?.loginScreenContainer
+
+    /*
+    Private methods
+     */
 
     private fun login() {
         FirebaseAuth.getInstance().signInWithEmailAndPassword("${emailEditText.text}", "${passwordEditText.text}")
@@ -42,7 +58,7 @@ class LoginFragment : Fragment() {
                         activity?.also { activity ->
                             R.string.login_successful.string().snack(activity) {
                                 activity.supportFragmentManager.popBackStack()
-                                splashScreenCallback?.loginSuccessful()
+                                emailPasswordLogin?.emailPasswordSuccessful()
                             }
                         }
                     } else {
@@ -51,9 +67,12 @@ class LoginFragment : Fragment() {
                 }
     }
 
+    /*
+    Override methods
+     */
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        splashScreenCallback = context as? SplashScreenCallback
+        emailPasswordLogin = context as? EmailPasswordLogin
     }
 
 }
