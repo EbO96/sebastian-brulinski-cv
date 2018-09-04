@@ -76,7 +76,7 @@
             android:layout_height="48dp"
             android:layout_marginEnd="16dp"
             android:layout_marginTop="8dp"
-            android:background="@drawable/outline_background"
+            android:background="@drawable/outline_background_rounded"
             android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
