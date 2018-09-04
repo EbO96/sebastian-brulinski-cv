@@ -74,4 +74,6 @@ class QrGraphicOverlay(context: Context?, attrs: AttributeSet?) : RelativeLayout
         addView(topBound)
         addView(bottomBound)
     }
+
+    fun areaSize() = qrPlaceholderSize;
 }

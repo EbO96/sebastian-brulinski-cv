@@ -16,6 +16,7 @@ import cv.brulinski.sebastian.dependency_injection.app.App
 import cv.brulinski.sebastian.fragment.EmailPasswordLogin
 import cv.brulinski.sebastian.fragment.LoginFragment
 import cv.brulinski.sebastian.fragment.QrCodeLogin
+import cv.brulinski.sebastian.model.Auth
 import cv.brulinski.sebastian.utils.*
 import cv.brulinski.sebastian.view.LargeSnackbar
 import inflate
@@ -36,6 +37,11 @@ class SplashActivity : AppCompatActivity(),
     private var loginFragment: LoginFragment? = null
     //Camera permission request code
     private val CAMERA_REQUEST_CODE = 0
+
+    companion object {
+        //Qr code auth activity result code
+        const val QR_CODE_AUTH = 1
+    }
 
     /*
     Public methods
@@ -85,8 +91,8 @@ class SplashActivity : AppCompatActivity(),
                 CAMERA_REQUEST_CODE)
     }
 
-    private fun startQrCodeLogin() {
-        startActivity(Intent(this, QrCodeLoginActivity::class.java))
+    private fun startQrCodeAuthActivity() {
+        startActivityForResult(Intent(this, QrCodeAuthActivity::class.java), QR_CODE_AUTH)
     }
 
     private fun makeCameraExplanation() {
@@ -139,7 +145,7 @@ class SplashActivity : AppCompatActivity(),
             requestForCameraPermission()
         } else {
             //Permission granted
-            startQrCodeLogin()
+            startQrCodeAuthActivity()
         }
     }
 
@@ -148,12 +154,22 @@ class SplashActivity : AppCompatActivity(),
             CAMERA_REQUEST_CODE -> {
                 // If request is cancelled, the result arrays are empty.
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    startQrCodeLogin()
+                    startQrCodeAuthActivity()
                 } else {
                     if (!shouldRequestRationale(Manifest.permission.CAMERA))
                         makeCameraExplanation()
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
+                }
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        when (requestCode) {
+            QR_CODE_AUTH -> {
+                data?.getParcelableExtra<Auth>(QrCodeAuthActivity.AUTH)?.also { auth ->
+                    loginFragment?.login(auth)
                 }
             }
         }

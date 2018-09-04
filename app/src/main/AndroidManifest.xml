@@ -84,7 +84,7 @@
         </service>
 
         <activity
-            android:name=".activity.QrCodeLoginActivity"
+            android:name=".activity.QrCodeAuthActivity"
             android:launchMode="singleTop"
             android:resizeableActivity="false"
             android:screenOrientation="portrait"

@@ -1,42 +1,65 @@
 package cv.brulinski.sebastian.utils.camera
 
-import android.graphics.Bitmap
-import com.google.firebase.ml.vision.FirebaseVision
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetectorOptions
-import com.google.firebase.ml.vision.common.FirebaseVisionImage
+import android.util.SparseArray
+import com.google.android.gms.vision.CameraSource
+import com.google.android.gms.vision.Detector
+import com.google.android.gms.vision.barcode.Barcode
+import com.google.android.gms.vision.barcode.BarcodeDetector
 import cv.brulinski.sebastian.model.Auth
-import cv.brulinski.sebastian.utils.log
+import cv.brulinski.sebastian.utils.ctx
 
 
-class QrCodeScanner {
+class QrCodeScanner(private val onAuthDecoded: OnAuthDecoded? = null) {
 
-    private var options = FirebaseVisionBarcodeDetectorOptions.Builder()
-            .setBarcodeFormats(
-                    FirebaseVisionBarcode.FORMAT_QR_CODE,
-                    FirebaseVisionBarcode.FORMAT_AZTEC)
-            .build()
+    private var cameraSource: CameraSource? = null
+    private var barcodeDetector: BarcodeDetector? = null
 
+    private fun getBarcodeDetector(): BarcodeDetector? {
+        if (barcodeDetector == null)
+            barcodeDetector = BarcodeDetector.Builder(ctx)
+                    .setBarcodeFormats(Barcode.QR_CODE).build()
 
-    fun recognizeCredentials(bitmap: Bitmap?, auth: (Auth?) -> Unit) {
-        if (bitmap != null) {
-            val image = FirebaseVisionImage.fromBitmap(bitmap)
+        return barcodeDetector
+    }
 
-            val detector = FirebaseVision.getInstance()
-                    .getVisionBarcodeDetector(options)
+    fun <C> ConvertToList(sparseArray: SparseArray<C>?): List<C>? {
+        if (sparseArray == null) return null
+        val arrayList = ArrayList<C>(sparseArray.size())
 
-            detector.detectInImage(image)
-                    .addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            if (task.result.isNotEmpty()) {
-                                val value = task.result[0].displayValue
-                                "qr".log("value: $value")
+        for (i in 0 until sparseArray.size())
+            arrayList.add(sparseArray.valueAt(i))
+        return arrayList
+    }
+
+    fun getCameraSource(): CameraSource? {
+        if (cameraSource == null) {
+
+            getBarcodeDetector()?.setProcessor(object : Detector.Processor<Barcode> {
+                override fun receiveDetections(detector: Detector.Detections<Barcode>?) {
+                    val detectedItems = detector?.detectedItems
+                    val barcodeSize = detectedItems?.size() ?: 0
+                    if (barcodeSize != 0) {
+                        ConvertToList(detectedItems)?.filter { it.rawValue.isNotBlank() }?.forEach {
+                            it.displayValue.split("#").apply {
+                                if (this.size == 2) {
+                                    val auth = Auth(get(0), get(1))
+                                    onAuthDecoded?.authDecoded(auth)
+                                }
                             }
-                        } else {
-                            auth(null)
                         }
                     }
+                }
+
+                override fun release() {
+                }
+            })
+
+            cameraSource = CameraSource.Builder(ctx, barcodeDetector)
+                    .setRequestedFps(24f)
+                    .setAutoFocusEnabled(true)
+                    .build()
 
         }
+        return cameraSource
     }
 }

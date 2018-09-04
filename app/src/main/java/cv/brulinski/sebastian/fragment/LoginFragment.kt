@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.google.firebase.auth.FirebaseAuth
 import cv.brulinski.sebastian.R
+import cv.brulinski.sebastian.model.Auth
 import cv.brulinski.sebastian.utils.snack
 import cv.brulinski.sebastian.utils.string
 import kotlinx.android.synthetic.main.fragment_login.*
@@ -30,8 +31,9 @@ class LoginFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         view.loginButton.setOnClickListener {
-            if (!emailEditText.text.isNullOrEmpty() && !passwordEditText.text.isNullOrEmpty())
-                login()
+            val auth = Auth("${emailEditText.text}", "${passwordEditText.text}")
+            if (auth.valid())
+                login(auth)
         }
 
         view.qrLoginButton.setOnClickListener {
@@ -47,12 +49,8 @@ class LoginFragment : Fragment() {
 
     fun getRootView() = view?.loginScreenContainer
 
-    /*
-    Private methods
-     */
-
-    private fun login() {
-        FirebaseAuth.getInstance().signInWithEmailAndPassword("${emailEditText.text}", "${passwordEditText.text}")
+    fun login(auth: Auth) {
+        FirebaseAuth.getInstance().signInWithEmailAndPassword(auth.email, auth.password)
                 .addOnCompleteListener {
                     if (it.isSuccessful) {
                         activity?.also { activity ->
@@ -66,6 +64,11 @@ class LoginFragment : Fragment() {
                     }
                 }
     }
+
+    /*
+    Private methods
+     */
+
 
     /*
     Override methods
