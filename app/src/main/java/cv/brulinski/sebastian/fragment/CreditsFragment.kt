@@ -10,13 +10,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import cv.brulinski.sebastian.R
+import cv.brulinski.sebastian.activity.MainActivity
 import cv.brulinski.sebastian.adapter.recycler.credits.CreditsRecyclerAdapter
 import cv.brulinski.sebastian.interfaces.OnItemClickListener
 import cv.brulinski.sebastian.interfaces.ParentActivityCallback
 import cv.brulinski.sebastian.model.Credit
 import cv.brulinski.sebastian.model.MyRecyclerItem
 import cv.brulinski.sebastian.utils.TYPE_ITEM
+import cv.brulinski.sebastian.utils.openUrl
 import cv.brulinski.sebastian.utils.string
+import kotlinx.android.synthetic.main.fragment_credits.*
 import kotlinx.android.synthetic.main.fragment_credits.view.*
 import kotlinx.android.synthetic.main.my_toolbar.view.*
 import setup
@@ -54,6 +57,8 @@ class CreditsFragment : Fragment(), OnItemClickListener, SwipeRefreshLayout.OnRe
             view.creditsRecyclerView.setup(this, true)
         }
 
+        //Get credits
+        showLoading()
         parentActivityCallback?.getCredits { listOfCredit ->
             updateUi(listOfCredit)
         }
@@ -66,10 +71,18 @@ class CreditsFragment : Fragment(), OnItemClickListener, SwipeRefreshLayout.OnRe
     Private methods
      */
     private fun updateUi(list: List<Credit>?) {
-        view?.swipeRefreshLayout?.isRefreshing = false
         list?.also { _ ->
             creditsRecyclerAdapter?.items = list.map { MyRecyclerItem(it, TYPE_ITEM) }
         }
+        hideLoading()
+    }
+
+    private fun showLoading() {
+        swipeRefreshLayout.isRefreshing = true
+    }
+
+    private fun hideLoading() {
+        swipeRefreshLayout.isRefreshing = false
     }
 
     /*
@@ -77,7 +90,8 @@ class CreditsFragment : Fragment(), OnItemClickListener, SwipeRefreshLayout.OnRe
     */
 
     override fun onClick(item: Any, position: Int, v: View) {
-
+        parentActivityCallback?.showLoading()
+        (item as? String)?.openUrl(activity, requestCode = MainActivity.OPEN_URL_REQUEST_CODE)
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {

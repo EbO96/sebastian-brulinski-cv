@@ -392,7 +392,7 @@ class MainActivity : AppCompatActivity(),
                 putExtra(MyLocationActivity.LAT, lat)
                 putExtra(MyLocationActivity.LNG, lng)
                 startActivityForResult(this, OPEN_MY_LOCATION_ACTIVITY_REQUEST_CODE)
-                loadingLayout.visible()
+                showLoading()
             }
     }
 
@@ -438,7 +438,7 @@ class MainActivity : AppCompatActivity(),
                 putExtra(Intent.EXTRA_EMAIL, email)
                 putExtra(Intent.EXTRA_SUBJECT, getString(R.string.email_subject))
                 resolveActivity(packageManager)?.let {
-                    loadingLayout.visible()
+                    showLoading()
                     startActivityForResult(this, APP_SETTINGS_REQUEST_CODE)
                 } ?: kotlin.run {
                     //No email app found
@@ -490,7 +490,7 @@ class MainActivity : AppCompatActivity(),
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             APP_SETTINGS_REQUEST_CODE, OPEN_URL_REQUEST_CODE, OPEN_MY_LOCATION_ACTIVITY_REQUEST_CODE -> {
-                loadingLayout.gone()
+                hideLoading()
             }
         }
     }

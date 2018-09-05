@@ -1,5 +1,6 @@
 package cv.brulinski.sebastian.adapter.recycler.view_holder.credit_view_holder
 
+import android.graphics.Paint
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import cv.brulinski.sebastian.interfaces.OnBindViewInViewHolder
@@ -15,7 +16,13 @@ class CreditItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), 
             (item.item as? Credit)?.also { credit ->
                 authorFirstLetterTextView.text = credit.author
                 authorTextView.text = credit.author
-                authorUrlTextView.text = credit.authorUrl
+                authorUrlTextView.apply {
+                    text = credit.authorUrl
+                    paintFlags = paintFlags or Paint.UNDERLINE_TEXT_FLAG
+                    setOnClickListener {
+                        onItemClickListener?.onClick(credit.authorUrl, 0, it)
+                    }
+                }
             }
         }
     }
