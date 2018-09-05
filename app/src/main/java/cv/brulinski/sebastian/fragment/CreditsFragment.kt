@@ -23,6 +23,7 @@ import kotlinx.android.synthetic.main.fragment_credits.*
 import kotlinx.android.synthetic.main.fragment_credits.view.*
 import kotlinx.android.synthetic.main.my_toolbar.view.*
 import setup
+import showLoading
 
 /**
  * Fragment to display credits
@@ -90,7 +91,7 @@ class CreditsFragment : Fragment(), OnItemClickListener, SwipeRefreshLayout.OnRe
     */
 
     override fun onClick(item: Any, position: Int, v: View) {
-        parentActivityCallback?.showLoading()
+        activity?.showLoading()
         (item as? String)?.openUrl(activity, requestCode = MainActivity.OPEN_URL_REQUEST_CODE)
     }
 

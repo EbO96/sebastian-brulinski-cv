@@ -1,3 +1,4 @@
+import android.app.Activity
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -32,18 +33,26 @@ infix fun ViewGroup.inflateViewHolderView(resLayout: Int) =
 fun Int.inflate(context: Context? = null) =
         LayoutInflater.from(context ?: ctx).inflate(this, null, false)
 
-fun AppCompatActivity.androidContainer() = findViewById<ViewGroup>(android.R.id.content)
+fun Activity.androidContainer() = findViewById<ViewGroup>(android.R.id.content)
 
-fun AppCompatActivity.addToAndroidContainer(view: View?) {
+fun Activity.addToAndroidContainer(view: View?) {
     view?.also {
         androidContainer().addView(view)
     }
 }
 
-fun AppCompatActivity.removeFromAndroidContainer(view: View?) {
+fun Activity.removeFromAndroidContainer(view: View?) {
     view?.also {
         androidContainer().removeView(view)
     }
+}
+
+fun Activity.showLoading() {
+    addToAndroidContainer(loadingLayout)
+}
+
+fun Activity.hideLoading() {
+    removeFromAndroidContainer(loadingLayout)
 }
 
 fun RecyclerView.setup(adapter: RecyclerView.Adapter<RecyclerView.ViewHolder>, divider: Boolean = false) {
@@ -125,9 +134,6 @@ fun AppCompatActivity.dialog(dialogConfig: DialogConfig, action: (Boolean) -> Un
                     .create()
         }
 
-
-enum class SlideDirection {
-    UP,
-    DOWN
+private val loadingLayout by lazy {
+    R.layout.loading_layout.inflate()
 }
-

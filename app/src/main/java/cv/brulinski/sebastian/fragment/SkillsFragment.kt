@@ -16,9 +16,9 @@ import cv.brulinski.sebastian.model.Skill
 import cv.brulinski.sebastian.utils.getBitmapsForObjects
 import cv.brulinski.sebastian.utils.openUrl
 import gone
-import kotlinx.android.synthetic.main.fragment_skills.*
 import kotlinx.android.synthetic.main.fragment_skills.view.*
 import setup
+import showLoading
 import visible
 
 /**
@@ -59,7 +59,7 @@ class SkillsFragment : Fragment() {
             override fun onClick(item: Any, position: Int, v: View) {
                 if (v.id == R.id.moreFooter) {
                     (item as? Skill)?.apply {
-                        parentActivityCallback?.showLoading()
+                        activity?.showLoading()
                         moreUrl.openUrl(activity, MainActivity.OPEN_URL_REQUEST_CODE)
                     }
                 }

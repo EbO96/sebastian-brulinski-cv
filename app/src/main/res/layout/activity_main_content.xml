@@ -61,25 +61,5 @@
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-    <FrameLayout
-        android:id="@+id/loadingLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clickable="true"
-        android:focusable="true"
-        android:foregroundTintMode="src_over"
-        android:visibility="gone">
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/colorPrimaryAlpha" />
-
-        <ProgressBar
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:layout_gravity="center_vertical|center_horizontal" />
-
-    </FrameLayout>
 </FrameLayout>
 

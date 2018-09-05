@@ -11,8 +11,10 @@ import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.model.Auth
 import cv.brulinski.sebastian.utils.snack
 import cv.brulinski.sebastian.utils.string
+import hideLoading
 import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.android.synthetic.main.fragment_login.view.*
+import showLoading
 
 /**
  * Class to handle login user to firebase
@@ -50,8 +52,10 @@ class LoginFragment : Fragment() {
     fun getRootView() = view?.loginScreenContainer
 
     fun login(auth: Auth) {
+        activity?.showLoading()
         FirebaseAuth.getInstance().signInWithEmailAndPassword(auth.email, auth.password)
                 .addOnCompleteListener {
+                    activity?.hideLoading()
                     if (it.isSuccessful) {
                         activity?.also { activity ->
                             R.string.login_successful.string().snack(activity) {

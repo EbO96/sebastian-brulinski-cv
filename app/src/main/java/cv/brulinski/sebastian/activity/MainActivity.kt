@@ -37,10 +37,10 @@ import cv.brulinski.sebastian.view.LargeSnackbar
 import cv.brulinski.sebastian.view.SlideDrawer
 import cv.brulinski.sebastian.view_model.MainViewModel
 import dialog
-import gone
+import hideLoading
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
-import visible
+import showLoading
 
 class MainActivity : AppCompatActivity(),
         Toolbar.OnMenuItemClickListener,
@@ -317,10 +317,6 @@ class MainActivity : AppCompatActivity(),
     override fun goToPage(page: Page) {
         viewPager.toPage(pageMap[page])
     }
-
-    override fun showLoading() = loadingLayout.visible()
-
-    override fun hideLoading() = loadingLayout.gone()
 
     override fun changeFabPosition(position: Int) {
         bar.fabAlignmentMode = position

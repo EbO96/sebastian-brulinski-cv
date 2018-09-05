@@ -23,8 +23,6 @@ interface ParentActivityCallback {
     fun refreshCredits(block: (List<Credit>?) -> Unit)
     fun tryMakeACall()
     fun composeEmail()
-    fun showLoading()
-    fun hideLoading()
     fun changeFabPosition(position: Int)
     fun goToPage(page: Page)
     fun registerForCvNotifications(register: Boolean, status: (Int) -> Unit)
