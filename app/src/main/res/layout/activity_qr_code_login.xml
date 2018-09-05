@@ -11,8 +11,9 @@
         android:layout_height="match_parent"
         android:adjustViewBounds="true" />
 
-    <!--<cv.brulinski.sebastian.utils.camera.QrGraphicOverlay-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent" />-->
+    <cv.brulinski.sebastian.utils.camera.QrGraphicOverlay
+        android:id="@+id/graphicOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </FrameLayout>

@@ -40,6 +40,7 @@ class QrCodeScanner(private val onAuthDecoded: OnAuthDecoded? = null) {
                     val barcodeSize = detectedItems?.size() ?: 0
                     if (barcodeSize != 0) {
                         ConvertToList(detectedItems)?.filter { it.rawValue.isNotBlank() }?.forEach {
+                            onAuthDecoded?.onQrDetected(it.boundingBox)
                             it.displayValue.split("#").apply {
                                 if (this.size == 2) {
                                     val auth = Auth(get(0), get(1))

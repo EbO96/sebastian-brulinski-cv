@@ -1,8 +1,8 @@
 package cv.brulinski.sebastian.activity
 
 import android.content.Intent
+import android.graphics.Rect
 import android.os.Bundle
-import android.util.Log
 import android.view.SurfaceHolder
 import androidx.appcompat.app.AppCompatActivity
 import cv.brulinski.sebastian.R
@@ -37,6 +37,10 @@ class QrCodeAuthActivity : AppCompatActivity(), OnAuthDecoded,
 
     override fun surfaceCreated(holder: SurfaceHolder?) {
         qrCodeScanner.getCameraSource()?.start(surfaceView.holder)
+    }
+
+    override fun onQrDetected(rect: Rect) {
+        graphicOverlay?.drawRectangle(rect)
     }
 
     override fun authDecoded(auth: Auth) {
