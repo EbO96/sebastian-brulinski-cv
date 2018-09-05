@@ -194,7 +194,8 @@ class MainActivity : AppCompatActivity(),
     private fun viewPagerPageListener() = object : ViewPager.OnPageChangeListener {
         override fun onPageScrollStateChanged(state: Int) {
             if (state == ViewPager.SCROLL_STATE_IDLE) {
-                if (viewPager.currentItem in 1..(mainActivityViewPagerAdapter?.count ?: 1)) {
+                if (viewPager.currentItem in 1..(mainActivityViewPagerAdapter?.count ?: 1)
+                        && viewPager.currentItem != 4) {
                     val currentState = bar.fabAlignmentMode
                     if (currentState != BottomAppBar.FAB_ALIGNMENT_MODE_END)
                         changeFabPosition(BottomAppBar.FAB_ALIGNMENT_MODE_END)
@@ -207,6 +208,8 @@ class MainActivity : AppCompatActivity(),
         }
 
         override fun onPageSelected(position: Int) {
+            //Update drawer menu UI
+            slideDrawer.updateMenu(position)
             when (position) {
                 pageMap[WELCOME_SCREEN] -> {
 

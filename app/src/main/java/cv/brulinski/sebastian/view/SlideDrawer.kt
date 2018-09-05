@@ -238,6 +238,37 @@ class SlideDrawer(context: Context?, attrs: AttributeSet?) : FrameLayout(context
         }
     }
 
+
+    fun getContentView() = contentView
+
+
+    fun setMenu(arrayList: ArrayList<DrawerMenuItem>, globalMenuTheme: GlobalMenuTheme? = null) {
+        setMenuItems(arrayList, globalMenuTheme)
+    }
+
+    fun setMenu(vararg drawerMenuItem: DrawerMenuItem, globalMenuTheme: GlobalMenuTheme? = null) {
+        setMenuItems(ArrayList(drawerMenuItem.asList()), globalMenuTheme)
+    }
+
+    fun setMenuItemClickListener(menuItemsClickListener: MenuItemsClickListener?) {
+        this.menuItemsClickListener = menuItemsClickListener
+    }
+
+    fun setDrawerTitle(title: String) {
+        theme.drawerTitle = title
+    }
+
+    fun updateMenu(position: Int) {
+        menuAdapter?.items?.withIndex()?.forEach {
+            it.value.selected = it.index == position
+        }
+        menuAdapter?.notifyDataSetChanged()
+    }
+
+    /*
+    Private methods
+    */
+
     private fun showCloseButton() {
         closeButtonScaleShowAnimator?.let {
             closeIcon?.startAnimation(it)
@@ -271,29 +302,6 @@ class SlideDrawer(context: Context?, attrs: AttributeSet?) : FrameLayout(context
                 start()
             }
     }
-
-    fun getContentView() = contentView
-
-
-    fun setMenu(arrayList: ArrayList<DrawerMenuItem>, globalMenuTheme: GlobalMenuTheme? = null) {
-        setMenuItems(arrayList, globalMenuTheme)
-    }
-
-    fun setMenu(vararg drawerMenuItem: DrawerMenuItem, globalMenuTheme: GlobalMenuTheme? = null) {
-        setMenuItems(ArrayList(drawerMenuItem.asList()), globalMenuTheme)
-    }
-
-    fun setMenuItemClickListener(menuItemsClickListener: MenuItemsClickListener?) {
-        this.menuItemsClickListener = menuItemsClickListener
-    }
-
-    fun setDrawerTitle(title: String) {
-        theme.drawerTitle = title
-    }
-
-    /*
-    Private methods
-     */
 
     private fun setMenuItems(items: ArrayList<DrawerMenuItem>, globalMenuTheme: GlobalMenuTheme?) {
         if (menuAdapter == null)
@@ -380,14 +388,15 @@ class SlideDrawer(context: Context?, attrs: AttributeSet?) : FrameLayout(context
     /*
     Menu list
      */
-    private inner class MenuAdapter(private val items: ArrayList<DrawerMenuItem>, private val globalMenuTheme: GlobalMenuTheme) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private inner class MenuAdapter(val items: ArrayList<DrawerMenuItem>, private val globalMenuTheme: GlobalMenuTheme) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         init {
             items.firstOrNull()?.selected = theme.selectableMenuItems == true
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-            return MenuItemHolder(viewCreator.createMenuItem())
+            val menuItemHolder = MenuItemHolder(viewCreator.createMenuItem())
+            return menuItemHolder
         }
 
         override fun getItemCount() = items.size
@@ -530,7 +539,6 @@ class SlideDrawer(context: Context?, attrs: AttributeSet?) : FrameLayout(context
      */
     inner class Theme {
         var drawerTitle = ""
-
             set(value) {
                 field = value
                 drawerTitleTextView?.text = value

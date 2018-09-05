@@ -18,7 +18,8 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:layout_marginBottom="16dp" />
 
         <cv.brulinski.sebastian.view.EmptyListLayout
             android:id="@+id/noLanguagesLayout"
