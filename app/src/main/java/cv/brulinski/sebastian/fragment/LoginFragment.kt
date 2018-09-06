@@ -5,10 +5,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import androidx.fragment.app.Fragment
 import com.google.firebase.auth.FirebaseAuth
 import cv.brulinski.sebastian.R
 import cv.brulinski.sebastian.model.Auth
+import cv.brulinski.sebastian.utils.hideKeyboard
 import cv.brulinski.sebastian.utils.snack
 import cv.brulinski.sebastian.utils.string
 import hideLoading
@@ -33,13 +35,21 @@ class LoginFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         view.loginButton.setOnClickListener {
-            val auth = Auth("${emailEditText.text}", "${passwordEditText.text}")
-            if (auth.valid())
-                login(auth)
+            tryLogin()
         }
 
         view.qrLoginButton.setOnClickListener {
             emailPasswordLogin?.tryQrLogin()
+        }
+
+        view.passwordEditText.setOnEditorActionListener { _, actionId, _ ->
+            when (actionId) {
+                EditorInfo.IME_ACTION_DONE -> {
+                    tryLogin()
+                    true
+                }
+                else -> false
+            }
         }
     }
 
@@ -53,6 +63,7 @@ class LoginFragment : Fragment() {
 
     fun login(auth: Auth) {
         activity?.showLoading()
+        activity?.hideKeyboard()
         FirebaseAuth.getInstance().signInWithEmailAndPassword(auth.email, auth.password)
                 .addOnCompleteListener {
                     activity?.hideLoading()
@@ -73,6 +84,14 @@ class LoginFragment : Fragment() {
     Private methods
      */
 
+    /**
+     * Get email and password from editTexts and try to login
+     */
+    private fun tryLogin() {
+        val auth = Auth("${emailEditText.text}", "${passwordEditText.text}")
+        if (auth.valid())
+            login(auth)
+    }
 
     /*
     Override methods
