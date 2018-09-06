@@ -2,6 +2,11 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android"
     android:opacity="opaque">
 
-    <item android:drawable="@color/colorPrimary" />
+    <item android:drawable="@color/colorAccent" />
+    <item>
+        <bitmap
+            android:gravity="center"
+            android:src="@drawable/cv" />
+    </item>
 
 </layer-list>
