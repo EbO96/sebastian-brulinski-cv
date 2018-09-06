@@ -191,20 +191,21 @@ class SlideDrawer(context: Context?, attrs: AttributeSet?) : FrameLayout(context
     fun open() {
         if (!cfg.isOpen) {
             contentView?.apply {
-                if (openAnimationX == null || openAnimationY == null) {
-                    if (openAnimationX == null)
-                        openAnimationX = ObjectAnimator.ofFloat(contentWrapper, "translationX", 0f, cfg.screenWidth)
-                    if (openAnimationY == null)
-                        openAnimationY = ObjectAnimator.ofFloat(contentWrapper, "translationY", 0f, cfg.screenHeight)
-                }
-                animSetOpen.apply {
-                    end()
-                    interpolator = LinearInterpolator()
-                    duration = cfg.duration
-                    playTogether(openAnimationX, openAnimationY)
-                    start()
-                    showCloseButton()
-                    showMenuList()
+                openAnimationX = ObjectAnimator.ofFloat(contentWrapper, "translationX", 0f, cfg.screenWidth)
+                openAnimationY = ObjectAnimator.ofFloat(contentWrapper, "translationY", 0f, cfg.screenHeight)
+
+                AnimatorSet().apply {
+                    try {
+                        end()
+                        interpolator = LinearInterpolator()
+                        duration = cfg.duration
+                        playTogether(openAnimationX, openAnimationY)
+                        start()
+                        showCloseButton()
+                        showMenuList()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                 }
 
                 cfg.isOpen = true
@@ -215,24 +216,25 @@ class SlideDrawer(context: Context?, attrs: AttributeSet?) : FrameLayout(context
     fun close(end: (() -> Unit)? = null) {
         if (cfg.isOpen) {
             contentView?.apply {
-                if (closeAnimationX == null || closeAnimationY == null) {
-                    if (closeAnimationX == null)
-                        closeAnimationX = ObjectAnimator.ofFloat(contentWrapper, "translationX", cfg.screenWidth, 0f)
-                    if (closeAnimationY == null)
-                        closeAnimationY = ObjectAnimator.ofFloat(contentWrapper, "translationY", cfg.screenHeight, 0f)
+
+                closeAnimationX = ObjectAnimator.ofFloat(contentWrapper, "translationX", cfg.screenWidth, 0f)
+                closeAnimationY = ObjectAnimator.ofFloat(contentWrapper, "translationY", cfg.screenHeight, 0f)
+
+                with(AnimatorSet()) {
+                    apply {
+                        end()
+                        interpolator = LinearInterpolator()
+                        duration = cfg.duration
+                        playTogether(closeAnimationX, closeAnimationY)
+                        start()
+                        hideCloseButton()
+                        hideMenuList()
+                    }
+                    endAnimationListener {
+                        end?.let { it1 -> it1() }
+                    }
                 }
-                animSetClose.apply {
-                    end()
-                    interpolator = LinearInterpolator()
-                    duration = cfg.duration
-                    playTogether(closeAnimationX, closeAnimationY)
-                    start()
-                    hideCloseButton()
-                    hideMenuList()
-                }
-                animSetClose.endAnimationListener {
-                    end?.let { it1 -> it1() }
-                }
+
                 cfg.isOpen = false
             }
         }
