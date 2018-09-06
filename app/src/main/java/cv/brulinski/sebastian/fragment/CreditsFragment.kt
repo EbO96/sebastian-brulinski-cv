@@ -79,11 +79,11 @@ class CreditsFragment : Fragment(), OnItemClickListener, SwipeRefreshLayout.OnRe
     }
 
     private fun showLoading() {
-        swipeRefreshLayout.isRefreshing = true
+        swipeRefreshLayout?.isRefreshing = true
     }
 
     private fun hideLoading() {
-        swipeRefreshLayout.isRefreshing = false
+        swipeRefreshLayout?.isRefreshing = false
     }
 
     /*

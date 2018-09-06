@@ -246,12 +246,11 @@ class MainActivity : AppCompatActivity(),
     private fun makeACall() {
         val phone = pagesComponent.getPersonalInfoScreen().getPersonalInfo()?.phoneNumber
         if (phone != null)
-            getPersonalInfo {
-                Intent(Intent.ACTION_CALL).apply {
-                    data = Uri.parse("tel:$phone")
-                    startActivity(this)
-                }
+            Intent(Intent.ACTION_CALL).apply {
+                data = Uri.parse("tel:$phone")
+                startActivity(this)
             }
+
     }
 
     private fun makeRequestForCallPermission() {
