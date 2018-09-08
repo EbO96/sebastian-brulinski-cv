@@ -27,11 +27,11 @@ open class LocalRepository(private val appRepository: AppRepository) {
             try {
                 fetch().apply {
                     var obs: Observer<Any>? = null
-                    val observer = Observer<Any> {
-                        it?.let { emitter.onNext(it) }
+                    val observer = Observer<Any> { any ->
+                        any?.also { emitter.onNext(any) }
                         emitter.onComplete()
-                        obs?.let {
-                            removeObserver(it)
+                        obs?.also { observer ->
+                            removeObserver(observer)
                         }
                     }
                     obs = observer
@@ -153,5 +153,38 @@ open class LocalRepository(private val appRepository: AppRepository) {
                 }, {
                     empty(EMPTY)
                 })
+    }
+
+    /**
+     * Get personal data processing object from local SQL database
+     * @see PersonalDataProcessing
+     */
+    fun getPersonalDataProcessing(result: (PersonalDataProcessing?) -> Unit) {
+
+        val observable = fetchFromDatabase {
+            database.getPersonalDataProcessing()
+        }
+
+        var personalDataProcessing: PersonalDataProcessing? = null
+        observable
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnComplete {
+                    result(personalDataProcessing)
+                }
+                .subscribe({
+                    personalDataProcessing = it as? PersonalDataProcessing
+                }, {
+                    result(null)
+                })
+    }
+
+    /**
+     * Update personal data processing in local databse
+     */
+    fun updatePersonalDataProcessing(personalDataProcessing: PersonalDataProcessing) {
+        doAsync {
+            database.insertPersonalDataProcessing(personalDataProcessing)
+        }
     }
 }

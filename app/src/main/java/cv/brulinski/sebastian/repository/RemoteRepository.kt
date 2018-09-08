@@ -250,4 +250,19 @@ class RemoteRepository(private val appRepository: AppRepository) {
                     credits(null)
                 })
     }
+
+    /**
+     * Get personal data processing clause from remote server
+     * @see PersonalDataProcessing
+     */
+    fun getPersonalDataProcessing(result: (PersonalDataProcessing?) -> Unit) {
+        retrofit.getPersonalDataProcessing()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    result(it)
+                }, {
+                    result(null)
+                })
+    }
 }

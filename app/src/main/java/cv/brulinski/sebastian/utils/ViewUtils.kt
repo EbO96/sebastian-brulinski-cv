@@ -131,6 +131,7 @@ fun AppCompatActivity.dialog(dialogConfig: DialogConfig, action: (Boolean) -> Un
                     .setNegativeButton(negative) { _, _ ->
                         action(false)
                     }
+                    .setCancelable(dialogConfig.cancelable)
                     .create()
         }
 

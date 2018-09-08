@@ -59,4 +59,6 @@
     <string name="explanation_no_email_app">Brak klienta poczty e-mail.</string>
     <string name="explanation_camera">Aby zeskanować kod QR wymagany do logowania musisz pozwolić na dostęp do kamery</string>
     <string name="qr">QR</string>
+    <string name="personal_data_processing">Przetwaranie danych osobowych</string>
+    <string name="dont_show_again">Nie pokazuj więcej</string>
 </resources>

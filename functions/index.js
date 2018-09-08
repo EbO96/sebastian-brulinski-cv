@@ -8,6 +8,7 @@ const cors = require('cors')({ origin: true });
 const app = express();
 const app1 = express();
 const app2 = express();
+const app3 = express();
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
@@ -226,6 +227,18 @@ const getCredits = functions.https.onRequest((request, response) => {
         })
 })
 
+const getPersonalDataProcessing = functions.https.onRequest((request, response) => {
+
+    return firestore.collection('personal_data_processing').get()
+        .then((snapshot) => {
+            snapshot.forEach( doc => {
+                response.status(200).send(doc.data())
+            })
+        }).catch((error) => {
+            response.status(400).send(null)
+        })
+})
+
 function validateToken(token) {
 
     return new Promise((resolve, reject) => {
@@ -264,7 +277,7 @@ const validateFirebaseIdToken = (req, res, next) => {
         console.log('Found "Authorization" header');
         // Read the ID Token from the Authorization header.
         idToken = req.headers.authorization.split('Bearer ')[1];
-    } else if (req.cookies) { 
+    } else if (req.cookies) {
         console.log('Found "__session" cookie');
         // Read the ID Token from cookie.
         idToken = req.cookies.__session;
@@ -298,9 +311,15 @@ app2.use(cookieParser);
 app2.use(validateFirebaseIdToken);
 app2.use(notifyAboutNewCv);
 
+app3.use(cors);
+app3.use(cookieParser);
+app3.use(validateFirebaseIdToken);
+app3.use(getPersonalDataProcessing);
+
 // This HTTPS endpoint can only be accessed by your Firebase Users.
 // Requests need to be authorized by providing an `Authorization` HTTP header
 // with value `Bearer <Firebase ID Token>`.
 exports.app = functions.https.onRequest(app);
 exports.app1 = functions.https.onRequest(app1);
 exports.app2 = functions.https.onRequest(app2);
+exports.app3 = functions.https.onRequest(app3)

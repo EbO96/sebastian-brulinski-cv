@@ -158,7 +158,35 @@ class MainActivity : AppCompatActivity(),
         //Init ViewModel
         mainViewModel = MainViewModel(this, this)
 
+        tryToShowPersonalDataProcessing()
     }
+
+    /**
+     * Show dialog with personal data processing message
+     */
+    private fun tryToShowPersonalDataProcessing() {
+        mainViewModel?.apply {
+            getPersonalDataProcessing { personalDataProcessing ->
+                personalDataProcessing?.let { _ ->
+                    if (personalDataProcessing.showAgain) {
+                        dialog(getPersonalDataProcessingDialogConfig(personalDataProcessing.message)) { actionPositive ->
+                            if (!actionPositive) {
+                                //Don't show dialog again
+                                personalDataProcessing.showAgain = false
+                                updatePersonalDataProcessing(personalDataProcessing)
+                            }
+                        }.show()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun getPersonalDataProcessingDialogConfig(message: String) = DialogConfig(R.string.personal_data_processing.string(),
+            message,
+            android.R.string.ok.string(),
+            R.string.dont_show_again.string(),
+            false)
 
     /*
     Public methods

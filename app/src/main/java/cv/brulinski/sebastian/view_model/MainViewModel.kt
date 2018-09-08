@@ -83,7 +83,15 @@ class MainViewModel<T : RemoteRepository> constructor(private val activity: AppC
         }
     }
 
-    fun refreshCredits(credits: (List<Credit>?) -> Unit){
+    fun getPersonalDataProcessing(result: (PersonalDataProcessing?) -> Unit) {
+        repository.getPersonalDataProcessing(result)
+    }
+
+    fun updatePersonalDataProcessing(personalDataProcessing: PersonalDataProcessing) {
+        repository.updatePersonalDataProcessing(personalDataProcessing)
+    }
+
+    fun refreshCredits(credits: (List<Credit>?) -> Unit) {
         repository.refreshCredits(credits)
     }
 

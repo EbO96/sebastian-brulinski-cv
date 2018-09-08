@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.annotation.Keep
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -26,6 +27,7 @@ import removeFromAndroidContainer
  * This is Splash screen. This screen decides where to go. MainActivity or LoginFragment
  * when user is not authorized yet
  */
+@Keep
 class SplashActivity : AppCompatActivity(),
         EmailPasswordLogin,
         QrCodeLogin {
@@ -48,7 +50,7 @@ class SplashActivity : AppCompatActivity(),
      */
 
 
-    /*
+    /*adb
     Private methods
      */
 

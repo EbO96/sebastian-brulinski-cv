@@ -30,6 +30,9 @@ interface MainDatabaseDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertCareer(career: List<Career>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertPersonalDataProcessing(personalDataProcessing: PersonalDataProcessing)
+
     //Delete
     @Query("DELETE FROM Welcome")
     fun deleteWelcome()
@@ -68,5 +71,8 @@ interface MainDatabaseDao {
 
     @Query("SELECT * FROM Credit")
     fun getCredits(): LiveData<List<Credit>>
+
+    @Query("SELECT * FROM PersonalDataProcessing")
+    fun getPersonalDataProcessing(): LiveData<PersonalDataProcessing>
 
 }

@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import cv.brulinski.sebastian.interfaces.RemoteRepository
 import cv.brulinski.sebastian.model.Credit
 import cv.brulinski.sebastian.model.MyCv
+import cv.brulinski.sebastian.model.PersonalDataProcessing
 import cv.brulinski.sebastian.utils.database
 import cv.brulinski.sebastian.utils.doAsync
 
@@ -41,6 +42,25 @@ class MainRepository<T : RemoteRepository>(private val listener: T?) : AppReposi
             fetchCreditsFromRemote()
         })
         return credits
+    }
+
+    fun getPersonalDataProcessing(result: (PersonalDataProcessing?) -> Unit) {
+        localRepository.getPersonalDataProcessing { personalDataProcessing ->
+            if (personalDataProcessing == null)
+                remoteRepository.getPersonalDataProcessing { personalDataProcessing ->
+                    personalDataProcessing?.also {
+                        doAsync {
+                            database.insertPersonalDataProcessing(personalDataProcessing)
+                        }
+                    }
+                    result(personalDataProcessing)
+                }
+            else result(personalDataProcessing)
+        }
+    }
+
+    fun updatePersonalDataProcessing(personalDataProcessing: PersonalDataProcessing) {
+        localRepository.updatePersonalDataProcessing(personalDataProcessing)
     }
 
     fun refreshCredits(credits: (List<Credit>?) -> Unit) {
